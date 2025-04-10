@@ -1,0 +1,26 @@
+# Fichiers de configuration
+tsconfig.json
+tailwind.config.js
+rundocker.sh
+postcss.config.js
+package.json
+package-lock.json
+Dockerfile
+docker-compose.yml
+.eslintrc.js
+
+# Dossier de build
+dist/
+
+# Dossier de configuration de l'IDE
+.cursor/
+
+# Dossier source
+src/
+
+# Dossier spécifique
+Jeroka/
+
+# Fichiers spécifiques
+-i
+digitalisation-entreprise.jpg
