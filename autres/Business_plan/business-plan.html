@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeroka Xperience - Business Plan</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0ea5e9;
+            --secondary-color: #d946ef;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --text-color: #374151;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .header-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: center;
+            padding: 15px 0;
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+        }
+
+        .nav-item a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item a:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Sections */
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #6b7280;
+            margin-bottom: 60px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .card-icon.primary { background: rgba(14, 165, 233, 0.1); color: var(--primary-color); }
+        .card-icon.success { background: rgba(34, 197, 94, 0.1); color: var(--success-color); }
+        .card-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+        .card-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .card-description {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateX(5px);
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-color);
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .pricing-card.featured {
+            border: 2px solid var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured::before {
+            content: 'Recommandé';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .pricing-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .pricing-period {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .pricing-features li {
+            padding: 8px 0;
+            color: #6b7280;
+        }
+
+        .pricing-features li i {
+            color: var(--success-color);
+            margin-right: 10px;
+        }
+
+        .pricing-button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-button.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .pricing-button.primary:hover {
+            background: #0284c7;
+        }
+
+        .pricing-button.secondary {
+            background: #f3f4f6;
+            color: var(--text-color);
+        }
+
+        .pricing-button.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            margin-top: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--primary-color);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            width: 45%;
+            position: relative;
+        }
+
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border: 10px solid transparent;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content::before {
+            right: -20px;
+            border-left-color: white;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content::before {
+            left: -20px;
+            border-right-color: white;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: var(--shadow);
+        }
+
+        .timeline-date {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .timeline-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .footer-section p, .footer-section li {
+            color: #9ca3af;
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding-top: 30px;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-list {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                flex-direction: column !important;
+                padding-left: 50px;
+            }
+
+            .timeline-content {
+                width: 100%;
+            }
+
+            .timeline-content::before {
+                display: none;
+            }
+
+            .timeline-dot {
+                left: 20px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Print Styles */
+        @media print {
+            .nav, .footer {
+                display: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🏢 Jeroka Xperience</h1>
+                <p class="tagline">L'IA qui transforme votre PME en entreprise digitale performante</p>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">1.2M</div>
+                        <div class="stat-label">PME/TPE en France</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">60%</div>
+                        <div class="stat-label">Réduction des coûts IT</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">+150%</div>
+                        <div class="stat-label">Gain de productivité</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">48h</div>
+                        <div class="stat-label">Digitalisation complète</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="#vision">Vision</a></li>
+                    <li class="nav-item"><a href="#marche">Marché</a></li>
+                    <li class="nav-item"><a href="#produits">Produits</a></li>
+                    <li class="nav-item"><a href="#finance">Finance</a></li>
+                    <li class="nav-item"><a href="#equipe">Équipe</a></li>
+                    <li class="nav-item"><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Vision Section -->
+    <section id="vision" class="section">
+        <div class="container">
+            <h2 class="section-title">Notre Vision</h2>
+            <p class="section-subtitle">Devenir la référence française de l'automatisation intelligente pour les PME/TPE</p>
+            
+            <div class="cards-grid">
+                <div class="card fade-in-up">
+                    <div class="card-icon primary">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="card-title">Mission</h3>
+                    <p class="card-description">Démocratiser l'accès aux technologies avancées pour les petites et moyennes entreprises en proposant des solutions clés en main, automatisées et personnalisées.</p>
+                </div>
+                
+                <div class="card fade-in-up">
+                    <div class="card-icon success">
+                        <i class="fas fa-target"></i>
+                    </div>
+                    <h3 class="card-title">Objectifs</h3>
+                    <p class="card-description">2000+ clients actifs, 10M€ de CA en 3 ans, avec une expansion européenne et une position de leader sur le marché français.</p>
+                </div>
+                
+                <div class="card fade-in-up">
+                    <div class="card-icon warning">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h3 class="card-title">Avantage Concurrentiel</h3>
+                    <p class="card-description">IA intégrée + solutions clés en main + prix accessible (50-70% moins cher que la concurrence) + support français.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marché Section -->
+    <section id="marche" class="section" style="background: white;">
+        <div class="container">
+            <h2 class="section-title">Analyse de Marché</h2>
+            <p class="section-subtitle">Un marché énorme avec des opportunités de croissance exceptionnelles</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">1.2M</div>
+                    <div class="stat-label">PME/TPE ciblées</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">400K</div>
+                    <div class="stat-label">Entreprises digitalisées</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">240K</div>
+                    <div class="stat-label">Besoin d'automatisation</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">200K</div>
+                    <div class="stat-label">Budget IT disponible</div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon danger">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="card-title">Tendances Favorables</h3>
+                    <ul class="features-grid">
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-arrow-up"></i></div>
+                            <span>Digitalisation accélérée (+40% depuis 2020)</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-robot"></i></div>
+                            <span>IA mainstream (adoption croissante des PME)</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-home"></i></div>
+                            <span>Remote work (besoin d'outils collaboratifs)</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-shopping-cart"></i></div>
+                            <span>E-commerce boom (+30% de croissance annuelle)</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon primary">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="card-title">Cibles Principales</h3>
+                    <ul class="features-grid">
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-store"></i></div>
+                            <span>Boutiques et commerces</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-utensils"></i></div>
+                            <span>Restaurants et cafés</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-briefcase"></i></div>
+                            <span>Consultants et freelances</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-hammer"></i></div>
+                            <span>Artisans et services</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Produits Section -->
+    <section id="produits" class="section">
+        <div class="container">
+            <h2 class="section-title">Nos Solutions</h2>
+            <p class="section-subtitle">Des produits complets pour transformer votre entreprise</p>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3 class="pricing-title">Jeroka Starter</h3>
+                    <div class="pricing-price">299€<span style="font-size: 1rem;">/mois</span></div>
+                    <div class="pricing-period">Pour TPE (1-5 employés)</div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Backoffice de base</li>
+                        <li><i class="fas fa-check"></i> Site web 5 pages</li>
+                        <li><i class="fas fa-check"></i> Gestion clients/factures</li>
+                        <li><i class="fas fa-check"></i> Support email</li>
+                        <li><i class="fas fa-check"></i> Dashboard simple</li>
+                    </ul>
+                    <button class="pricing-button secondary">Découvrir</button>
+                </div>
+                
+                <div class="pricing-card featured">
+                    <h3 class="pricing-title">Jeroka Business</h3>
+                    <div class="pricing-price">599€<span style="font-size: 1rem;">/mois</span></div>
+                    <div class="pricing-period">Pour PME (6-20 employés)</div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Backoffice avancé</li>
+                        <li><i class="fas fa-check"></i> Site web + E-commerce</li>
+                        <li><i class="fas fa-check"></i> IA intégrée</li>
+                        <li><i class="fas fa-check"></i> Analytics avancés</li>
+                        <li><i class="fas fa-check"></i> Support prioritaire</li>
+                        <li><i class="fas fa-check"></i> Multi-utilisateurs</li>
+                    </ul>
+                    <button class="pricing-button primary">Commencer</button>
+                </div>
+                
+                <div class="pricing-card">
+                    <h3 class="pricing-title">Jeroka Enterprise</h3>
+                    <div class="pricing-price">999€<span style="font-size: 1rem;">/mois</span></div>
+                    <div class="pricing-period">Pour PME+ (20+ employés)</div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Solution complète</li>
+                        <li><i class="fas fa-check"></i> Multi-entreprises</li>
+                        <li><i class="fas fa-check"></i> Intégrations tierces</li>
+                        <li><i class="fas fa-check"></i> Formation dédiée</li>
+                        <li><i class="fas fa-check"></i> SLA 99.9%</li>
+                        <li><i class="fas fa-check"></i> Support 24/7</li>
+                    </ul>
+                    <button class="pricing-button secondary">Contacter</button>
+                </div>
+            </div>
+
+            <div class="cards-grid" style="margin-top: 60px;">
+                <div class="card">
+                    <div class="card-icon success">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="card-title">Intelligence Artificielle</h3>
+                    <p class="card-description">Chatbot client, génération de contenu, automatisation des workflows, prédictions ML et personnalisation intelligente.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon primary">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3 class="card-title">Backoffice Intelligent</h3>
+                    <p class="card-description">Dashboard unifié, IA conversationnelle, automatisation complète et analytics en temps réel pour une vue 360° de l'entreprise.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon warning">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3 class="card-title">Sites Web Modernes</h3>
+                    <p class="card-description">Design responsive mobile-first, SEO optimisé, performance et sécurité, maintenance automatique et mises à jour.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon danger">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3 class="card-title">E-commerce Intégré</h3>
+                    <p class="card-description">Catalogue produits, paiements multiples, logistique, suivi commandes et marketing automation pour maximiser les ventes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Finance Section -->
+    <section id="finance" class="section" style="background: white;">
+        <div class="container">
+            <h2 class="section-title">Projections Financières</h2>
+            <p class="section-subtitle">Une croissance soutenue avec des revenus récurrents</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">1.8M€</div>
+                    <div class="stat-label">CA Année 1</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4.5M€</div>
+                    <div class="stat-label">CA Année 2</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8.7M€</div>
+                    <div class="stat-label">CA Année 3</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">28%</div>
+                    <div class="stat-label">Marge EBITDA</div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon primary">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3 class="card-title">Modèle Économique</h3>
+                    <ul class="features-grid">
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-percentage"></i></div>
+                            <span>70% SaaS (revenus récurrents)</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-code"></i></div>
+                            <span>20% Développement (projets ponctuels)</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-handshake"></i></div>
+                            <span>10% Services (consulting, formation)</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon success">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3 class="card-title">Métriques Clés</h3>
+                    <ul class="features-grid">
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-users"></i></div>
+                            <span>LTV/CAC ratio : 15:1</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-heart"></i></div>
+                            <span>Churn rate : 5% annuel</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-euro-sign"></i></div>
+                            <span>LTV : 12 000€ par client</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">Q1 2024</div>
+                        <h3 class="timeline-title">Lancement MVP</h3>
+                        <p>50 clients pilotes, 200k€ de CA, validation du product-market fit avec les premiers retours clients.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">Q2 2024</div>
+                        <h3 class="timeline-title">Croissance Initiale</h3>
+                        <p>500 clients actifs, 2M€ de CA, équipe de 15 personnes, expansion des fonctionnalités IA.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">Q3 2024</div>
+                        <h3 class="timeline-title">Expansion</h3>
+                        <p>1200 clients, 4.5M€ de CA, levée de fonds Série A (2M€), développement international.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">Q4 2024</div>
+                        <h3 class="timeline-title">Leadership</h3>
+                        <p>2000+ clients, 8.7M€ de CA, position de leader sur le marché français, préparation IPO.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Équipe Section -->
+    <section id="equipe" class="section">
+        <div class="container">
+            <h2 class="section-title">Notre Équipe</h2>
+            <p class="section-subtitle">Des experts passionnés pour transformer votre vision en réalité</p>
+            
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon primary">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h3 class="card-title">CEO - Jérôme</h3>
+                    <p class="card-description">10+ ans en tech, ex-startup. Vision, stratégie, financement. Expertise en business development et leadership d'équipes.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon success">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="card-title">CTO - À recruter</h3>
+                    <p class="card-description">8+ ans développement, architecture. Rôle : Architecture technique, R&D. Expertise : Full-stack, IA, cloud.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon warning">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="card-title">VP Sales - À recruter</h3>
+                    <p class="card-description">5+ ans B2B SaaS, PME. Rôle : Stratégie commerciale, équipe. Expertise : Sales, marketing, partenaires.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid" style="margin-top: 40px;">
+                <div class="stat-card">
+                    <div class="stat-number">15</div>
+                    <div class="stat-label">Personnes Année 1</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">25</div>
+                    <div class="stat-label">Personnes Année 2</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">40</div>
+                    <div class="stat-label">Personnes Année 3</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">950k€</div>
+                    <div class="stat-label">Budget Développement</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section" style="background: white;">
+        <div class="container">
+            <h2 class="section-title">Contactez-Nous</h2>
+            <p class="section-subtitle">Prêt à transformer votre entreprise ? Parlons-en !</p>
+            
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon primary">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="card-title">Email</h3>
+                    <p class="card-description">contact@jeroka.fr</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon success">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h3 class="card-title">Téléphone</h3>
+                    <p class="card-description">+33 6 19 57 69 47</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon warning">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3 class="card-title">Site Web</h3>
+                    <p class="card-description">www.jeroka.fr</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Jeroka Xperience</h3>
+                    <p>Spécialistes en transformation digitale pour TPE/PME. Nous démocratisons l'accès aux technologies avancées pour permettre à toutes les entreprises de réussir dans l'ère numérique.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Solutions</h3>
+                    <ul>
+                        <li>Backoffice Intelligent</li>
+                        <li>Sites Web Modernes</li>
+                        <li>E-commerce Intégré</li>
+                        <li>IA et Automatisation</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li>Documentation</li>
+                        <li>Formation</li>
+                        <li>Support Technique</li>
+                        <li>Communauté</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Légal</h3>
+                    <ul>
+                        <li>Conditions d'utilisation</li>
+                        <li>Politique de confidentialité</li>
+                        <li>Mentions légales</li>
+                        <li>CGV</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Jeroka Xperience. Tous droits réservés. | Développé avec ❤️ en France</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards and sections
+        document.querySelectorAll('.card, .section').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add active state to navigation
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-item a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

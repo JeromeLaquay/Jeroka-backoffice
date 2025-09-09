@@ -3,6 +3,8 @@
 -- =============================================
 
 -- Suppression des tables existantes (ordre inverse des dépendances)
+DROP TABLE IF EXISTS appointments CASCADE;
+DROP TABLE IF EXISTS availability_rules CASCADE;
 DROP TABLE IF EXISTS publication_platforms CASCADE;
 DROP TABLE IF EXISTS publications CASCADE;
 DROP TABLE IF EXISTS invoice_items CASCADE;
@@ -344,6 +346,56 @@ CREATE INDEX idx_publication_platforms_platform ON publication_platforms(platfor
 CREATE INDEX idx_publication_platforms_status ON publication_platforms(status);
 
 -- =============================================
+-- TABLE: availability_rules (Règles de disponibilité)
+-- =============================================
+CREATE TABLE availability_rules (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    day_of_week INTEGER NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6), -- 0=dimanche, 6=samedi
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    created_by UUID REFERENCES users(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Contrainte pour éviter les doublons de jour
+    UNIQUE(day_of_week)
+);
+
+CREATE INDEX idx_availability_rules_day_of_week ON availability_rules(day_of_week);
+CREATE INDEX idx_availability_rules_is_active ON availability_rules(is_active);
+
+-- =============================================
+-- TABLE: appointments (Rendez-vous)
+-- =============================================
+CREATE TABLE appointments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    client_name VARCHAR(200) NOT NULL,
+    client_email VARCHAR(255) NOT NULL,
+    client_phone VARCHAR(20),
+    notes TEXT,
+    status VARCHAR(20) DEFAULT 'confirmed' CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed', 'no_show')),
+    google_event_id VARCHAR(255), -- ID de l'événement Google Calendar
+    reminder_sent BOOLEAN DEFAULT false,
+    reminder_sent_at TIMESTAMP WITH TIME ZONE,
+    created_by UUID REFERENCES users(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Contrainte pour éviter les créneaux en double
+    UNIQUE(date, start_time)
+);
+
+CREATE INDEX idx_appointments_date ON appointments(date);
+CREATE INDEX idx_appointments_status ON appointments(status);
+CREATE INDEX idx_appointments_client_email ON appointments(client_email);
+CREATE INDEX idx_appointments_created_at ON appointments(created_at);
+CREATE INDEX idx_appointments_google_event_id ON appointments(google_event_id);
+
+-- =============================================
 -- TRIGGERS pour updated_at automatique
 -- =============================================
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -363,6 +415,8 @@ CREATE TRIGGER update_quotes_updated_at BEFORE UPDATE ON quotes FOR EACH ROW EXE
 CREATE TRIGGER update_invoices_updated_at BEFORE UPDATE ON invoices FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_publications_updated_at BEFORE UPDATE ON publications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_publication_platforms_updated_at BEFORE UPDATE ON publication_platforms FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_availability_rules_updated_at BEFORE UPDATE ON availability_rules FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_appointments_updated_at BEFORE UPDATE ON appointments FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =============================================
 -- FONCTIONS UTILITAIRES

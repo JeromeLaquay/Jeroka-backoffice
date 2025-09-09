@@ -131,7 +131,7 @@ class OrdersService {
    * Récupérer la liste des commandes avec filtres et pagination
    */
   async getOrders(params: OrdersListParams = {}) {
-    const response = await apiService.api.get('/orders', { params })
+    const response = await apiService.axiosInstance.get('/orders', { params })
     return response.data
   }
 
@@ -139,7 +139,7 @@ class OrdersService {
    * Récupérer une commande par son ID
    */
   async getOrder(id: string) {
-    const response = await apiService.api.get(`/orders/${id}`)
+    const response = await apiService.axiosInstance.get(`/orders/${id}`)
     return response.data
   }
 
@@ -147,7 +147,7 @@ class OrdersService {
    * Créer une nouvelle commande
    */
   async createOrder(data: CreateOrderRequest) {
-    const response = await apiService.api.post('/orders', data)
+    const response = await apiService.axiosInstance.post('/orders', data)
     return response.data
   }
 
@@ -155,7 +155,7 @@ class OrdersService {
    * Mettre à jour une commande
    */
   async updateOrder(id: string, data: UpdateOrderRequest) {
-    const response = await apiService.api.put(`/orders/${id}`, data)
+    const response = await apiService.axiosInstance.put(`/orders/${id}`, data)
     return response.data
   }
 
@@ -163,7 +163,7 @@ class OrdersService {
    * Supprimer une commande
    */
   async deleteOrder(id: string) {
-    const response = await apiService.api.delete(`/orders/${id}`)
+    const response = await apiService.axiosInstance.delete(`/orders/${id}`)
     return response.data
   }
 
@@ -171,7 +171,7 @@ class OrdersService {
    * Changer le statut d'une commande
    */
   async updateOrderStatus(id: string, status: string) {
-    const response = await apiService.api.patch(`/orders/${id}/status`, { status })
+    const response = await apiService.axiosInstance.patch(`/orders/${id}/status`, { status })
     return response.data
   }
 
@@ -179,7 +179,7 @@ class OrdersService {
    * Marquer une commande comme payée
    */
   async markOrderAsPaid(id: string, paymentData?: { method?: string; transactionId?: string }) {
-    const response = await apiService.api.patch(`/orders/${id}/payment`, {
+    const response = await apiService.axiosInstance.patch(`/orders/${id}/payment`, {
       paymentStatus: 'paid',
       ...paymentData
     })
@@ -190,7 +190,7 @@ class OrdersService {
    * Ajouter un numéro de suivi
    */
   async addTrackingNumber(id: string, trackingNumber: string) {
-    const response = await apiService.api.patch(`/orders/${id}/tracking`, { trackingNumber })
+    const response = await apiService.axiosInstance.patch(`/orders/${id}/tracking`, { trackingNumber })
     return response.data
   }
 
@@ -199,7 +199,7 @@ class OrdersService {
    */
   async getOrderStats(period?: string) {
     const params = period ? { period } : {}
-    const response = await apiService.api.get('/orders/stats', { params })
+    const response = await apiService.axiosInstance.get('/orders/stats', { params })
     return response.data
   }
 
@@ -207,7 +207,7 @@ class OrdersService {
    * Exporter les commandes en CSV/Excel
    */
   async exportOrders(params: OrdersListParams & { format: 'csv' | 'excel' }) {
-    const response = await apiService.api.get('/orders/export', {
+    const response = await apiService.axiosInstance.get('/orders/export', {
       params,
       responseType: 'blob'
     })
@@ -218,7 +218,7 @@ class OrdersService {
    * Récupérer l'historique des changements d'une commande
    */
   async getOrderHistory(id: string) {
-    const response = await apiService.api.get(`/orders/${id}/history`)
+    const response = await apiService.axiosInstance.get(`/orders/${id}/history`)
     return response.data
   }
 
@@ -226,7 +226,7 @@ class OrdersService {
    * Générer une facture pour une commande
    */
   async generateInvoice(id: string) {
-    const response = await apiService.api.post(`/orders/${id}/invoice`)
+    const response = await apiService.axiosInstance.post(`/orders/${id}/invoice`)
     return response.data
   }
 
@@ -234,7 +234,7 @@ class OrdersService {
    * Télécharger une facture en PDF
    */
   async downloadInvoice(orderId: string, invoiceId: string) {
-    const response = await apiService.api.get(`/orders/${orderId}/invoice/${invoiceId}/pdf`, {
+    const response = await apiService.axiosInstance.get(`/orders/${orderId}/invoice/${invoiceId}/pdf`, {
       responseType: 'blob'
     })
     return response.data
@@ -244,7 +244,7 @@ class OrdersService {
    * Envoyer un email de confirmation de commande
    */
   async sendOrderConfirmation(id: string) {
-    const response = await apiService.api.post(`/orders/${id}/send-confirmation`)
+    const response = await apiService.axiosInstance.post(`/orders/${id}/send-confirmation`)
     return response.data
   }
 
@@ -252,7 +252,7 @@ class OrdersService {
    * Envoyer un email de suivi de livraison
    */
   async sendShippingNotification(id: string) {
-    const response = await apiService.api.post(`/orders/${id}/send-shipping`)
+    const response = await apiService.axiosInstance.post(`/orders/${id}/send-shipping`)
     return response.data
   }
 
@@ -268,7 +268,7 @@ class OrdersService {
     }
     method?: string
   }) {
-    const response = await apiService.api.post('/orders/calculate-shipping', data)
+    const response = await apiService.axiosInstance.post('/orders/calculate-shipping', data)
     return response.data
   }
 
@@ -276,7 +276,7 @@ class OrdersService {
    * Récupérer les méthodes de livraison disponibles
    */
   async getShippingMethods() {
-    const response = await apiService.api.get('/orders/shipping-methods')
+    const response = await apiService.axiosInstance.get('/orders/shipping-methods')
     return response.data
   }
 
@@ -284,7 +284,7 @@ class OrdersService {
    * Récupérer les méthodes de paiement disponibles
    */
   async getPaymentMethods() {
-    const response = await apiService.api.get('/orders/payment-methods')
+    const response = await apiService.axiosInstance.get('/orders/payment-methods')
     return response.data
   }
 }

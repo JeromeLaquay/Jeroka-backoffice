@@ -105,7 +105,7 @@ class QuotesService {
    * Récupérer la liste des devis avec filtres et pagination
    */
   async getQuotes(params: QuotesListParams = {}) {
-    const response = await apiService.api.get('/quotes', { params })
+    const response = await apiService.axiosInstance.get('/quotes', { params })
     return response.data
   }
 
@@ -113,7 +113,7 @@ class QuotesService {
    * Récupérer un devis par son ID
    */
   async getQuote(id: string) {
-    const response = await apiService.api.get(`/quotes/${id}`)
+    const response = await apiService.axiosInstance.get(`/quotes/${id}`)
     return response.data
   }
 
@@ -121,7 +121,7 @@ class QuotesService {
    * Créer un nouveau devis
    */
   async createQuote(data: CreateQuoteRequest) {
-    const response = await apiService.api.post('/quotes', data)
+    const response = await apiService.axiosInstance.post('/quotes', data)
     return response.data
   }
 
@@ -129,7 +129,7 @@ class QuotesService {
    * Mettre à jour un devis
    */
   async updateQuote(id: string, data: UpdateQuoteRequest) {
-    const response = await apiService.api.put(`/quotes/${id}`, data)
+    const response = await apiService.axiosInstance.put(`/quotes/${id}`, data)
     return response.data
   }
 
@@ -137,7 +137,7 @@ class QuotesService {
    * Supprimer un devis
    */
   async deleteQuote(id: string) {
-    const response = await apiService.api.delete(`/quotes/${id}`)
+    const response = await apiService.axiosInstance.delete(`/quotes/${id}`)
     return response.data
   }
 
@@ -145,7 +145,7 @@ class QuotesService {
    * Changer le statut d'un devis
    */
   async updateQuoteStatus(id: string, status: string) {
-    const response = await apiService.api.patch(`/quotes/${id}/status`, { status })
+    const response = await apiService.axiosInstance.patch(`/quotes/${id}/status`, { status })
     return response.data
   }
 
@@ -153,7 +153,7 @@ class QuotesService {
    * Accepter un devis
    */
   async acceptQuote(id: string, acceptanceData?: { acceptedDate?: string; notes?: string }) {
-    const response = await apiService.api.patch(`/quotes/${id}/accept`, {
+    const response = await apiService.axiosInstance.patch(`/quotes/${id}/accept`, {
       status: 'accepted',
       acceptedDate: acceptanceData?.acceptedDate || new Date().toISOString(),
       notes: acceptanceData?.notes
@@ -165,7 +165,7 @@ class QuotesService {
    * Rejeter un devis
    */
   async rejectQuote(id: string, rejectionData?: { rejectedDate?: string; reason?: string }) {
-    const response = await apiService.api.patch(`/quotes/${id}/reject`, {
+    const response = await apiService.axiosInstance.patch(`/quotes/${id}/reject`, {
       status: 'rejected',
       rejectedDate: rejectionData?.rejectedDate || new Date().toISOString(),
       reason: rejectionData?.reason
@@ -177,7 +177,7 @@ class QuotesService {
    * Convertir un devis en facture
    */
   async convertToInvoice(id: string, invoiceData?: { issueDate?: string; dueDate?: string }) {
-    const response = await apiService.api.post(`/quotes/${id}/convert-to-invoice`, invoiceData)
+    const response = await apiService.axiosInstance.post(`/quotes/${id}/convert-to-invoice`, invoiceData)
     return response.data
   }
 
@@ -185,7 +185,7 @@ class QuotesService {
    * Envoyer un devis par email
    */
   async sendQuote(id: string, emailData?: { to?: string; subject?: string; message?: string }) {
-    const response = await apiService.api.post(`/quotes/${id}/send`, emailData)
+    const response = await apiService.axiosInstance.post(`/quotes/${id}/send`, emailData)
     return response.data
   }
 
@@ -193,7 +193,7 @@ class QuotesService {
    * Télécharger un devis en PDF
    */
   async downloadQuotePdf(id: string) {
-    const response = await apiService.api.get(`/quotes/${id}/pdf`, {
+    const response = await apiService.axiosInstance.get(`/quotes/${id}/pdf`, {
       responseType: 'blob'
     })
     return response.data
@@ -203,7 +203,7 @@ class QuotesService {
    * Dupliquer un devis
    */
   async duplicateQuote(id: string) {
-    const response = await apiService.api.post(`/quotes/${id}/duplicate`)
+    const response = await apiService.axiosInstance.post(`/quotes/${id}/duplicate`)
     return response.data
   }
 
@@ -212,7 +212,7 @@ class QuotesService {
    */
   async getQuoteStats(period?: string) {
     const params = period ? { period } : {}
-    const response = await apiService.api.get('/quotes/stats', { params })
+    const response = await apiService.axiosInstance.get('/quotes/stats', { params })
     return response.data
   }
 
@@ -220,7 +220,7 @@ class QuotesService {
    * Exporter les devis en CSV/Excel
    */
   async exportQuotes(params: QuotesListParams & { format: 'csv' | 'excel' }) {
-    const response = await apiService.api.get('/quotes/export', {
+    const response = await apiService.axiosInstance.get('/quotes/export', {
       params,
       responseType: 'blob'
     })
@@ -231,7 +231,7 @@ class QuotesService {
    * Récupérer le prochain numéro de devis
    */
   async getNextQuoteNumber() {
-    const response = await apiService.api.get('/quotes/next-number')
+    const response = await apiService.axiosInstance.get('/quotes/next-number')
     return response.data
   }
 
@@ -239,7 +239,7 @@ class QuotesService {
    * Envoyer un rappel pour un devis
    */
   async sendQuoteReminder(id: string, reminderData?: { type?: 'follow-up' | 'expiration'; message?: string }) {
-    const response = await apiService.api.post(`/quotes/${id}/reminder`, reminderData)
+    const response = await apiService.axiosInstance.post(`/quotes/${id}/reminder`, reminderData)
     return response.data
   }
 
@@ -247,7 +247,7 @@ class QuotesService {
    * Récupérer l'historique d'un devis
    */
   async getQuoteHistory(id: string) {
-    const response = await apiService.api.get(`/quotes/${id}/history`)
+    const response = await apiService.axiosInstance.get(`/quotes/${id}/history`)
     return response.data
   }
 
@@ -255,7 +255,7 @@ class QuotesService {
    * Prolonger la validité d'un devis
    */
   async extendQuoteValidity(id: string, extensionData: { validUntil: string; notifyClient?: boolean }) {
-    const response = await apiService.api.patch(`/quotes/${id}/extend`, extensionData)
+    const response = await apiService.axiosInstance.patch(`/quotes/${id}/extend`, extensionData)
     return response.data
   }
 
@@ -263,7 +263,7 @@ class QuotesService {
    * Récupérer les modèles de devis
    */
   async getQuoteTemplates() {
-    const response = await apiService.api.get('/quotes/templates')
+    const response = await apiService.axiosInstance.get('/quotes/templates')
     return response.data
   }
 
@@ -271,7 +271,7 @@ class QuotesService {
    * Créer un devis à partir d'un modèle
    */
   async createQuoteFromTemplate(templateId: string, data: { clientId: string; customizations?: any }) {
-    const response = await apiService.api.post(`/quotes/templates/${templateId}/create`, data)
+    const response = await apiService.axiosInstance.post(`/quotes/templates/${templateId}/create`, data)
     return response.data
   }
 }

@@ -1,0 +1,269 @@
+# Jeroka Xperience - Planning MVP pour Démarrer les Ventes
+## Équipe : 1 personne temps partiel (soir/week-end) + 1 personne 10h/semaine + IA
+
+## Phase 1 - Infrastructure MVP (Janvier-Février 2025)
+2025-01-15 / 2025-02-01: Configuration Docker
+- Docker containers (1 semaine)
+- Docker Compose (1 semaine)
+- Environnement dev (1 semaine)
+*Estimation : 6h/semaine × 3 semaines = 18h*
+
+2025-01-20 / 2025-02-10: Base de données PostgreSQL
+- Schéma de base (2 semaines)
+- Migrations (1 semaine)
+- Seed data (1 semaine)
+*Estimation : 4h/semaine × 3 semaines = 12h*
+
+2025-02-01 / 2025-02-28: API Backend Core
+- Express server (1 semaine)
+- Middleware de base (1 semaine)
+- Structure des routes (1 semaine)
+*Estimation : 8h/semaine × 3 semaines = 24h*
+
+2025-02-10 / 2025-03-10: Authentification JWT
+- Login/Register (2 semaines)
+- Middleware auth (1 semaine)
+- Protection routes (1 semaine)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+2025-03-01 / 2025-03-15: Middleware Sécurité
+- Helmet (1 semaine)
+- CORS (1 semaine)
+- Validation données (1 semaine)
+*Estimation : 4h/semaine × 2 semaines = 8h*
+
+## Phase 2 - Modules Backend Essentiels (Mars-Mai 2025)
+2025-03-15 / 2025-04-01: Gestion Utilisateurs
+- CRUD utilisateurs (1 semaine)
+- Profils (1 semaine)
+- Rôles de base (1 semaine)
+*Estimation : 6h/semaine × 3 semaines = 18h*
+
+2025-03-20 / 2025-04-20: Gestion Clients
+- CRUD clients (2 semaines)
+- Types (particulier/entreprise) (1 semaine)
+- Historique basique (1 semaine)
+*Estimation : 5h/semaine × 4 semaines = 20h*
+
+2025-04-01 / 2025-05-01: Gestion Produits
+- Catalogue produits (2 semaines)
+- Catégories (1 semaine)
+- Gestion stock basique (1 semaine)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+2025-04-15 / 2025-05-15: Gestion Factures
+- Création factures (2 semaines)
+- Calculs automatiques (1 semaine)
+- Export PDF basique (1 semaine)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+2025-05-01 / 2025-05-31: Système Devis
+- Création devis (2 semaines)
+- Conversion en factures (1 semaine)
+- Suivi statuts (1 semaine)
+*Estimation : 5h/semaine × 4 semaines = 20h*
+
+2025-05-15 / 2025-06-15: Gestion Commandes
+- Processus commande (2 semaines)
+- Statuts (1 semaine)
+- Intégration stock (1 semaine)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+## Phase 3 - Frontend Backoffice Essentiel (Juin-Août 2025)
+2025-06-01 / 2025-07-01: Layout Dashboard
+- Structure principale (2 semaines)
+- Navigation (1 semaine)
+- Sidebar (1 semaine)
+*Estimation : 8h/semaine × 4 semaines = 32h*
+
+2025-06-15 / 2025-07-15: Authentification Frontend
+- Login/Register forms (2 semaines)
+- Gestion tokens (1 semaine)
+- Guards de navigation (1 semaine)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+2025-07-01 / 2025-08-01: Module Clients
+- Liste clients (2 semaines)
+- Détail client (1 semaine)
+- Création/édition (1 semaine)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+2025-07-15 / 2025-08-15: Module Produits
+- Catalogue produits (2 semaines)
+- Gestion stock (1 semaine)
+- Images (1 semaine)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+2025-08-01 / 2025-09-01: Module Factures
+- Liste factures (2 semaines)
+- Création facture (1 semaine)
+- Export PDF (1 semaine)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+2025-08-15 / 2025-09-15: Module Devis
+- Liste devis (2 semaines)
+- Création devis (1 semaine)
+- Conversion (1 semaine)
+*Estimation : 5h/semaine × 4 semaines = 20h*
+
+2025-09-01 / 2025-10-01: Module Commandes
+- Liste commandes (2 semaines)
+- Détail commande (1 semaine)
+- Statuts (1 semaine)
+*Estimation : 5h/semaine × 4 semaines = 20h*
+
+## Phase 4 - E-boutique MVP (Septembre-Novembre 2025)
+2025-09-15 / 2025-10-15: Interface Produits
+- Catalogue (2 semaines)
+- Filtres basiques (1 semaine)
+- Détail produit (1 semaine)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+2025-10-01 / 2025-11-01: Panier & Checkout
+- Ajout panier (2 semaines)
+- Gestion quantités (1 semaine)
+- Processus commande (1 semaine)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+2025-10-15 / 2025-11-15: Système Paiements
+- Stripe (2 semaines)
+- Sécurisation (1 semaine)
+- Gestion erreurs (1 semaine)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+2025-11-01 / 2025-12-01: Gestion Commandes Client
+- Historique (2 semaines)
+- Détail commande (1 semaine)
+- Suivi basique (1 semaine)
+*Estimation : 5h/semaine × 4 semaines = 20h*
+
+## Phase 5 - Site Web MVP (Parallèle - Janvier 2025)
+2025-01-15 / 2025-02-15: Pages Statiques
+- Accueil (2 semaines)
+- Services (1 semaine)
+- Contact (1 semaine)
+*Estimation : 4h/semaine × 4 semaines = 16h*
+
+2025-02-01 / 2025-03-01: Design Responsive
+- Mobile first (2 semaines)
+- Navigation (1 semaine)
+- Performance (1 semaine)
+*Estimation : 4h/semaine × 4 semaines = 16h*
+
+2025-02-15 / 2025-03-15: Intégration Contenu
+- Textes (2 semaines)
+- Images (1 semaine)
+- SEO basique (1 semaine)
+*Estimation : 3h/semaine × 4 semaines = 12h*
+
+## Phase 6 - Tests & Déploiement MVP (Novembre 2025 - Janvier 2026)
+2025-11-15 / 2025-12-15: Tests Essentiels
+- Backend tests (2 semaines)
+- Frontend tests (2 semaines)
+- Tests d'intégration (2 semaines)
+*Estimation : 6h/semaine × 4 semaines = 24h*
+
+2025-12-01 / 2026-01-01: Optimisation Performance
+- Code splitting (1 semaine)
+- Lazy loading (1 semaine)
+- Caching (1 semaine)
+- Compression (1 semaine)
+*Estimation : 4h/semaine × 4 semaines = 16h*
+
+2025-12-15 / 2026-01-15: Déploiement Production
+- Infrastructure (2 semaines)
+- SSL (1 semaine)
+- Monitoring basique (1 semaine)
+*Estimation : 5h/semaine × 4 semaines = 20h*
+
+2026-01-01 / 2026-01-31: Documentation Essentielle
+- API docs (2 semaines)
+- User guides (1 semaine)
+- Technical docs (1 semaine)
+*Estimation : 3h/semaine × 4 semaines = 12h*
+
+## Jalons Critiques MVP pour Ventes
+2025-03-31: MVP Backend
+- Authentification
+- Gestion clients
+- API de base
+*Estimation : 86h total*
+
+2025-06-30: Modules Core Backend
+- Produits
+- Factures
+- Devis
+- Commandes
+*Estimation : 130h total*
+
+2025-10-31: Interface Backoffice MVP
+- Modules essentiels frontend
+- Tests basiques
+*Estimation : 168h total*
+
+2025-12-31: E-boutique MVP
+- Catalogue
+- Panier
+- Checkout
+- Paiements
+*Estimation : 92h total*
+
+2026-01-31: Déploiement Production
+- Tests essentiels
+- Performance
+- Infrastructure
+*Estimation : 72h total*
+
+## Équipe et Ressources MVP
+2025-01-15 / 2026-01-31: Équipe Développement
+- 1 Développeur Principal (soir/week-end) : 15h/semaine
+- 1 Développeur Support (10h/semaine)
+- 1 Assistant IA (toujours disponible)
+
+## Répartition du Temps MVP
+- **Développement Backend** : 45% (216h)
+- **Développement Frontend** : 35% (168h)
+- **Tests & QA** : 10% (48h)
+- **DevOps & Déploiement** : 10% (48h)
+
+## Technologies avec IA
+2025-01-15 / 2026-01-31: Stack Technologique
+- Backend: Node.js, Express, TypeScript, PostgreSQL
+- Frontend: Vue.js 3, TypeScript, Tailwind CSS, Pinia
+- Infrastructure: Docker, Nginx, SSL
+- Outils: Git, ESLint, Jest, Postman
+- **IA**: ChatGPT, GitHub Copilot, Claude, Cursor
+
+## Budget Estimatif MVP (1 an)
+- **Développement** : 480h × 50€/h = 24 000€
+- **Infrastructure** : 2 000€
+- **Outils IA** : 500€
+- **Formation** : 1 000€
+- **Total** : 27 500€ sur 1 an
+
+## Avantages de l'IA
+- **Génération de code** : -40% temps de développement
+- **Debugging** : -60% temps de résolution bugs
+- **Documentation** : -70% temps de rédaction
+- **Tests** : -50% temps d'écriture tests
+- **Optimisation** : Suggestions automatiques
+
+## Modules Supprimés (Phase 2)
+- Module Comptabilité avancé
+- Module Calendrier
+- Module Emails avancé
+- Module Messages
+- Module Publications
+- Module Annonces
+- Module Paramètres avancé
+- Profil client détaillé
+- Gestion stock avancée
+- Tests E2E complets
+- Documentation complète
+
+## Objectif : Démarrer les Ventes en Janvier 2026
+- **Backoffice fonctionnel** pour gérer clients, produits, factures, devis
+- **E-boutique basique** pour vendre en ligne
+- **Site web** pour la visibilité
+- **Système de paiement** opérationnel
+- **Tests essentiels** pour la stabilité

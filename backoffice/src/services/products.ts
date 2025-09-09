@@ -134,7 +134,7 @@ class ProductsService {
    * Récupérer la liste des produits avec filtres et pagination
    */
   async getProducts(params: ProductsListParams = {}) {
-    const response = await apiService.api.get('/products', { params })
+    const response = await apiService.axiosInstance.get('/products', { params })
     return response.data
   }
 
@@ -142,7 +142,7 @@ class ProductsService {
    * Récupérer un produit par son ID
    */
   async getProduct(id: string) {
-    const response = await apiService.api.get(`/products/${id}`)
+    const response = await apiService.axiosInstance.get(`/products/${id}`)
     return response.data
   }
 
@@ -150,7 +150,7 @@ class ProductsService {
    * Créer un nouveau produit
    */
   async createProduct(data: CreateProductRequest) {
-    const response = await apiService.api.post('/products', data)
+    const response = await apiService.axiosInstance.post('/products', data)
     return response.data
   }
 
@@ -158,7 +158,7 @@ class ProductsService {
    * Mettre à jour un produit
    */
   async updateProduct(id: string, data: UpdateProductRequest) {
-    const response = await apiService.api.put(`/products/${id}`, data)
+    const response = await apiService.axiosInstance.put(`/products/${id}`, data)
     return response.data
   }
 
@@ -166,7 +166,7 @@ class ProductsService {
    * Supprimer un produit
    */
   async deleteProduct(id: string) {
-    const response = await apiService.api.delete(`/products/${id}`)
+    const response = await apiService.axiosInstance.delete(`/products/${id}`)
     return response.data
   }
 
@@ -174,7 +174,7 @@ class ProductsService {
    * Changer le statut d'un produit
    */
   async updateProductStatus(id: string, status: string) {
-    const response = await apiService.api.patch(`/products/${id}/status`, { status })
+    const response = await apiService.axiosInstance.patch(`/products/${id}/status`, { status })
     return response.data
   }
 
@@ -182,7 +182,7 @@ class ProductsService {
    * Ajuster le stock d'un produit
    */
   async adjustStock(id: string, quantity: number, reason: string) {
-    const response = await apiService.api.patch(`/products/${id}/stock`, {
+    const response = await apiService.axiosInstance.patch(`/products/${id}/stock`, {
       quantity,
       reason
     })
@@ -193,7 +193,7 @@ class ProductsService {
    * Récupérer l'historique du stock d'un produit
    */
   async getStockHistory(id: string, params?: { page?: number; limit?: number }) {
-    const response = await apiService.api.get(`/products/${id}/stock/history`, { params })
+    const response = await apiService.axiosInstance.get(`/products/${id}/stock/history`, { params })
     return response.data
   }
 
@@ -201,7 +201,7 @@ class ProductsService {
    * Dupliquer un produit
    */
   async duplicateProduct(id: string) {
-    const response = await apiService.api.post(`/products/${id}/duplicate`)
+    const response = await apiService.axiosInstance.post(`/products/${id}/duplicate`)
     return response.data
   }
 
@@ -210,7 +210,7 @@ class ProductsService {
    */
   async getProductStats(period?: string) {
     const params = period ? { period } : {}
-    const response = await apiService.api.get('/products/stats', { params })
+    const response = await apiService.axiosInstance.get('/products/stats', { params })
     return response.data
   }
 
@@ -218,7 +218,7 @@ class ProductsService {
    * Exporter les produits en CSV/Excel
    */
   async exportProducts(params: ProductsListParams & { format: 'csv' | 'excel' }) {
-    const response = await apiService.api.get('/products/export', {
+    const response = await apiService.axiosInstance.get('/products/export', {
       params,
       responseType: 'blob'
     })
@@ -232,7 +232,7 @@ class ProductsService {
     const formData = new FormData()
     formData.append('file', file)
     
-    const response = await apiService.api.post('/products/import', formData, {
+    const response = await apiService.axiosInstance.post('/products/import', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -245,7 +245,7 @@ class ProductsService {
    */
   async generateSKU(categoryId?: string) {
     const params = categoryId ? { categoryId } : {}
-    const response = await apiService.api.get('/products/generate-sku', { params })
+    const response = await apiService.axiosInstance.get('/products/generate-sku', { params })
     return response.data
   }
 
@@ -253,7 +253,7 @@ class ProductsService {
    * Rechercher des produits par code-barres
    */
   async searchByBarcode(barcode: string) {
-    const response = await apiService.api.get(`/products/barcode/${barcode}`)
+    const response = await apiService.axiosInstance.get(`/products/barcode/${barcode}`)
     return response.data
   }
 
@@ -261,7 +261,7 @@ class ProductsService {
    * Récupérer les catégories de produits
    */
   async getCategories() {
-    const response = await apiService.api.get('/products/categories')
+    const response = await apiService.axiosInstance.get('/products/categories')
     return response.data
   }
 
@@ -274,7 +274,7 @@ class ProductsService {
     parentId?: string
     sortOrder?: number
   }) {
-    const response = await apiService.api.post('/products/categories', data)
+    const response = await apiService.axiosInstance.post('/products/categories', data)
     return response.data
   }
 
@@ -288,7 +288,7 @@ class ProductsService {
     sortOrder?: number
     isActive?: boolean
   }) {
-    const response = await apiService.api.put(`/products/categories/${id}`, data)
+    const response = await apiService.axiosInstance.put(`/products/categories/${id}`, data)
     return response.data
   }
 
@@ -296,7 +296,7 @@ class ProductsService {
    * Supprimer une catégorie
    */
   async deleteCategory(id: string) {
-    const response = await apiService.api.delete(`/products/categories/${id}`)
+    const response = await apiService.axiosInstance.delete(`/products/categories/${id}`)
     return response.data
   }
 
@@ -307,7 +307,7 @@ class ProductsService {
     const formData = new FormData()
     formData.append('image', file)
     
-    const response = await apiService.api.post(`/products/${productId}/images`, formData, {
+    const response = await apiService.axiosInstance.post(`/products/${productId}/images`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -319,7 +319,7 @@ class ProductsService {
    * Supprimer une image de produit
    */
   async deleteProductImage(productId: string, imageId: string) {
-    const response = await apiService.api.delete(`/products/${productId}/images/${imageId}`)
+    const response = await apiService.axiosInstance.delete(`/products/${productId}/images/${imageId}`)
     return response.data
   }
 
@@ -327,7 +327,7 @@ class ProductsService {
    * Récupérer les produits populaires/tendances
    */
   async getTrendingProducts(params?: { period?: string; limit?: number }) {
-    const response = await apiService.api.get('/products/trending', { params })
+    const response = await apiService.axiosInstance.get('/products/trending', { params })
     return response.data
   }
 
@@ -335,7 +335,7 @@ class ProductsService {
    * Récupérer les produits en rupture de stock
    */
   async getLowStockProducts(params?: { page?: number; limit?: number }) {
-    const response = await apiService.api.get('/products/low-stock', { params })
+    const response = await apiService.axiosInstance.get('/products/low-stock', { params })
     return response.data
   }
 
@@ -343,7 +343,7 @@ class ProductsService {
    * Définir un produit comme vedette
    */
   async toggleFeatured(id: string, featured: boolean) {
-    const response = await apiService.api.patch(`/products/${id}/featured`, { featured })
+    const response = await apiService.axiosInstance.patch(`/products/${id}/featured`, { featured })
     return response.data
   }
 }

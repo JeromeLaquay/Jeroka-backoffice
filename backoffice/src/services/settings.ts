@@ -151,7 +151,7 @@ class SettingsService {
    * Récupérer le profil utilisateur
    */
   async getUserProfile() {
-    const response = await apiService.api.get('/settings/profile')
+    const response = await apiService.axiosInstance.get('/settings/profile')
     return response.data
   }
 
@@ -159,7 +159,7 @@ class SettingsService {
    * Mettre à jour le profil utilisateur
    */
   async updateUserProfile(data: UpdateProfileRequest) {
-    const response = await apiService.api.put('/settings/profile', data)
+    const response = await apiService.axiosInstance.put('/settings/profile', data)
     return response.data
   }
 
@@ -167,7 +167,7 @@ class SettingsService {
    * Changer le mot de passe
    */
   async changePassword(data: ChangePasswordRequest) {
-    const response = await apiService.api.post('/settings/change-password', data)
+    const response = await apiService.axiosInstance.post('/settings/change-password', data)
     return response.data
   }
 
@@ -175,7 +175,7 @@ class SettingsService {
    * Activer/désactiver l'authentification à deux facteurs
    */
   async toggleTwoFactor(enabled: boolean) {
-    const response = await apiService.api.post('/settings/two-factor', { enabled })
+    const response = await apiService.axiosInstance.post('/settings/two-factor', { enabled })
     return response.data
   }
 
@@ -186,7 +186,7 @@ class SettingsService {
     const formData = new FormData()
     formData.append('avatar', file)
     
-    const response = await apiService.api.post('/settings/avatar', formData, {
+    const response = await apiService.axiosInstance.post('/settings/avatar', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -198,7 +198,7 @@ class SettingsService {
    * Récupérer les paramètres de l'entreprise
    */
   async getCompanySettings() {
-    const response = await apiService.api.get('/settings/company')
+    const response = await apiService.axiosInstance.get('/settings/company')
     return response.data
   }
 
@@ -206,7 +206,7 @@ class SettingsService {
    * Mettre à jour les paramètres de l'entreprise
    */
   async updateCompanySettings(data: UpdateCompanyRequest) {
-    const response = await apiService.api.put('/settings/company', data)
+    const response = await apiService.axiosInstance.put('/settings/company', data)
     return response.data
   }
 
@@ -217,7 +217,7 @@ class SettingsService {
     const formData = new FormData()
     formData.append('logo', file)
     
-    const response = await apiService.api.post('/settings/company/logo', formData, {
+    const response = await apiService.axiosInstance.post('/settings/company/logo', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -229,7 +229,7 @@ class SettingsService {
    * Récupérer les paramètres système
    */
   async getSystemSettings() {
-    const response = await apiService.api.get('/settings/system')
+    const response = await apiService.axiosInstance.get('/settings/system')
     return response.data
   }
 
@@ -237,7 +237,7 @@ class SettingsService {
    * Mettre à jour les paramètres système
    */
   async updateSystemSettings(data: UpdateSystemRequest) {
-    const response = await apiService.api.put('/settings/system', data)
+    const response = await apiService.axiosInstance.put('/settings/system', data)
     return response.data
   }
 
@@ -245,7 +245,7 @@ class SettingsService {
    * Tester la configuration email
    */
   async testEmailConfig(emailSettings: any) {
-    const response = await apiService.api.post('/settings/test-email', emailSettings)
+    const response = await apiService.axiosInstance.post('/settings/test-email', emailSettings)
     return response.data
   }
 
@@ -253,7 +253,7 @@ class SettingsService {
    * Créer une sauvegarde manuelle
    */
   async createBackup() {
-    const response = await apiService.api.post('/settings/backup')
+    const response = await apiService.axiosInstance.post('/settings/backup')
     return response.data
   }
 
@@ -261,7 +261,7 @@ class SettingsService {
    * Récupérer la liste des sauvegardes
    */
   async getBackups() {
-    const response = await apiService.api.get('/settings/backups')
+    const response = await apiService.axiosInstance.get('/settings/backups')
     return response.data
   }
 
@@ -269,7 +269,7 @@ class SettingsService {
    * Restaurer une sauvegarde
    */
   async restoreBackup(backupId: string) {
-    const response = await apiService.api.post(`/settings/backup/${backupId}/restore`)
+    const response = await apiService.axiosInstance.post(`/settings/backup/${backupId}/restore`)
     return response.data
   }
 
@@ -277,7 +277,7 @@ class SettingsService {
    * Supprimer une sauvegarde
    */
   async deleteBackup(backupId: string) {
-    const response = await apiService.api.delete(`/settings/backup/${backupId}`)
+    const response = await apiService.axiosInstance.delete(`/settings/backup/${backupId}`)
     return response.data
   }
 
@@ -285,7 +285,7 @@ class SettingsService {
    * Exporter les données
    */
   async exportData(format: 'json' | 'csv') {
-    const response = await apiService.api.get('/settings/export', {
+    const response = await apiService.axiosInstance.get('/settings/export', {
       params: { format },
       responseType: 'blob'
     })
@@ -299,7 +299,7 @@ class SettingsService {
     const formData = new FormData()
     formData.append('data', file)
     
-    const response = await apiService.api.post('/settings/import', formData, {
+    const response = await apiService.axiosInstance.post('/settings/import', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -311,7 +311,7 @@ class SettingsService {
    * Activer/désactiver le mode maintenance
    */
   async toggleMaintenance(enabled: boolean, message?: string) {
-    const response = await apiService.api.post('/settings/maintenance', {
+    const response = await apiService.axiosInstance.post('/settings/maintenance', {
       enabled,
       message
     })
@@ -322,7 +322,7 @@ class SettingsService {
    * Vérifier les mises à jour
    */
   async checkUpdates() {
-    const response = await apiService.api.get('/settings/check-updates')
+    const response = await apiService.axiosInstance.get('/settings/check-updates')
     return response.data
   }
 
@@ -335,7 +335,7 @@ class SettingsService {
     dateTo?: string
     limit?: number
   }) {
-    const response = await apiService.api.get('/settings/logs', { params })
+    const response = await apiService.axiosInstance.get('/settings/logs', { params })
     return response.data
   }
 
@@ -343,7 +343,7 @@ class SettingsService {
    * Vider les logs
    */
   async clearLogs() {
-    const response = await apiService.api.delete('/settings/logs')
+    const response = await apiService.axiosInstance.delete('/settings/logs')
     return response.data
   }
 
@@ -351,7 +351,7 @@ class SettingsService {
    * Récupérer les statistiques d'utilisation
    */
   async getUsageStats() {
-    const response = await apiService.api.get('/settings/usage-stats')
+    const response = await apiService.axiosInstance.get('/settings/usage-stats')
     return response.data
   }
 
@@ -359,7 +359,7 @@ class SettingsService {
    * Réinitialiser les paramètres par défaut
    */
   async resetToDefaults(section: 'company' | 'system' | 'all') {
-    const response = await apiService.api.post('/settings/reset', { section })
+    const response = await apiService.axiosInstance.post('/settings/reset', { section })
     return response.data
   }
 }

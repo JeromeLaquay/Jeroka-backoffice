@@ -168,6 +168,11 @@ const router = createRouter({
           path: '/annonces',
           name: 'Annonces',
           component: () => import('@/views/announcements/AnnouncementsView.vue')
+        },
+        {
+          path: '/calendrier',
+          name: 'Calendrier',
+          component: () => import('@/views/calendar/CalendarView.vue')
         }
       ]
     }

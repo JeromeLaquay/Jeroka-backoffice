@@ -111,7 +111,7 @@ class AccountingService {
    */
   async getFinancialDashboard(period?: string) {
     const params = period ? { period } : {}
-    const response = await apiService.api.get('/accounting/dashboard', { params })
+    const response = await apiService.axiosInstance.get('/accounting/dashboard', { params })
     return response.data
   }
 
@@ -120,7 +120,7 @@ class AccountingService {
    */
   async getFinancialStats(period?: string) {
     const params = period ? { period } : {}
-    const response = await apiService.api.get('/accounting/stats', { params })
+    const response = await apiService.axiosInstance.get('/accounting/stats', { params })
     return response.data
   }
 
@@ -128,7 +128,7 @@ class AccountingService {
    * Récupérer les transactions avec filtres et pagination
    */
   async getTransactions(params: TransactionsListParams = {}) {
-    const response = await apiService.api.get('/accounting/transactions', { params })
+    const response = await apiService.axiosInstance.get('/accounting/transactions', { params })
     return response.data
   }
 
@@ -136,7 +136,7 @@ class AccountingService {
    * Récupérer une transaction par son ID
    */
   async getTransaction(id: string) {
-    const response = await apiService.api.get(`/accounting/transactions/${id}`)
+    const response = await apiService.axiosInstance.get(`/accounting/transactions/${id}`)
     return response.data
   }
 
@@ -144,7 +144,7 @@ class AccountingService {
    * Créer une nouvelle transaction
    */
   async createTransaction(data: CreateTransactionRequest) {
-    const response = await apiService.api.post('/accounting/transactions', data)
+    const response = await apiService.axiosInstance.post('/accounting/transactions', data)
     return response.data
   }
 
@@ -152,7 +152,7 @@ class AccountingService {
    * Mettre à jour une transaction
    */
   async updateTransaction(id: string, data: UpdateTransactionRequest) {
-    const response = await apiService.api.put(`/accounting/transactions/${id}`, data)
+    const response = await apiService.axiosInstance.put(`/accounting/transactions/${id}`, data)
     return response.data
   }
 
@@ -160,7 +160,7 @@ class AccountingService {
    * Supprimer une transaction
    */
   async deleteTransaction(id: string) {
-    const response = await apiService.api.delete(`/accounting/transactions/${id}`)
+    const response = await apiService.axiosInstance.delete(`/accounting/transactions/${id}`)
     return response.data
   }
 
@@ -172,7 +172,7 @@ class AccountingService {
     formData.append('file', file)
     formData.append('format', format)
     
-    const response = await apiService.api.post('/accounting/transactions/import', formData, {
+    const response = await apiService.axiosInstance.post('/accounting/transactions/import', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -184,7 +184,7 @@ class AccountingService {
    * Exporter les transactions
    */
   async exportTransactions(params: TransactionsListParams & { format: 'csv' | 'excel' | 'pdf' }) {
-    const response = await apiService.api.get('/accounting/transactions/export', {
+    const response = await apiService.axiosInstance.get('/accounting/transactions/export', {
       params,
       responseType: 'blob'
     })
@@ -195,7 +195,7 @@ class AccountingService {
    * Générer un rapport de TVA
    */
   async generateVatReport(period: string) {
-    const response = await apiService.api.get('/accounting/reports/vat', {
+    const response = await apiService.axiosInstance.get('/accounting/reports/vat', {
       params: { period }
     })
     return response.data
@@ -205,7 +205,7 @@ class AccountingService {
    * Générer un compte de résultat
    */
   async generateProfitLossReport(period: string) {
-    const response = await apiService.api.get('/accounting/reports/profit-loss', {
+    const response = await apiService.axiosInstance.get('/accounting/reports/profit-loss', {
       params: { period }
     })
     return response.data
@@ -215,7 +215,7 @@ class AccountingService {
    * Générer un rapport de trésorerie
    */
   async generateCashFlowReport(period: string) {
-    const response = await apiService.api.get('/accounting/reports/cash-flow', {
+    const response = await apiService.axiosInstance.get('/accounting/reports/cash-flow', {
       params: { period }
     })
     return response.data
@@ -226,7 +226,7 @@ class AccountingService {
    */
   async getBalanceSheet(date?: string) {
     const params = date ? { date } : {}
-    const response = await apiService.api.get('/accounting/reports/balance-sheet', { params })
+    const response = await apiService.axiosInstance.get('/accounting/reports/balance-sheet', { params })
     return response.data
   }
 
@@ -234,7 +234,7 @@ class AccountingService {
    * Récupérer les catégories de transactions
    */
   async getTransactionCategories() {
-    const response = await apiService.api.get('/accounting/categories')
+    const response = await apiService.axiosInstance.get('/accounting/categories')
     return response.data
   }
 
@@ -242,7 +242,7 @@ class AccountingService {
    * Créer une nouvelle catégorie
    */
   async createCategory(data: { name: string; type: 'income' | 'expense'; description?: string }) {
-    const response = await apiService.api.post('/accounting/categories', data)
+    const response = await apiService.axiosInstance.post('/accounting/categories', data)
     return response.data
   }
 
@@ -250,7 +250,7 @@ class AccountingService {
    * Récupérer les méthodes de paiement
    */
   async getPaymentMethods() {
-    const response = await apiService.api.get('/accounting/payment-methods')
+    const response = await apiService.axiosInstance.get('/accounting/payment-methods')
     return response.data
   }
 
@@ -258,7 +258,7 @@ class AccountingService {
    * Réconcilier les transactions bancaires
    */
   async reconcileTransactions(data: { bankStatementId: string; transactionIds: string[] }) {
-    const response = await apiService.api.post('/accounting/reconcile', data)
+    const response = await apiService.axiosInstance.post('/accounting/reconcile', data)
     return response.data
   }
 
@@ -266,7 +266,7 @@ class AccountingService {
    * Calculer les taxes dues
    */
   async calculateTaxes(period: string) {
-    const response = await apiService.api.get('/accounting/taxes', {
+    const response = await apiService.axiosInstance.get('/accounting/taxes', {
       params: { period }
     })
     return response.data
@@ -276,7 +276,7 @@ class AccountingService {
    * Générer une déclaration de TVA
    */
   async generateVatDeclaration(period: string) {
-    const response = await apiService.api.post('/accounting/vat-declaration', {
+    const response = await apiService.axiosInstance.post('/accounting/vat-declaration', {
       period
     })
     return response.data
@@ -286,7 +286,7 @@ class AccountingService {
    * Archiver les données comptables
    */
   async archiveData(year: number) {
-    const response = await apiService.api.post('/accounting/archive', {
+    const response = await apiService.axiosInstance.post('/accounting/archive', {
       year
     })
     return response.data

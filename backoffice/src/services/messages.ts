@@ -99,7 +99,7 @@ class MessagesService {
    * Récupérer les statistiques des messages
    */
   async getMessagesStats() {
-    const response = await apiService.api.get('/messages/stats')
+    const response = await apiService.axiosInstance.get('/messages/stats')
     return response.data
   }
 
@@ -107,7 +107,7 @@ class MessagesService {
    * Récupérer les messages avec filtres et pagination
    */
   async getMessages(params: MessagesListParams = {}) {
-    const response = await apiService.api.get('/messages', { params })
+    const response = await apiService.axiosInstance.get('/messages', { params })
     return response.data
   }
 
@@ -115,7 +115,7 @@ class MessagesService {
    * Récupérer un message par son ID
    */
   async getMessage(id: string) {
-    const response = await apiService.api.get(`/messages/${id}`)
+    const response = await apiService.axiosInstance.get(`/messages/${id}`)
     return response.data
   }
 
@@ -123,7 +123,7 @@ class MessagesService {
    * Créer un nouveau message de contact (depuis le formulaire public)
    */
   async createMessage(data: CreateMessageRequest) {
-    const response = await apiService.api.post('/messages', data)
+    const response = await apiService.axiosInstance.post('/messages', data)
     return response.data
   }
 
@@ -131,7 +131,7 @@ class MessagesService {
    * Mettre à jour un message
    */
   async updateMessage(id: string, data: UpdateMessageRequest) {
-    const response = await apiService.api.put(`/messages/${id}`, data)
+    const response = await apiService.axiosInstance.put(`/messages/${id}`, data)
     return response.data
   }
 
@@ -139,7 +139,7 @@ class MessagesService {
    * Supprimer un message
    */
   async deleteMessage(id: string) {
-    const response = await apiService.api.delete(`/messages/${id}`)
+    const response = await apiService.axiosInstance.delete(`/messages/${id}`)
     return response.data
   }
 
@@ -147,7 +147,7 @@ class MessagesService {
    * Marquer un message comme lu
    */
   async markAsRead(id: string) {
-    const response = await apiService.api.post(`/messages/${id}/mark-read`)
+    const response = await apiService.axiosInstance.post(`/messages/${id}/mark-read`)
     return response.data
   }
 
@@ -155,7 +155,7 @@ class MessagesService {
    * Marquer un message comme non lu
    */
   async markAsUnread(id: string) {
-    const response = await apiService.api.post(`/messages/${id}/mark-unread`)
+    const response = await apiService.axiosInstance.post(`/messages/${id}/mark-unread`)
     return response.data
   }
 
@@ -163,7 +163,7 @@ class MessagesService {
    * Archiver un message
    */
   async archiveMessage(id: string) {
-    const response = await apiService.api.post(`/messages/${id}/archive`)
+    const response = await apiService.axiosInstance.post(`/messages/${id}/archive`)
     return response.data
   }
 
@@ -171,7 +171,7 @@ class MessagesService {
    * Restaurer un message archivé
    */
   async unarchiveMessage(id: string) {
-    const response = await apiService.api.post(`/messages/${id}/unarchive`)
+    const response = await apiService.axiosInstance.post(`/messages/${id}/unarchive`)
     return response.data
   }
 
@@ -188,7 +188,7 @@ class MessagesService {
       })
     }
 
-    const response = await apiService.api.post(`/messages/${id}/reply`, formData, {
+    const response = await apiService.axiosInstance.post(`/messages/${id}/reply`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -200,7 +200,7 @@ class MessagesService {
    * Récupérer les réponses d'un message
    */
   async getMessageReplies(id: string) {
-    const response = await apiService.api.get(`/messages/${id}/replies`)
+    const response = await apiService.axiosInstance.get(`/messages/${id}/replies`)
     return response.data
   }
 
@@ -208,7 +208,7 @@ class MessagesService {
    * Assigner un message à un utilisateur
    */
   async assignMessage(id: string, userId: string) {
-    const response = await apiService.api.post(`/messages/${id}/assign`, {
+    const response = await apiService.axiosInstance.post(`/messages/${id}/assign`, {
       userId
     })
     return response.data
@@ -218,7 +218,7 @@ class MessagesService {
    * Désassigner un message
    */
   async unassignMessage(id: string) {
-    const response = await apiService.api.post(`/messages/${id}/unassign`)
+    const response = await apiService.axiosInstance.post(`/messages/${id}/unassign`)
     return response.data
   }
 
@@ -226,7 +226,7 @@ class MessagesService {
    * Ajouter des tags à un message
    */
   async addTags(id: string, tags: string[]) {
-    const response = await apiService.api.post(`/messages/${id}/tags`, { tags })
+    const response = await apiService.axiosInstance.post(`/messages/${id}/tags`, { tags })
     return response.data
   }
 
@@ -234,7 +234,7 @@ class MessagesService {
    * Supprimer des tags d'un message
    */
   async removeTags(id: string, tags: string[]) {
-    const response = await apiService.api.delete(`/messages/${id}/tags`, {
+    const response = await apiService.axiosInstance.delete(`/messages/${id}/tags`, {
       data: { tags }
     })
     return response.data
@@ -244,7 +244,7 @@ class MessagesService {
    * Actions en lot sur plusieurs messages
    */
   async bulkAction(data: BulkActionRequest) {
-    const response = await apiService.api.post('/messages/bulk-action', data)
+    const response = await apiService.axiosInstance.post('/messages/bulk-action', data)
     return response.data
   }
 
@@ -252,7 +252,7 @@ class MessagesService {
    * Marquer tous les messages comme lus
    */
   async markAllAsRead() {
-    const response = await apiService.api.post('/messages/mark-all-read')
+    const response = await apiService.axiosInstance.post('/messages/mark-all-read')
     return response.data
   }
 
@@ -260,7 +260,7 @@ class MessagesService {
    * Exporter les messages
    */
   async exportMessages(params: MessagesListParams & { format: 'csv' | 'excel' | 'pdf' }) {
-    const response = await apiService.api.get('/messages/export', {
+    const response = await apiService.axiosInstance.get('/messages/export', {
       params,
       responseType: 'blob'
     })
@@ -274,7 +274,7 @@ class MessagesService {
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await apiService.api.post('/messages/import', formData, {
+    const response = await apiService.axiosInstance.post('/messages/import', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -291,7 +291,7 @@ class MessagesService {
     dateRange?: { from: string; to: string }
     tags?: string[]
   }) {
-    const response = await apiService.api.post('/messages/search', {
+    const response = await apiService.axiosInstance.post('/messages/search', {
       query,
       filters
     })
@@ -302,7 +302,7 @@ class MessagesService {
    * Récupérer les tags disponibles
    */
   async getTags() {
-    const response = await apiService.api.get('/messages/tags')
+    const response = await apiService.axiosInstance.get('/messages/tags')
     return response.data
   }
 
@@ -310,7 +310,7 @@ class MessagesService {
    * Créer un nouveau tag
    */
   async createTag(name: string, color?: string) {
-    const response = await apiService.api.post('/messages/tags', {
+    const response = await apiService.axiosInstance.post('/messages/tags', {
       name,
       color
     })
@@ -321,7 +321,7 @@ class MessagesService {
    * Supprimer un tag
    */
   async deleteTag(tagId: string) {
-    const response = await apiService.api.delete(`/messages/tags/${tagId}`)
+    const response = await apiService.axiosInstance.delete(`/messages/tags/${tagId}`)
     return response.data
   }
 
@@ -329,7 +329,7 @@ class MessagesService {
    * Récupérer les templates de réponse
    */
   async getReplyTemplates() {
-    const response = await apiService.api.get('/messages/reply-templates')
+    const response = await apiService.axiosInstance.get('/messages/reply-templates')
     return response.data
   }
 
@@ -342,7 +342,7 @@ class MessagesService {
     content: string
     category?: string
   }) {
-    const response = await apiService.api.post('/messages/reply-templates', data)
+    const response = await apiService.axiosInstance.post('/messages/reply-templates', data)
     return response.data
   }
 
@@ -355,7 +355,7 @@ class MessagesService {
     content?: string
     category?: string
   }) {
-    const response = await apiService.api.put(`/messages/reply-templates/${id}`, data)
+    const response = await apiService.axiosInstance.put(`/messages/reply-templates/${id}`, data)
     return response.data
   }
 
@@ -363,7 +363,7 @@ class MessagesService {
    * Supprimer un template de réponse
    */
   async deleteReplyTemplate(id: string) {
-    const response = await apiService.api.delete(`/messages/reply-templates/${id}`)
+    const response = await apiService.axiosInstance.delete(`/messages/reply-templates/${id}`)
     return response.data
   }
 
@@ -371,7 +371,7 @@ class MessagesService {
    * Obtenir les métriques de performance
    */
   async getPerformanceMetrics(period: 'day' | 'week' | 'month' | 'year' = 'month') {
-    const response = await apiService.api.get('/messages/metrics', {
+    const response = await apiService.axiosInstance.get('/messages/metrics', {
       params: { period }
     })
     return response.data
@@ -386,7 +386,7 @@ class MessagesService {
     slackWebhook?: string
     notifyOnPriority?: string[]
   }) {
-    const response = await apiService.api.put('/messages/notification-settings', settings)
+    const response = await apiService.axiosInstance.put('/messages/notification-settings', settings)
     return response.data
   }
 
@@ -399,7 +399,7 @@ class MessagesService {
     actions: any
     isActive: boolean
   }) {
-    const response = await apiService.api.post('/messages/auto-assign-rules', rule)
+    const response = await apiService.axiosInstance.post('/messages/auto-assign-rules', rule)
     return response.data
   }
 
@@ -411,7 +411,7 @@ class MessagesService {
     language?: 'fr' | 'en'
     template?: string
   }) {
-    const response = await apiService.api.post(`/messages/${messageId}/ai-draft`, options)
+    const response = await apiService.axiosInstance.post(`/messages/${messageId}/ai-draft`, options)
     return response.data
   }
 
@@ -419,7 +419,7 @@ class MessagesService {
    * Récupérer les règles d'auto-assignation
    */
   async getAutoAssignRules() {
-    const response = await apiService.api.get('/messages/auto-assign-rules')
+    const response = await apiService.axiosInstance.get('/messages/auto-assign-rules')
     return response.data
   }
 }

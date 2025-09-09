@@ -24,6 +24,7 @@ import quotesRoutes from '@/routes/quotes';
 import dashboardRoutes from '@/routes/dashboard';
 import emailsRoutes from '@/routes/emails';
 import announcementsRoutes from '@/routes/announcements';
+import calendarRoutes from '@/routes/calendar';
 
 // Load environment variables
 dotenv.config();
@@ -102,6 +103,7 @@ app.use(`${API_PREFIX}/quotes`, quotesRoutes);
 app.use(`${API_PREFIX}/dashboard`, dashboardRoutes);
 app.use(`${API_PREFIX}/emails`, emailsRoutes);
 app.use(`${API_PREFIX}/announcements`, announcementsRoutes);
+app.use(`${API_PREFIX}/calendar`, calendarRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

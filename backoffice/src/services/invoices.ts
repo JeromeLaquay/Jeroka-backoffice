@@ -108,7 +108,7 @@ class InvoicesService {
    * Récupérer la liste des factures avec filtres et pagination
    */
   async getInvoices(params: InvoicesListParams = {}) {
-    const response = await apiService.api.get('/invoices', { params })
+    const response = await apiService.axiosInstance.get('/invoices', { params })
     return response.data
   }
 
@@ -116,7 +116,7 @@ class InvoicesService {
    * Récupérer une facture par son ID
    */
   async getInvoice(id: string) {
-    const response = await apiService.api.get(`/invoices/${id}`)
+    const response = await apiService.axiosInstance.get(`/invoices/${id}`)
     return response.data
   }
 
@@ -124,7 +124,7 @@ class InvoicesService {
    * Créer une nouvelle facture
    */
   async createInvoice(data: CreateInvoiceRequest) {
-    const response = await apiService.api.post('/invoices', data)
+    const response = await apiService.axiosInstance.post('/invoices', data)
     return response.data
   }
 
@@ -132,7 +132,7 @@ class InvoicesService {
    * Créer une facture depuis une commande
    */
   async createInvoiceFromOrder(orderId: string) {
-    const response = await apiService.api.post(`/invoices/from-order/${orderId}`)
+    const response = await apiService.axiosInstance.post(`/invoices/from-order/${orderId}`)
     return response.data
   }
 
@@ -140,7 +140,7 @@ class InvoicesService {
    * Mettre à jour une facture
    */
   async updateInvoice(id: string, data: UpdateInvoiceRequest) {
-    const response = await apiService.api.put(`/invoices/${id}`, data)
+    const response = await apiService.axiosInstance.put(`/invoices/${id}`, data)
     return response.data
   }
 
@@ -148,7 +148,7 @@ class InvoicesService {
    * Supprimer une facture
    */
   async deleteInvoice(id: string) {
-    const response = await apiService.api.delete(`/invoices/${id}`)
+    const response = await apiService.axiosInstance.delete(`/invoices/${id}`)
     return response.data
   }
 
@@ -156,7 +156,7 @@ class InvoicesService {
    * Changer le statut d'une facture
    */
   async updateInvoiceStatus(id: string, status: string) {
-    const response = await apiService.api.patch(`/invoices/${id}/status`, { status })
+    const response = await apiService.axiosInstance.patch(`/invoices/${id}/status`, { status })
     return response.data
   }
 
@@ -164,7 +164,7 @@ class InvoicesService {
    * Marquer une facture comme payée
    */
   async markInvoiceAsPaid(id: string, paymentData?: { method?: string; paidDate?: string }) {
-    const response = await apiService.api.patch(`/invoices/${id}/payment`, {
+    const response = await apiService.axiosInstance.patch(`/invoices/${id}/payment`, {
       status: 'paid',
       paidDate: paymentData?.paidDate || new Date().toISOString(),
       paymentMethod: paymentData?.method
@@ -176,7 +176,7 @@ class InvoicesService {
    * Envoyer une facture par email
    */
   async sendInvoice(id: string, emailData?: { to?: string; subject?: string; message?: string }) {
-    const response = await apiService.api.post(`/invoices/${id}/send`, emailData)
+    const response = await apiService.axiosInstance.post(`/invoices/${id}/send`, emailData)
     return response.data
   }
 
@@ -184,7 +184,7 @@ class InvoicesService {
    * Télécharger une facture en PDF
    */
   async downloadInvoicePdf(id: string) {
-    const response = await apiService.api.get(`/invoices/${id}/pdf`, {
+    const response = await apiService.axiosInstance.get(`/invoices/${id}/pdf`, {
       responseType: 'blob'
     })
     return response.data
@@ -194,7 +194,7 @@ class InvoicesService {
    * Dupliquer une facture
    */
   async duplicateInvoice(id: string) {
-    const response = await apiService.api.post(`/invoices/${id}/duplicate`)
+    const response = await apiService.axiosInstance.post(`/invoices/${id}/duplicate`)
     return response.data
   }
 
@@ -203,7 +203,7 @@ class InvoicesService {
    */
   async getInvoiceStats(period?: string) {
     const params = period ? { period } : {}
-    const response = await apiService.api.get('/invoices/stats', { params })
+    const response = await apiService.axiosInstance.get('/invoices/stats', { params })
     return response.data
   }
 
@@ -211,7 +211,7 @@ class InvoicesService {
    * Exporter les factures en CSV/Excel
    */
   async exportInvoices(params: InvoicesListParams & { format: 'csv' | 'excel' }) {
-    const response = await apiService.api.get('/invoices/export', {
+    const response = await apiService.axiosInstance.get('/invoices/export', {
       params,
       responseType: 'blob'
     })
@@ -222,7 +222,7 @@ class InvoicesService {
    * Récupérer le prochain numéro de facture
    */
   async getNextInvoiceNumber() {
-    const response = await apiService.api.get('/invoices/next-number')
+    const response = await apiService.axiosInstance.get('/invoices/next-number')
     return response.data
   }
 
@@ -230,7 +230,7 @@ class InvoicesService {
    * Envoyer un rappel de paiement
    */
   async sendPaymentReminder(id: string, reminderData?: { type?: 'first' | 'second' | 'final'; message?: string }) {
-    const response = await apiService.api.post(`/invoices/${id}/reminder`, reminderData)
+    const response = await apiService.axiosInstance.post(`/invoices/${id}/reminder`, reminderData)
     return response.data
   }
 
@@ -238,7 +238,7 @@ class InvoicesService {
    * Récupérer l'historique des paiements
    */
   async getPaymentHistory(id: string) {
-    const response = await apiService.api.get(`/invoices/${id}/payments`)
+    const response = await apiService.axiosInstance.get(`/invoices/${id}/payments`)
     return response.data
   }
 
@@ -246,7 +246,7 @@ class InvoicesService {
    * Ajouter un paiement partiel
    */
   async addPartialPayment(id: string, paymentData: { amount: number; date: string; method: string; reference?: string }) {
-    const response = await apiService.api.post(`/invoices/${id}/payments`, paymentData)
+    const response = await apiService.axiosInstance.post(`/invoices/${id}/payments`, paymentData)
     return response.data
   }
 }

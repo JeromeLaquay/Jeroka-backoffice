@@ -149,7 +149,8 @@ import {
   ShoppingCartIcon,
   CurrencyDollarIcon,
   CogIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  CalendarIcon
 } from '@heroicons/vue/24/outline'
 
 const route = useRoute()
@@ -163,13 +164,15 @@ const isDark = ref(false)
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon },
   { name: 'Messages', href: '/messages', icon: BellIcon },
-  { name: 'Emails', href: '/emails', icon: EnvelopeIcon },
+  { name: 'Calendrier', href: '/calendrier', icon: CalendarIcon },
   { name: 'Publications', href: '/publications', icon: DocumentTextIcon },
   { name: 'Clients', href: '/clients', icon: UsersIcon },
   { name: 'Factures', href: '/factures', icon: DocumentTextIcon },
   { name: 'Devis', href: '/devis', icon: ClipboardDocumentListIcon },
   { name: 'Produits', href: '/produits', icon: CubeIcon },
   { name: 'Commandes', href: '/commandes', icon: ShoppingCartIcon },
+  { name: 'Emails', href: '/emails', icon: EnvelopeIcon },
+
   { name: 'Comptabilite', href: '/comptabilite', icon: CurrencyDollarIcon },
   { name: 'Parametres', href: '/parametres', icon: CogIcon },
   { name: 'Annonces', href: '/annonces', icon: DocumentTextIcon }
