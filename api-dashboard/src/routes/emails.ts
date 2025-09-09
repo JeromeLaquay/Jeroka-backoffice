@@ -1,7 +1,7 @@
 import express from 'express';
 import { Request, Response } from 'express';
 import multer from 'multer';
-import { auth } from '@/middleware/auth';
+import { verifyToken } from '@/middleware/auth';
 import { logger } from '@/utils/logger';
 
 const router = express.Router();
@@ -78,7 +78,7 @@ interface EmailAttachment {
 // ===== ROUTES CATÉGORIES EMAIL =====
 
 // GET /api/v1/emails/categories - Récupérer toutes les catégories
-router.get('/categories', auth, async (req: Request, res: Response) => {
+router.get('/categories', verifyToken, async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
     
@@ -136,7 +136,7 @@ router.get('/categories', auth, async (req: Request, res: Response) => {
 });
 
 // POST /api/v1/emails/categories - Créer une nouvelle catégorie
-router.post('/categories', auth, async (req: Request, res: Response) => {
+router.post('/categories', verifyToken, async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
     const { name, downloadAttachments } = req.body;
@@ -181,7 +181,7 @@ router.post('/categories', auth, async (req: Request, res: Response) => {
 });
 
 // PUT /api/v1/emails/categories/:id - Modifier une catégorie
-router.put('/categories/:id', auth, async (req: Request, res: Response) => {
+router.put('/categories/:id', verifyToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user.id;
@@ -218,7 +218,7 @@ router.put('/categories/:id', auth, async (req: Request, res: Response) => {
 });
 
 // DELETE /api/v1/emails/categories/:id - Supprimer une catégorie
-router.delete('/categories/:id', auth, async (req: Request, res: Response) => {
+router.delete('/categories/:id', verifyToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user.id;
@@ -246,7 +246,7 @@ router.delete('/categories/:id', auth, async (req: Request, res: Response) => {
 // ===== ROUTES EXPÉDITEURS EMAIL =====
 
 // GET /api/v1/emails/senders - Récupérer tous les expéditeurs
-router.get('/senders', auth, async (req: Request, res: Response) => {
+router.get('/senders', verifyToken, async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
     
@@ -299,7 +299,7 @@ router.get('/senders', auth, async (req: Request, res: Response) => {
 });
 
 // PUT /api/v1/emails/senders/:id/category - Associer un expéditeur à une catégorie
-router.put('/senders/:id/category', auth, async (req: Request, res: Response) => {
+router.put('/senders/:id/category', verifyToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user.id;
@@ -328,7 +328,7 @@ router.put('/senders/:id/category', auth, async (req: Request, res: Response) =>
 // ===== ROUTES EMAILS =====
 
 // GET /api/v1/emails - Récupérer tous les emails
-router.get('/', auth, async (req: Request, res: Response) => {
+router.get('/', verifyToken, async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
     const { page = 1, limit = 20, categoryId, hasAttachments } = req.query;
@@ -436,7 +436,7 @@ router.get('/', auth, async (req: Request, res: Response) => {
 });
 
 // POST /api/v1/emails/sync - Synchroniser les emails depuis la boîte mail
-router.post('/sync', auth, async (req: Request, res: Response) => {
+router.post('/sync', verifyToken, async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
     
@@ -476,7 +476,7 @@ router.post('/sync', auth, async (req: Request, res: Response) => {
 // ===== ROUTES PIÈCES JOINTES =====
 
 // GET /api/v1/emails/attachments - Récupérer toutes les pièces jointes
-router.get('/attachments', auth, async (req: Request, res: Response) => {
+router.get('/attachments', verifyToken, async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
     const { analyzed, page = 1, limit = 20 } = req.query;
@@ -552,7 +552,7 @@ router.get('/attachments', auth, async (req: Request, res: Response) => {
 });
 
 // POST /api/v1/emails/attachments/:id/analyze - Analyser une pièce jointe avec IA
-router.post('/attachments/:id/analyze', auth, async (req: Request, res: Response) => {
+router.post('/attachments/:id/analyze', verifyToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user.id;
@@ -626,7 +626,7 @@ router.post('/attachments/:id/analyze', auth, async (req: Request, res: Response
 });
 
 // POST /api/v1/emails/attachments/:id/convert - Convertir l'analyse en facture/devis
-router.post('/attachments/:id/convert', auth, async (req: Request, res: Response) => {
+router.post('/attachments/:id/convert', verifyToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user.id;
@@ -665,7 +665,7 @@ router.post('/attachments/:id/convert', auth, async (req: Request, res: Response
 });
 
 // GET /api/v1/emails/attachments/:id/download - Télécharger une pièce jointe
-router.get('/attachments/:id/download', auth, async (req: Request, res: Response) => {
+router.get('/attachments/:id/download', verifyToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user.id;

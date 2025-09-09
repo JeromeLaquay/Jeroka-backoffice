@@ -389,4 +389,118 @@ router.delete('/:id', verifyToken, async (req: Request, res: Response) => {
   }
 })
 
+/**
+ * @route POST /api/v1/messages/:id/ai-draft
+ * @desc Generate AI draft response for a message
+ * @access Private
+ */
+router.post('/:id/ai-draft', verifyToken, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const { tone = 'professionnel', language = 'fr', template } = req.body
+
+    const message = mockMessages.find(m => m.id === id)
+    if (!message) {
+      return res.status(404).json({
+        success: false,
+        message: 'Message non trouvé'
+      })
+    }
+
+    // Simulation de génération IA (en production, utiliser une vraie API IA)
+    const generateAIDraft = (msg: any, options: any) => {
+      const { tone, language } = options
+      
+      const greetings = {
+        fr: 'Bonjour',
+        en: 'Hello'
+      }
+      
+      const thanks = {
+        fr: 'Merci pour votre message.',
+        en: 'Thank you for your message.'
+      }
+      
+      const signatures = {
+        fr: 'Cordialement,\nL\'équipe Jeroka',
+        en: 'Kind regards,\nJeroka Team'
+      }
+
+      // Détection du type de message
+      let responseContent = ''
+      const subject = msg.subject.toLowerCase()
+      const messageText = msg.message.toLowerCase()
+      
+      if (subject.includes('devis') || messageText.includes('devis')) {
+        responseContent = language === 'fr'
+          ? 'Nous avons bien reçu votre demande de devis. Notre équipe va étudier votre projet et vous recontacter sous 24-48h avec une proposition détaillée et un devis personnalisé.'
+          : 'We have received your quote request. Our team will review your project and get back to you within 24-48 hours with a detailed proposal and personalized quote.'
+      } else if (subject.includes('partenariat') || messageText.includes('partenariat')) {
+        responseContent = language === 'fr'
+          ? 'Votre proposition de partenariat nous intéresse. Nous allons examiner votre dossier et vous recontacter pour discuter des modalités de collaboration.'
+          : 'Your partnership proposal interests us. We will review your file and get back to you to discuss collaboration terms.'
+      } else if (subject.includes('information') || messageText.includes('information')) {
+        responseContent = language === 'fr'
+          ? 'Merci pour votre demande d\'information. Nous vous fournirons les détails demandés dans les plus brefs délais.'
+          : 'Thank you for your information request. We will provide you with the requested details as soon as possible.'
+      } else {
+        responseContent = language === 'fr'
+          ? 'Nous avons bien reçu votre message et nous vous remercions de nous avoir contactés. Nous vous répondrons dans les plus brefs délais.'
+          : 'We have received your message and thank you for contacting us. We will respond as soon as possible.'
+      }
+
+      // Ajustement du ton
+      if (tone === 'amical') {
+        responseContent = responseContent.replace(/Nous/g, 'Nous').replace(/Merci/g, 'Merci beaucoup')
+      } else if (tone === 'concis') {
+        responseContent = responseContent.split('.')[0] + '.'
+      } else if (tone === 'formel') {
+        responseContent = responseContent.replace(/nous/g, 'nous').replace(/vous/g, 'vous')
+      }
+
+      const clientName = `${msg.firstName} ${msg.lastName}`.trim()
+      const messageSummary = msg.message.slice(0, 200) + (msg.message.length > 200 ? '...' : '')
+      
+      const nextSteps = language === 'fr'
+        ? 'Prochaine étape:\n- Nous revenons vers vous sous 24-48h avec les informations demandées\n- Si urgent, vous pouvez répondre à cet email en précisant votre disponibilité'
+        : 'Next steps:\n- We will get back to you within 24-48 hours with the requested information\n- If urgent, you can reply to this email specifying your availability'
+
+      return `${greetings[language]} ${clientName},
+
+${thanks}
+
+${responseContent}
+
+Résumé de votre message:
+${messageSummary}
+
+${nextSteps}
+
+${signatures[language]}`
+    }
+
+    // Simulation d'un délai de traitement IA
+    await new Promise(resolve => setTimeout(resolve, 1500))
+
+    const draft = generateAIDraft(message, { tone, language, template })
+
+    res.json({
+      success: true,
+      data: {
+        draft,
+        messageId: id,
+        generatedAt: new Date().toISOString(),
+        options: { tone, language, template }
+      },
+      message: 'Brouillon IA généré avec succès'
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la génération du brouillon IA',
+      error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
+    })
+  }
+})
+
 export default router

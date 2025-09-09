@@ -404,6 +404,18 @@ class MessagesService {
   }
 
   /**
+   * Générer un brouillon de réponse IA
+   */
+  async generateAIDraft(messageId: string, options: {
+    tone?: 'professionnel' | 'amical' | 'formel' | 'concis'
+    language?: 'fr' | 'en'
+    template?: string
+  }) {
+    const response = await apiService.api.post(`/messages/${messageId}/ai-draft`, options)
+    return response.data
+  }
+
+  /**
    * Récupérer les règles d'auto-assignation
    */
   async getAutoAssignRules() {

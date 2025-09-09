@@ -39,7 +39,7 @@ echo    PostgreSQL a besoin de temps pour :
 echo    - Initialiser la base de données
 echo    - Exécuter les migrations
 echo    - Créer les tables et utilisateurs
-timeout /t 75 /nobreak >nul
+timeout /t 30 /nobreak >nul
 
 echo.
 echo 📋 Étape 7/9: Vérification PostgreSQL...
@@ -69,7 +69,7 @@ docker-compose -f docker-compose.dev.yml up -d api-dev
 
 echo.
 echo ⏳ Attente du démarrage de l'API (45 secondes)...
-timeout /t 45 /nobreak >nul
+timeout /t 20 /nobreak >nul
 
 echo.
 echo 📋 Étape 9/9: Tests finaux...
