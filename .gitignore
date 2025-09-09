@@ -1,26 +1,52 @@
-# Fichiers de configuration
-tsconfig.json
-tailwind.config.js
-rundocker.sh
-postcss.config.js
-package.json
-package-lock.json
-Dockerfile
-docker-compose.yml
-.eslintrc.js
-
-# Dossier de build
-dist/
-
+#génére le gitignore global
 # Dossier de configuration de l'IDE
 .cursor/
 
-# Dossier source
-src/
+./node_modules*
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Dossier spécifique
-Jeroka/
+node_modules
+.DS_Store
+dist
+dist-ssr
+coverage
+*.local
 
-# Fichiers spécifiques
--i
-digitalisation-entreprise.jpg
+/cypress/videos/
+/cypress/screenshots/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*.tsbuildinfo
+
+node_modules/
+npm-debug.log*
+.env
+.env.*
+logs/
+*.log
+coverage/
+.git/
+.gitignore
+README.md
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+uploads/
+dist/
+

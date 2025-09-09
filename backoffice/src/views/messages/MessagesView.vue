@@ -1,0 +1,648 @@
+<template>
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="sm:flex sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Messages de contact</h1>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          Gérez les messages reçus via le formulaire de contact
+        </p>
+      </div>
+      <div class="mt-4 sm:mt-0 flex space-x-3">
+        <button
+          @click="markAllAsRead"
+          class="btn-secondary inline-flex items-center"
+        >
+          <CheckIcon class="h-4 w-4 mr-2" />
+          Tout marquer comme lu
+        </button>
+        <button
+          @click="exportMessages"
+          class="btn-primary inline-flex items-center"
+        >
+          <ArrowDownTrayIcon class="h-4 w-4 mr-2" />
+          Exporter
+        </button>
+      </div>
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-4">
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <EnvelopeIcon class="h-6 w-6 text-primary-600" />
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Total messages
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {{ messages.length }}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <ExclamationCircleIcon class="h-6 w-6 text-warning-600" />
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Non lus
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {{ unreadCount }}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <DocumentTextIcon class="h-6 w-6 text-success-600" />
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Demandes de devis
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {{ quotesCount }}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <UserGroupIcon class="h-6 w-6 text-secondary-600" />
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Partenariats
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {{ partnershipsCount }}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label class="form-label">Rechercher</label>
+          <input
+            v-model="searchQuery"
+            type="text"
+            class="form-input"
+            placeholder="Nom, email, sujet..."
+          />
+        </div>
+        <div>
+          <label class="form-label">Type</label>
+          <select v-model="typeFilter" class="form-input">
+            <option value="">Tous les types</option>
+            <option value="devis">Demande de devis</option>
+            <option value="information">Information</option>
+            <option value="partnership">Partenariat</option>
+            <option value="other">Autre</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Statut</label>
+          <select v-model="statusFilter" class="form-input">
+            <option value="">Tous les statuts</option>
+            <option value="unread">Non lu</option>
+            <option value="read">Lu</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Date</label>
+          <select v-model="dateFilter" class="form-input">
+            <option value="">Toutes les dates</option>
+            <option value="today">Aujourd'hui</option>
+            <option value="week">Cette semaine</option>
+            <option value="month">Ce mois</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des messages -->
+    <div class="card p-0 overflow-hidden">
+      <div class="divide-y divide-gray-200 dark:divide-gray-700">
+        <div 
+          v-for="message in filteredMessages" 
+          :key="message.id"
+          :class="[
+            'p-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors',
+            message.status === 'new' ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+          ]"
+          @click="openMessage(message)"
+        >
+          <div class="flex items-start justify-between">
+            <div class="flex items-start space-x-4 flex-1 min-w-0">
+              <div class="flex-shrink-0">
+                <div class="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {{ getMessageInitials(message) }}
+                  </span>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center">
+                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {{ getMessageName(message) }}
+                  </p>
+                  <span 
+                    v-if="message.status === 'new'"
+                    class="ml-2 inline-block w-2 h-2 bg-primary-600 rounded-full"
+                  ></span>
+                </div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ message.email }}
+                </p>
+                <p class="text-sm font-medium text-gray-900 dark:text-gray-100 mt-1">
+                  {{ message.subject }}
+                </p>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
+                  {{ message.message }}
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-col items-end space-y-2">
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                {{ formatDate(message.createdAt) }}
+              </p>
+              <span 
+                :class="[
+                  'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
+                  getMessageType(message) === 'devis' ? 'badge-warning' : 
+                  getMessageType(message) === 'information' ? 'badge-info' : 
+                  getMessageType(message) === 'partnership' ? 'badge-secondary' : 'badge-success'
+                ]"
+              >
+                {{ getMessageTypeLabel(getMessageType(message)) }}
+              </span>
+              <div class="flex space-x-2">
+                <button
+                  @click.stop="toggleRead(message)"
+                  class="text-primary-600 hover:text-primary-900 text-xs"
+                >
+                  {{ message.status === 'new' ? 'Marquer lu' : 'Marquer non lu' }}
+                </button>
+                <button
+                  @click.stop="deleteMessage(message.id)"
+                  class="text-danger-600 hover:text-danger-900 text-xs"
+                >
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div v-if="filteredMessages.length === 0" class="text-center py-12">
+        <EnvelopeIcon class="mx-auto h-12 w-12 text-gray-400" />
+        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+          Aucun message trouvé
+        </h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          {{ searchQuery || typeFilter || statusFilter ? 'Essayez de modifier vos filtres' : 'Aucun message de contact pour le moment' }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de détail du message -->
+  <div 
+    v-if="selectedMessage" 
+    class="fixed inset-0 z-50 overflow-y-auto"
+    @click="closeMessage"
+  >
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"></div>
+      
+      <div 
+        class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white dark:bg-gray-800 rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full"
+        @click.stop
+      >
+        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="flex items-start justify-between mb-4">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Message de {{ getMessageName(selectedMessage) }}
+            </h3>
+            <button
+              @click="closeMessage"
+              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <XMarkIcon class="h-6 w-6" />
+            </button>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Nom</label>
+                <p class="text-sm text-gray-900 dark:text-gray-100">{{ getMessageName(selectedMessage) }}</p>
+              </div>
+              <div>
+                <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
+                <p class="text-sm text-gray-900 dark:text-gray-100">{{ selectedMessage.email }}</p>
+              </div>
+            </div>
+            
+            <div>
+              <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Sujet</label>
+              <p class="text-sm text-gray-900 dark:text-gray-100">{{ selectedMessage.subject }}</p>
+            </div>
+            
+            <div>
+              <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Type</label>
+              <span 
+                :class="[
+                  'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
+                  getMessageType(selectedMessage) === 'devis' ? 'badge-warning' : 
+                  getMessageType(selectedMessage) === 'information' ? 'badge-info' : 
+                  getMessageType(selectedMessage) === 'partnership' ? 'badge-secondary' : 'badge-success'
+                ]"
+              >
+                {{ getMessageTypeLabel(getMessageType(selectedMessage)) }}
+              </span>
+            </div>
+            
+            <div>
+              <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Message</label>
+              <div class="mt-1 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                <p class="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">{{ selectedMessage.message }}</p>
+              </div>
+            </div>
+            
+            <div>
+              <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Date de réception</label>
+              <p class="text-sm text-gray-900 dark:text-gray-100">{{ formatDate(selectedMessage.createdAt) }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button
+            v-if="getMessageType(selectedMessage) === 'devis'"
+            @click="createQuote(selectedMessage)"
+            class="btn-primary mb-3 sm:mb-0 sm:ml-3"
+          >
+            Créer un devis
+          </button>
+          <a
+            :href="`mailto:${selectedMessage.email}?subject=Re: ${selectedMessage.subject}`"
+            class="btn-secondary mb-3 sm:mb-0 sm:ml-3"
+          >
+            Répondre par email
+          </a>
+          <button
+            @click="closeMessage"
+            class="btn-secondary"
+          >
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import {
+  EnvelopeIcon,
+  ExclamationCircleIcon,
+  DocumentTextIcon,
+  CheckIcon,
+  ArrowDownTrayIcon,
+  XMarkIcon,
+  UserGroupIcon
+} from '@heroicons/vue/24/outline'
+import { messagesService, type ContactMessage, type MessageStats } from '../../services/messages'
+
+const router = useRouter()
+
+// État
+const loading = ref(false)
+const messages = ref<ContactMessage[]>([])
+const selectedMessage = ref<ContactMessage | null>(null)
+const searchQuery = ref('')
+const typeFilter = ref('')
+const statusFilter = ref('')
+const dateFilter = ref('')
+
+const stats = ref<MessageStats>({
+  total: 0,
+  new: 0,
+  read: 0,
+  replied: 0,
+  archived: 0,
+  todayCount: 0,
+  weekCount: 0,
+  monthCount: 0,
+  averageResponseTime: 0,
+  responseRate: 0
+})
+const selectedMessages = ref<string[]>([])
+const filters = ref({
+  search: '',
+  status: '',
+  priority: '',
+  dateFrom: '',
+  dateTo: ''
+})
+const currentPage = ref(1)
+const itemsPerPage = 20
+
+// Utilitaires pour les messages
+const getMessageName = (message: ContactMessage | null) => {
+  if (!message) return 'Inconnu'
+  const firstName = message.firstName || ''
+  const lastName = message.lastName || ''
+  return `${firstName} ${lastName}`.trim() || 'Inconnu'
+}
+
+const getMessageInitials = (message: ContactMessage) => {
+  if (!message) return '?'
+  const firstName = message.firstName || ''
+  const lastName = message.lastName || ''
+  const firstInitial = firstName.charAt(0).toUpperCase()
+  const lastInitial = lastName.charAt(0).toUpperCase()
+  return firstInitial + lastInitial || '?'
+}
+
+const getMessageType = (message: ContactMessage | null) => {
+  if (!message) return 'other'
+  
+  // Détecter le type basé sur les tags ou le contenu
+  if (message.tags?.includes('devis') || message.subject.toLowerCase().includes('devis')) {
+    return 'devis'
+  }
+  if (message.tags?.includes('partnership') || message.subject.toLowerCase().includes('partenariat')) {
+    return 'partnership'
+  }
+  if (message.tags?.includes('information') || message.subject.toLowerCase().includes('information')) {
+    return 'information'
+  }
+  return 'other'
+}
+
+const getMessageTypeLabel = (type: string) => {
+  const labels: Record<string, string> = {
+    'devis': 'Demande de devis',
+    'information': 'Information',
+    'partnership': 'Partenariat',
+    'other': 'Autre'
+  }
+  return labels[type] || type
+}
+
+// Méthodes
+const loadMessages = async () => {
+  loading.value = true
+  try {
+    const response = await messagesService.getMessages({
+      page: currentPage.value,
+      limit: itemsPerPage,
+      search: filters.value.search,
+      status: filters.value.status || undefined,
+      priority: filters.value.priority || undefined,
+      dateFrom: filters.value.dateFrom || undefined,
+      dateTo: filters.value.dateTo || undefined
+    })
+    messages.value = response.data.messages
+  } catch (error) {
+    console.error('Erreur lors du chargement des messages:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadStats = async () => {
+  try {
+    const response = await messagesService.getMessagesStats()
+    stats.value = response.data
+  } catch (error) {
+    console.error('Erreur lors du chargement des statistiques:', error)
+  }
+}
+
+const markAsRead = async (messageId: string) => {
+  try {
+    await messagesService.markAsRead(messageId)
+    await loadMessages()
+    await loadStats()
+  } catch (error) {
+    console.error('Erreur lors du marquage:', error)
+  }
+}
+
+const markAllAsRead = async () => {
+  try {
+    await messagesService.markAllAsRead()
+    await loadMessages()
+    await loadStats()
+  } catch (error) {
+    console.error('Erreur lors du marquage global:', error)
+  }
+}
+
+const exportMessages = async () => {
+  try {
+    const blob = await messagesService.exportMessages({
+      format: 'excel',
+      ...filters.value
+    })
+    
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `messages-${new Date().toISOString().split('T')[0]}.xlsx`
+    link.click()
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('Erreur lors de l\'export:', error)
+  }
+}
+
+const deleteMessage = async (messageId: string) => {
+  if (confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) {
+    try {
+      await messagesService.deleteMessage(messageId)
+      await loadMessages()
+      await loadStats()
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error)
+    }
+  }
+}
+
+const openMessage = (message: ContactMessage) => {
+  selectedMessage.value = message
+  // Marquer comme lu si ce n'est pas déjà fait
+  if (message.status === 'new') {
+    toggleRead(message)
+  }
+}
+
+const closeMessage = () => {
+  selectedMessage.value = null
+}
+
+const toggleRead = async (message: ContactMessage) => {
+  try {
+    const newStatus = message.status === 'new' ? 'read' : 'new'
+    await messagesService.updateMessageStatus(message.id, { status: newStatus })
+    message.status = newStatus
+    if (newStatus === 'read' && !message.readAt) {
+      message.readAt = new Date().toISOString()
+    }
+  } catch (error) {
+    console.error('Erreur lors du changement de statut:', error)
+  }
+}
+
+const createQuote = (message: ContactMessage) => {
+  // Rediriger vers la création de devis avec les données du message
+  router.push({
+    name: 'CreateQuote',
+    query: {
+      clientName: getMessageName(message),
+      clientEmail: message.email,
+      clientPhone: message.phone || '',
+      clientCompany: message.company || '',
+      fromMessage: message.id
+    }
+  })
+  closeMessage()
+}
+
+// Computed
+const filteredMessages = computed(() => {
+  let filtered = [...messages.value]
+  
+  // Filtrage par recherche
+  if (searchQuery.value) {
+    const search = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(message => 
+      getMessageName(message).toLowerCase().includes(search) ||
+      message.email.toLowerCase().includes(search) ||
+      message.subject.toLowerCase().includes(search) ||
+      message.message.toLowerCase().includes(search)
+    )
+  }
+  
+  // Filtrage par type (basé sur les tags ou le sujet)
+  if (typeFilter.value) {
+    filtered = filtered.filter(message => {
+      if (typeFilter.value === 'devis') {
+        return message.tags?.includes('devis') || message.subject.toLowerCase().includes('devis')
+      }
+      if (typeFilter.value === 'partnership') {
+        return message.tags?.includes('partnership') || message.subject.toLowerCase().includes('partenariat')
+      }
+      if (typeFilter.value === 'information') {
+        return message.tags?.includes('information') || message.subject.toLowerCase().includes('information')
+      }
+      return true
+    })
+  }
+  
+  // Filtrage par statut
+  if (statusFilter.value) {
+    const status = statusFilter.value === 'unread' ? 'new' : statusFilter.value
+    filtered = filtered.filter(message => message.status === status)
+  }
+  
+  return filtered
+})
+
+// Statistiques calculées
+const unreadCount = computed(() => 
+  messages.value.filter(m => m.status === 'new').length
+)
+
+const quotesCount = computed(() => 
+  messages.value.filter(m => 
+    m.tags?.includes('devis') || 
+    m.subject.toLowerCase().includes('devis')
+  ).length
+)
+
+const partnershipsCount = computed(() => 
+  messages.value.filter(m => 
+    m.tags?.includes('partnership') || 
+    m.subject.toLowerCase().includes('partenariat')
+  ).length
+)
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
+
+const getPriorityClass = (priority: string) => {
+  switch (priority) {
+    case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+    case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+    case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+    default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+  }
+}
+
+const getStatusClass = (status: string) => {
+  switch (status) {
+    case 'new': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+    case 'read': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+    case 'replied': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+    case 'archived': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+    default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+  }
+}
+
+// Lifecycle
+onMounted(async () => {
+  await Promise.all([loadMessages(), loadStats()])
+})
+</script>
+
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>

@@ -1,0 +1,954 @@
+{
+	"info": {
+		"_postman_id": "jeroka-api-dashboard",
+		"name": "Jeroka API Dashboard",
+		"description": "Collection complète pour tester l'API backend Jeroka - Gestion TPE/PME\n\n🚀 **Fonctionnalités:**\n- Authentification JWT\n- Gestion des utilisateurs\n- Messages de contact\n- Clients et CRM\n- Publications multi-plateformes\n- Dashboard et statistiques\n\n🔑 **Variables d'environnement:**\n- `baseUrl`: http://localhost:3002/api/v1\n- `accessToken`: Token JWT (auto-set)\n- `userId`: ID utilisateur (auto-set)\n\n📋 **Ordre de test recommandé:**\n1. Health Check\n2. Register/Login\n3. Profile\n4. Dashboard Stats\n5. CRUD operations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "🏥 Health & Status",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/../../health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"..",
+								"..",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Dashboard Stats",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recent Activity",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/recent-activity",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard",
+								"recent-activity"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data.accessToken) {",
+									"        pm.environment.set('accessToken', jsonData.data.accessToken);",
+									"        pm.environment.set('userId', jsonData.data.user.id);",
+									"        console.log('✅ User registered and token saved');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@jeroka.com\",\n  \"password\": \"Test123!\",\n  \"confirmPassword\": \"Test123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"phone\": \"0123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data.accessToken) {",
+									"        pm.environment.set('accessToken', jsonData.data.accessToken);",
+									"        pm.environment.set('userId', jsonData.data.user.id);",
+									"        console.log('✅ Login successful, token saved');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@jeroka.com\",\n  \"password\": \"admin123\",\n  \"rememberMe\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Admin\",\n  \"lastName\": \"Jeroka Updated\",\n  \"phone\": \"0123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"admin123\",\n  \"newPassword\": \"newPassword123!\",\n  \"confirmPassword\": \"newPassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/change-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📧 Messages",
+			"item": [
+				{
+					"name": "Get All Messages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/messages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Message (Public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data.id) {",
+									"        pm.environment.set('messageId', jsonData.data.id);",
+									"        console.log('✅ Message created with ID:', jsonData.data.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Jean Dupont\",\n  \"email\": \"jean.dupont@example.fr\",\n  \"phone\": \"0123456789\",\n  \"company\": \"Mon Entreprise\",\n  \"subject\": \"Demande de devis pour site web\",\n  \"message\": \"Bonjour, je souhaiterais obtenir un devis pour la création d'un site web vitrine pour mon entreprise. Pouvez-vous me contacter ?\",\n  \"type\": \"devis\",\n  \"source\": \"website_form\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/messages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Message Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"read\",\n  \"priority\": \"high\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/messages/{{messageId}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages",
+								"{{messageId}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Message",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/messages/{{messageId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages",
+								"{{messageId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🤝 Clients",
+			"item": [
+				{
+					"name": "Get All Clients",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/clients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Client - Company",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data.id) {",
+									"        pm.environment.set('clientId', jsonData.data.id);",
+									"        console.log('✅ Client created with ID:', jsonData.data.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"company\",\n  \"firstName\": \"Marie\",\n  \"lastName\": \"Dupont\",\n  \"companyName\": \"Tech Innovations SARL\",\n  \"email\": \"marie.dupont@techinnovations.fr\",\n  \"phone\": \"0123456789\",\n  \"mobile\": \"0687654321\",\n  \"addressLine1\": \"123 Rue de la Tech\",\n  \"addressLine2\": \"Bâtiment A\",\n  \"city\": \"Paris\",\n  \"postalCode\": \"75001\",\n  \"country\": \"France\",\n  \"siret\": \"12345678901234\",\n  \"vatNumber\": \"FR12345678901\",\n  \"website\": \"https://techinnovations.fr\",\n  \"notes\": \"Client premium intéressé par nos solutions d'automatisation\",\n  \"source\": \"linkedin\",\n  \"tags\": [\"premium\", \"automation\", \"saas\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/clients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Client - Individual",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"individual\",\n  \"firstName\": \"Pierre\",\n  \"lastName\": \"Martin\",\n  \"email\": \"pierre.martin@email.fr\",\n  \"phone\": \"0234567890\",\n  \"mobile\": \"0698765432\",\n  \"addressLine1\": \"456 Avenue des Particuliers\",\n  \"city\": \"Lyon\",\n  \"postalCode\": \"69000\",\n  \"country\": \"France\",\n  \"notes\": \"Particulier souhaitant créer un site portfolio\",\n  \"source\": \"recommendation\",\n  \"tags\": [\"portfolio\", \"photography\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/clients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Client",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"active\",\n  \"notes\": \"Client mis à jour - projet confirmé\",\n  \"tags\": [\"premium\", \"automation\", \"saas\", \"confirmed\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/clients/{{clientId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients",
+								"{{clientId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Client",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/clients/{{clientId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients",
+								"{{clientId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📱 Publications",
+			"item": [
+				{
+					"name": "Get All Publications",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/publications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"publications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Publication",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data.id) {",
+									"        pm.environment.set('publicationId', jsonData.data.id);",
+									"        console.log('✅ Publication created with ID:', jsonData.data.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Nouveautés Jeroka : Solutions d'automatisation pour PME\",\n  \"content\": \"🚀 Découvrez nos nouvelles solutions d'automatisation spécialement conçues pour les PME ! \\n\\n✨ Automatisez vos processus répétitifs\\n📊 Gagnez en productivité\\n💰 Réduisez vos coûts\\n\\nContactez-nous pour une démonstration gratuite !\",\n  \"excerpt\": \"Nouvelles solutions d'automatisation Jeroka pour PME\",\n  \"featuredImage\": \"https://images.unsplash.com/photo-1551434678-e076c223a692\",\n  \"hashtags\": [\"#jeroka\", \"#automatisation\", \"#PME\", \"#innovation\", \"#productivité\"],\n  \"type\": \"announcement\",\n  \"status\": \"draft\",\n  \"category\": \"technology\",\n  \"tags\": [\"automation\", \"business\", \"innovation\"],\n  \"seoTitle\": \"Solutions d'automatisation Jeroka pour PME - Augmentez votre productivité\",\n  \"seoDescription\": \"Découvrez les solutions d'automatisation Jeroka spécialement conçues pour les PME. Automatisez vos processus et augmentez votre productivité.\",\n  \"seoKeywords\": [\"automatisation\", \"PME\", \"productivité\", \"innovation\", \"jeroka\"],\n  \"platforms\": [\"facebook\", \"linkedin\", \"website\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/publications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"publications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Publication",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"published\",\n  \"platforms\": [\"facebook\", \"linkedin\", \"instagram\", \"website\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/publications/{{publicationId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"publications",
+								"{{publicationId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Publish to Platforms",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/publications/{{publicationId}}/publish",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"publications",
+								"{{publicationId}}",
+								"publish"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Publication",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/publications/{{publicationId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"publications",
+								"{{publicationId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📦 Products",
+			"item": [
+				{
+					"name": "Get All Products",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📄 Quotes",
+			"item": [
+				{
+					"name": "Get All Quotes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/quotes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"quotes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🧾 Invoices",
+			"item": [
+				{
+					"name": "Get All Invoices",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/invoices",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3002/api/v1",
+			"type": "string"
+		}
+	]
+}
+
+
