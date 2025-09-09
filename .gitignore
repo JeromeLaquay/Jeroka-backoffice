@@ -1,52 +1,251 @@
-#génére le gitignore global
-# Dossier de configuration de l'IDE
+# Gitignore Global - JeroKa Ecosystem
+# Fichier de configuration global pour tous les projets Jeroka
+
+# ===========================================
+# SYSTÈME D'EXPLOITATION
+# ===========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ===========================================
+# ÉDITEURS ET IDEs
+# ===========================================
+# Cursor (utilisé dans Jeroka/)
 .cursor/
 
-./node_modules*
-# Logs
-logs
-*.log
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+# ===========================================
+# PROJETS JEROKA - SPÉCIFICITÉS
+# ===========================================
+
+# API Dashboard (Express + TypeScript + PostgreSQL)
+# - Backend Node.js avec Express
+# - Base de données PostgreSQL
+# - Tests Jest
+# - Docker avec PostgreSQL
+
+# Backoffice (Vue 3 + Vite + TypeScript + Tailwind)
+# - Frontend Vue 3 avec Vite
+# - TypeScript
+# - Tailwind CSS
+# - Charts.js
+
+# E-boutique (Vue 3 + Vite)
+# - Frontend Vue 3 simple
+# - Vite pour le build
+
+# Jeroka (Vue 3 + Vue CLI + TypeScript + Tailwind)
+# - Frontend Vue 3 avec Vue CLI
+# - TypeScript
+# - Tailwind CSS
+# - Webpack
+
+# ===========================================
+# NODE.JS / JAVASCRIPT / TYPESCRIPT
+# ===========================================
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-node_modules
-.DS_Store
-dist
-dist-ssr
-coverage
-*.local
-
-/cypress/videos/
-/cypress/screenshots/
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
+.npm
+.yarn-integrity
 *.tsbuildinfo
 
-node_modules/
-npm-debug.log*
-.env
-.env.*
+# Build outputs
+dist/
+dist-ssr/
+build/
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+.fusebox/
+
+# ===========================================
+# VUE.JS / VITE / VUE CLI
+# ===========================================
+# Vite
+.vite/
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Vue CLI
+.vue-cli-service/
+
+# Vue specific
+*.vue.js
+*.vue.ts
+
+# ===========================================
+# EXPRESS / NODE.JS BACKEND
+# ===========================================
+# Logs spécifiques à l'API
 logs/
 *.log
-coverage/
-.git/
-.gitignore
-README.md
+
+# Uploads (utilisé dans api-dashboard)
+uploads/
+public/uploads/
+
+# Sessions et cache
+sessions/
+.cache/
+
+# ===========================================
+# BASE DE DONNÉES
+# ===========================================
+# PostgreSQL (utilisé dans api-dashboard)
+*.db
+*.sqlite
+*.sqlite3
+*.rdb
+
+# Dumps de base de données
+*.sql
+*.dump
+
+# ===========================================
+# DOCKER (utilisé dans api-dashboard)
+# ===========================================
 docker-compose*.yml
 Dockerfile*
 .dockerignore
-uploads/
-dist/
 
+# ===========================================
+# TESTING
+# ===========================================
+# Jest (utilisé dans api-dashboard)
+coverage/
+.nyc_output/
+junit.xml
+test-results/
+test-results.xml
+
+# Cypress (utilisé dans eboutique)
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+
+# Playwright
+playwright-report/
+test-results/
+
+# ===========================================
+# ENVIRONNEMENT ET CONFIGURATION
+# ===========================================
+.env
+.env.*
+!.env.example
+config/local.json
+config/production.json
+config/staging.json
+
+# ===========================================
+# CACHE ET TEMPORAIRES
+# ===========================================
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+*.tmp
+*.temp
+
+# ===========================================
+# SÉCURITÉ
+# ===========================================
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+.secrets/
+
+# ===========================================
+# PACKAGE MANAGERS
+# ===========================================
+# Lock files (à ignorer selon les projets)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# ===========================================
+# DOCUMENTATION GÉNÉRÉE
+# ===========================================
+docs/_build/
+site/
+_site/
+
+# ===========================================
+# PROJETS SPÉCIFIQUES
+# ===========================================
+# Git
+.git/
+.gitignore
+
+# README (optionnel - décommentez si vous ne voulez pas ignorer les README)
+# README.md
+
+# ===========================================
+# RÈGLES SPÉCIFIQUES AUX PROJETS JEROKA
+# ===========================================
+
+# API Dashboard - Fichiers de diagnostic et scripts
+# (Ces fichiers sont spécifiques au projet et peuvent être ignorés)
+# complete-restart.bat
+# reset-postgres.bat
+# diagnose-connection.bat
+# fix-postgres-auth.bat
+
+# Fichiers de logs spécifiques
+logs/
+*.log
+
+# Uploads et médias
+uploads/
+public/uploads/
+storage/
+media/
+
+# ===========================================
+# COMPATIBILITÉ AVEC LES .GITIGNORE EXISTANTS
+# ===========================================
+# Ce fichier global est compatible avec les .gitignore existants
+# des projets backoffice/, eboutique/, et Jeroka/
+# Il ne remplace pas les .gitignore spécifiques mais les complète
