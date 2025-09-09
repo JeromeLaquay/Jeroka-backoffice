@@ -1,352 +1,173 @@
-import { apiService } from './api'
+import { apiService, ApiResponse } from './api'
 
 export interface Product {
-  id: string
+  id: number
   name: string
-  description?: string
-  sku: string
-  barcode?: string
+  description: string
+  price: number
+  stock: number
   category: string
-  subcategory?: string
-  brand?: string
-  unitPrice: number
-  costPrice: number
-  currency: string
-  vatRate: number
-  unit: string // unité de mesure (pièce, kg, litre, etc.)
-  stock: {
-    current: number
-    minimum: number
-    maximum?: number
-    reserved: number
-    available: number
-  }
-  status: 'active' | 'inactive' | 'discontinued'
-  dimensions?: {
-    weight?: number
-    length?: number
-    width?: number
-    height?: number
-  }
-  images: string[]
-  tags: string[]
   featured: boolean
-  isService: boolean // true pour les services, false pour les produits physiques
-  supplier?: {
-    id: string
-    name: string
-    reference?: string
-  }
   createdAt: string
-  updatedAt: string
 }
 
 export interface ProductCategory {
-  id: string
+  id: number
   name: string
-  description?: string
-  parentId?: string
-  subcategories?: ProductCategory[]
-  productsCount: number
-  isActive: boolean
-  sortOrder: number
-  createdAt: string
-  updatedAt: string
+  productCount: number
 }
 
 export interface CreateProductRequest {
   name: string
-  description?: string
-  sku: string
-  barcode?: string
-  categoryId: string
-  subcategoryId?: string
-  brand?: string
-  unitPrice: number
-  costPrice?: number
-  vatRate?: number
-  unit: string
-  stock?: {
-    current?: number
-    minimum?: number
-    maximum?: number
-  }
-  status?: string
-  dimensions?: {
-    weight?: number
-    length?: number
-    width?: number
-    height?: number
-  }
-  tags?: string[]
+  description: string
+  price: number
+  stock: number
+  category: string
   featured?: boolean
-  isService?: boolean
-  supplierId?: string
-  supplierReference?: string
 }
 
-export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
-
-export interface ProductsListParams {
-  page?: number
-  limit?: number
-  search?: string
+export interface UpdateProductRequest {
+  name?: string
+  description?: string
+  price?: number
+  stock?: number
   category?: string
-  subcategory?: string
-  status?: string
   featured?: boolean
-  isService?: boolean
-  brand?: string
-  lowStock?: boolean
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
 }
 
 export interface ProductStats {
   total: number
-  active: number
-  inactive: number
+  featured: number
   lowStock: number
-  outOfStock: number
-  services: number
-  physicalProducts: number
   totalValue: number
   categories: number
+  averagePrice: number
 }
 
-export interface StockMovement {
-  id: string
-  productId: string
-  type: 'in' | 'out' | 'adjustment' | 'reserved' | 'released'
-  quantity: number
-  reason: string
-  reference?: string // référence commande/facture/ajustement
-  userId: string
-  user: {
-    id: string
-    name: string
-  }
-  createdAt: string
+export interface ProductsListResponse {
+  products: Product[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
 }
 
-class ProductsService {
+class ProductService {
   /**
-   * Récupérer la liste des produits avec filtres et pagination
+   * Récupère la liste des produits avec pagination et filtres
    */
-  async getProducts(params: ProductsListParams = {}) {
-    const response = await apiService.axiosInstance.get('/products', { params })
-    return response.data
+  async getProducts(params?: {
+    page?: number
+    limit?: number
+    search?: string
+    category?: string
+    type?: 'featured' | 'low-stock'
+  }): Promise<ApiResponse<ProductsListResponse>> {
+    return await apiService.getProducts(params)
   }
 
   /**
-   * Récupérer un produit par son ID
+   * Récupère un produit par son ID
    */
-  async getProduct(id: string) {
-    const response = await apiService.axiosInstance.get(`/products/${id}`)
-    return response.data
+  async getProduct(id: string): Promise<ApiResponse<Product>> {
+    return await apiService.getProduct(id)
   }
 
   /**
-   * Créer un nouveau produit
+   * Crée un nouveau produit
    */
-  async createProduct(data: CreateProductRequest) {
-    const response = await apiService.axiosInstance.post('/products', data)
-    return response.data
+  async createProduct(data: CreateProductRequest): Promise<ApiResponse<Product>> {
+    return await apiService.createProduct(data)
   }
 
   /**
-   * Mettre à jour un produit
+   * Met à jour un produit
    */
-  async updateProduct(id: string, data: UpdateProductRequest) {
-    const response = await apiService.axiosInstance.put(`/products/${id}`, data)
-    return response.data
+  async updateProduct(id: string, data: UpdateProductRequest): Promise<ApiResponse<Product>> {
+    return await apiService.updateProduct(id, data)
   }
 
   /**
-   * Supprimer un produit
+   * Supprime un produit
    */
-  async deleteProduct(id: string) {
-    const response = await apiService.axiosInstance.delete(`/products/${id}`)
-    return response.data
+  async deleteProduct(id: string): Promise<ApiResponse> {
+    return await apiService.deleteProduct(id)
   }
 
   /**
-   * Changer le statut d'un produit
+   * Met à jour le stock d'un produit
    */
-  async updateProductStatus(id: string, status: string) {
-    const response = await apiService.axiosInstance.patch(`/products/${id}/status`, { status })
-    return response.data
+  async updateProductStock(
+    id: string, 
+    stock: number, 
+    operation: 'add' | 'subtract' | 'set'
+  ): Promise<ApiResponse<{ id: number; stock: number }>> {
+    return await apiService.updateProductStock(id, stock, operation)
   }
 
   /**
-   * Ajuster le stock d'un produit
+   * Récupère les catégories de produits
    */
-  async adjustStock(id: string, quantity: number, reason: string) {
-    const response = await apiService.axiosInstance.patch(`/products/${id}/stock`, {
-      quantity,
-      reason
-    })
-    return response.data
+  async getProductCategories(): Promise<ApiResponse<ProductCategory[]>> {
+    return await apiService.getProductCategories()
   }
 
   /**
-   * Récupérer l'historique du stock d'un produit
+   * Récupère les statistiques des produits
    */
-  async getStockHistory(id: string, params?: { page?: number; limit?: number }) {
-    const response = await apiService.axiosInstance.get(`/products/${id}/stock/history`, { params })
-    return response.data
+  async getProductStats(): Promise<ApiResponse<ProductStats>> {
+    return await apiService.getProductStats()
   }
 
   /**
-   * Dupliquer un produit
+   * Recherche des produits
    */
-  async duplicateProduct(id: string) {
-    const response = await apiService.axiosInstance.post(`/products/${id}/duplicate`)
-    return response.data
+  async searchProducts(query: string): Promise<ApiResponse<ProductsListResponse>> {
+    return await this.getProducts({ search: query, limit: 20 })
   }
 
   /**
-   * Récupérer les statistiques des produits
+   * Récupère les produits par catégorie
    */
-  async getProductStats(period?: string) {
-    const params = period ? { period } : {}
-    const response = await apiService.axiosInstance.get('/products/stats', { params })
-    return response.data
+  async getProductsByCategory(category: string): Promise<ApiResponse<ProductsListResponse>> {
+    return await this.getProducts({ category, limit: 100 })
   }
 
   /**
-   * Exporter les produits en CSV/Excel
+   * Récupère les produits en vedette
    */
-  async exportProducts(params: ProductsListParams & { format: 'csv' | 'excel' }) {
-    const response = await apiService.axiosInstance.get('/products/export', {
-      params,
-      responseType: 'blob'
-    })
-    return response.data
+  async getFeaturedProducts(): Promise<ApiResponse<ProductsListResponse>> {
+    return await this.getProducts({ type: 'featured', limit: 100 })
   }
 
   /**
-   * Importer des produits depuis un fichier CSV/Excel
+   * Récupère les produits en rupture de stock
    */
-  async importProducts(file: File) {
-    const formData = new FormData()
-    formData.append('file', file)
-    
-    const response = await apiService.axiosInstance.post('/products/import', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-    return response.data
+  async getLowStockProducts(): Promise<ApiResponse<ProductsListResponse>> {
+    return await this.getProducts({ type: 'low-stock', limit: 100 })
   }
 
   /**
-   * Générer un nouveau SKU
+   * Ajoute du stock à un produit
    */
-  async generateSKU(categoryId?: string) {
-    const params = categoryId ? { categoryId } : {}
-    const response = await apiService.axiosInstance.get('/products/generate-sku', { params })
-    return response.data
+  async addStock(id: string, quantity: number): Promise<ApiResponse<{ id: number; stock: number }>> {
+    return await this.updateProductStock(id, quantity, 'add')
   }
 
   /**
-   * Rechercher des produits par code-barres
+   * Retire du stock d'un produit
    */
-  async searchByBarcode(barcode: string) {
-    const response = await apiService.axiosInstance.get(`/products/barcode/${barcode}`)
-    return response.data
+  async removeStock(id: string, quantity: number): Promise<ApiResponse<{ id: number; stock: number }>> {
+    return await this.updateProductStock(id, quantity, 'subtract')
   }
 
   /**
-   * Récupérer les catégories de produits
+   * Définit le stock d'un produit
    */
-  async getCategories() {
-    const response = await apiService.axiosInstance.get('/products/categories')
-    return response.data
-  }
-
-  /**
-   * Créer une nouvelle catégorie
-   */
-  async createCategory(data: {
-    name: string
-    description?: string
-    parentId?: string
-    sortOrder?: number
-  }) {
-    const response = await apiService.axiosInstance.post('/products/categories', data)
-    return response.data
-  }
-
-  /**
-   * Mettre à jour une catégorie
-   */
-  async updateCategory(id: string, data: {
-    name?: string
-    description?: string
-    parentId?: string
-    sortOrder?: number
-    isActive?: boolean
-  }) {
-    const response = await apiService.axiosInstance.put(`/products/categories/${id}`, data)
-    return response.data
-  }
-
-  /**
-   * Supprimer une catégorie
-   */
-  async deleteCategory(id: string) {
-    const response = await apiService.axiosInstance.delete(`/products/categories/${id}`)
-    return response.data
-  }
-
-  /**
-   * Uploader une image de produit
-   */
-  async uploadProductImage(productId: string, file: File) {
-    const formData = new FormData()
-    formData.append('image', file)
-    
-    const response = await apiService.axiosInstance.post(`/products/${productId}/images`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-    return response.data
-  }
-
-  /**
-   * Supprimer une image de produit
-   */
-  async deleteProductImage(productId: string, imageId: string) {
-    const response = await apiService.axiosInstance.delete(`/products/${productId}/images/${imageId}`)
-    return response.data
-  }
-
-  /**
-   * Récupérer les produits populaires/tendances
-   */
-  async getTrendingProducts(params?: { period?: string; limit?: number }) {
-    const response = await apiService.axiosInstance.get('/products/trending', { params })
-    return response.data
-  }
-
-  /**
-   * Récupérer les produits en rupture de stock
-   */
-  async getLowStockProducts(params?: { page?: number; limit?: number }) {
-    const response = await apiService.axiosInstance.get('/products/low-stock', { params })
-    return response.data
-  }
-
-  /**
-   * Définir un produit comme vedette
-   */
-  async toggleFeatured(id: string, featured: boolean) {
-    const response = await apiService.axiosInstance.patch(`/products/${id}/featured`, { featured })
-    return response.data
+  async setStock(id: string, quantity: number): Promise<ApiResponse<{ id: number; stock: number }>> {
+    return await this.updateProductStock(id, quantity, 'set')
   }
 }
 
-export const productsService = new ProductsService()
-export default productsService
+export const productService = new ProductService()
+export default productService

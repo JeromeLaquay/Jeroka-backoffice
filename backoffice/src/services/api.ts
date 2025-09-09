@@ -248,10 +248,82 @@ class ApiService {
     return this.api
   }
 
+  // ===== UTILISATEURS =====
+
+  async getUsers(params?: any): Promise<ApiResponse<any[]>> {
+    const response = await this.api.get<ApiResponse<any[]>>('/users', { params })
+    return response.data
+  }
+
+  async getUser(id: string): Promise<ApiResponse<any>> {
+    const response = await this.api.get<ApiResponse<any>>(`/users/${id}`)
+    return response.data
+  }
+
+  async createUser(data: any): Promise<ApiResponse<any>> {
+    const response = await this.api.post<ApiResponse<any>>('/users', data)
+    return response.data
+  }
+
+  async updateUser(id: string, data: any): Promise<ApiResponse<any>> {
+    const response = await this.api.put<ApiResponse<any>>(`/users/${id}`, data)
+    return response.data
+  }
+
+  async deleteUser(id: string): Promise<ApiResponse> {
+    const response = await this.api.delete<ApiResponse>(`/users/${id}`)
+    return response.data
+  }
+
+  async updateUserStatus(id: string, isActive: boolean): Promise<ApiResponse<any>> {
+    const response = await this.api.put<ApiResponse<any>>(`/users/${id}/status`, { isActive })
+    return response.data
+  }
+
+  async getUserStats(): Promise<ApiResponse<any>> {
+    const response = await this.api.get<ApiResponse<any>>('/users/stats')
+    return response.data
+  }
+
   // ===== PRODUITS =====
 
   async getProducts(params?: any): Promise<ApiResponse<any[]>> {
     const response = await this.api.get<ApiResponse<any[]>>('/products', { params })
+    return response.data
+  }
+
+  async getProduct(id: string): Promise<ApiResponse<any>> {
+    const response = await this.api.get<ApiResponse<any>>(`/products/${id}`)
+    return response.data
+  }
+
+  async createProduct(data: any): Promise<ApiResponse<any>> {
+    const response = await this.api.post<ApiResponse<any>>('/products', data)
+    return response.data
+  }
+
+  async updateProduct(id: string, data: any): Promise<ApiResponse<any>> {
+    const response = await this.api.put<ApiResponse<any>>(`/products/${id}`, data)
+    return response.data
+  }
+
+  async deleteProduct(id: string): Promise<ApiResponse> {
+    const response = await this.api.delete<ApiResponse>(`/products/${id}`)
+    return response.data
+  }
+
+  async updateProductStock(id: string, stock: number, operation: 'add' | 'subtract' | 'set'): Promise<ApiResponse<any>> {
+    const response = await this.api.put<ApiResponse<any>>(`/products/${id}/stock`, { stock, operation })
+    return response.data
+  }
+
+  async getProductCategories(): Promise<ApiResponse<any[]>> {
+    const response = await this.api.get<ApiResponse<any[]>>('/products/categories')
+    return response.data
+  }
+
+  async getProductStats(): Promise<ApiResponse<any>> {
+    const response = await this.api.get<ApiResponse<any>>('/products/stats')
     return response.data
   }
 
@@ -262,10 +334,75 @@ class ApiService {
     return response.data
   }
 
+  async getInvoice(id: string): Promise<ApiResponse<any>> {
+    const response = await this.api.get<ApiResponse<any>>(`/invoices/${id}`)
+    return response.data
+  }
+
+  async createInvoice(data: any): Promise<ApiResponse<any>> {
+    const response = await this.api.post<ApiResponse<any>>('/invoices', data)
+    return response.data
+  }
+
+  async updateInvoice(id: string, data: any): Promise<ApiResponse<any>> {
+    const response = await this.api.put<ApiResponse<any>>(`/invoices/${id}`, data)
+    return response.data
+  }
+
+  async deleteInvoice(id: string): Promise<ApiResponse> {
+    const response = await this.api.delete<ApiResponse>(`/invoices/${id}`)
+    return response.data
+  }
+
+  async updateInvoiceStatus(id: string, status: string): Promise<ApiResponse<any>> {
+    const response = await this.api.put<ApiResponse<any>>(`/invoices/${id}/status`, { status })
+    return response.data
+  }
+
+  async getInvoiceStats(): Promise<ApiResponse<any>> {
+    const response = await this.api.get<ApiResponse<any>>('/invoices/stats')
+    return response.data
+  }
+
   // ===== DEVIS =====
 
   async getQuotes(params?: any): Promise<ApiResponse<any[]>> {
     const response = await this.api.get<ApiResponse<any[]>>('/quotes', { params })
+    return response.data
+  }
+
+  async getQuote(id: string): Promise<ApiResponse<any>> {
+    const response = await this.api.get<ApiResponse<any>>(`/quotes/${id}`)
+    return response.data
+  }
+
+  async createQuote(data: any): Promise<ApiResponse<any>> {
+    const response = await this.api.post<ApiResponse<any>>('/quotes', data)
+    return response.data
+  }
+
+  async updateQuote(id: string, data: any): Promise<ApiResponse<any>> {
+    const response = await this.api.put<ApiResponse<any>>(`/quotes/${id}`, data)
+    return response.data
+  }
+
+  async deleteQuote(id: string): Promise<ApiResponse> {
+    const response = await this.api.delete<ApiResponse>(`/quotes/${id}`)
+    return response.data
+  }
+
+  async updateQuoteStatus(id: string, status: string): Promise<ApiResponse<any>> {
+    const response = await this.api.put<ApiResponse<any>>(`/quotes/${id}/status`, { status })
+    return response.data
+  }
+
+  async convertQuoteToInvoice(id: string): Promise<ApiResponse<any>> {
+    const response = await this.api.post<ApiResponse<any>>(`/quotes/${id}/convert`)
+    return response.data
+  }
+
+  async getQuoteStats(): Promise<ApiResponse<any>> {
+    const response = await this.api.get<ApiResponse<any>>('/quotes/stats')
     return response.data
   }
 

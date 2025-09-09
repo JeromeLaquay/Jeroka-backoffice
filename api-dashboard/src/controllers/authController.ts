@@ -28,8 +28,8 @@ interface LoginRequest extends Request {
 
 // Generate JWT tokens
 const generateTokens = (payload: { id: string; email: string; role: string }) => {
-  const jwtSecret = process.env.JWT_SECRET!;
-  const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET!;
+  const jwtSecret = process.env.JWT_SECRET || 'default-secret-key';
+  const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET || 'default-refresh-secret-key';
 
   const accessToken = jwt.sign(payload, jwtSecret, {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d'

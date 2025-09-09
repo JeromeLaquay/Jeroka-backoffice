@@ -1,6 +1,6 @@
 import express from 'express';
 import { body, param, query, validationResult } from 'express-validator';
-import { authenticateToken } from '../middleware/auth';
+import { verifyToken } from '../middleware/auth';
 import { Request, Response } from 'express';
 
 const router = express.Router();
@@ -36,7 +36,7 @@ interface AvailabilityRule {
 // ===========================================
 
 // GET /api/v1/calendar/availability - Récupérer les règles de disponibilité
-router.get('/availability', authenticateToken, async (req: Request, res: Response) => {
+router.get('/availability', verifyToken, async (req: Request, res: Response) => {
   try {
     // TODO: Récupérer depuis la base de données
     const availabilityRules: AvailabilityRule[] = [
@@ -93,7 +93,7 @@ router.get('/availability', authenticateToken, async (req: Request, res: Respons
     });
   } catch (error) {
     console.error('Erreur lors de la récupération des règles de disponibilité:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la récupération des règles de disponibilité'
     });
@@ -102,7 +102,7 @@ router.get('/availability', authenticateToken, async (req: Request, res: Respons
 
 // POST /api/v1/calendar/availability - Créer une règle de disponibilité
 router.post('/availability', [
-  authenticateToken,
+  verifyToken,
   body('dayOfWeek').isInt({ min: 0, max: 6 }).withMessage('Jour de la semaine invalide (0-6)'),
   body('startTime').matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('Heure de début invalide (HH:MM)'),
   body('endTime').matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('Heure de fin invalide (HH:MM)'),
@@ -138,7 +138,7 @@ router.post('/availability', [
     });
   } catch (error) {
     console.error('Erreur lors de la création de la règle de disponibilité:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la création de la règle de disponibilité'
     });
@@ -147,7 +147,7 @@ router.post('/availability', [
 
 // PUT /api/v1/calendar/availability/:id - Modifier une règle de disponibilité
 router.put('/availability/:id', [
-  authenticateToken,
+  verifyToken,
   param('id').isString().withMessage('ID invalide'),
   body('dayOfWeek').optional().isInt({ min: 0, max: 6 }).withMessage('Jour de la semaine invalide (0-6)'),
   body('startTime').optional().matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('Heure de début invalide (HH:MM)'),
@@ -181,7 +181,7 @@ router.put('/availability/:id', [
     });
   } catch (error) {
     console.error('Erreur lors de la mise à jour de la règle de disponibilité:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la mise à jour de la règle de disponibilité'
     });
@@ -190,7 +190,7 @@ router.put('/availability/:id', [
 
 // DELETE /api/v1/calendar/availability/:id - Supprimer une règle de disponibilité
 router.delete('/availability/:id', [
-  authenticateToken,
+  verifyToken,
   param('id').isString().withMessage('ID invalide')
 ], async (req: Request, res: Response) => {
   try {
@@ -204,7 +204,7 @@ router.delete('/availability/:id', [
     });
   } catch (error) {
     console.error('Erreur lors de la suppression de la règle de disponibilité:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la suppression de la règle de disponibilité'
     });
@@ -241,7 +241,7 @@ router.get('/slots', [
     });
   } catch (error) {
     console.error('Erreur lors de la génération des créneaux:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la génération des créneaux'
     });
@@ -254,7 +254,7 @@ router.get('/slots', [
 
 // GET /api/v1/calendar/appointments - Récupérer les rendez-vous
 router.get('/appointments', [
-  authenticateToken,
+  verifyToken,
   query('startDate').optional().isISO8601().withMessage('Date de début invalide'),
   query('endDate').optional().isISO8601().withMessage('Date de fin invalide')
 ], async (req: Request, res: Response) => {
@@ -270,7 +270,7 @@ router.get('/appointments', [
     });
   } catch (error) {
     console.error('Erreur lors de la récupération des rendez-vous:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la récupération des rendez-vous'
     });
@@ -279,6 +279,7 @@ router.get('/appointments', [
 
 // POST /api/v1/calendar/appointments - Créer un rendez-vous
 router.post('/appointments', [
+  verifyToken,
   body('date').isISO8601().withMessage('Date invalide'),
   body('startTime').matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('Heure de début invalide (HH:MM)'),
   body('endTime').matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('Heure de fin invalide (HH:MM)'),
@@ -325,7 +326,7 @@ router.post('/appointments', [
     });
   } catch (error) {
     console.error('Erreur lors de la création du rendez-vous:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la création du rendez-vous'
     });
@@ -334,7 +335,7 @@ router.post('/appointments', [
 
 // PUT /api/v1/calendar/appointments/:id - Modifier un rendez-vous
 router.put('/appointments/:id', [
-  authenticateToken,
+  verifyToken,
   param('id').isString().withMessage('ID invalide'),
   body('clientName').optional().isString().isLength({ min: 2, max: 100 }).withMessage('Nom du client invalide'),
   body('clientEmail').optional().isEmail().withMessage('Email du client invalide'),
@@ -363,7 +364,7 @@ router.put('/appointments/:id', [
     });
   } catch (error) {
     console.error('Erreur lors de la mise à jour du rendez-vous:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la mise à jour du rendez-vous'
     });
@@ -372,7 +373,7 @@ router.put('/appointments/:id', [
 
 // DELETE /api/v1/calendar/appointments/:id - Supprimer un rendez-vous
 router.delete('/appointments/:id', [
-  authenticateToken,
+  verifyToken,
   param('id').isString().withMessage('ID invalide')
 ], async (req: Request, res: Response) => {
   try {
@@ -387,7 +388,7 @@ router.delete('/appointments/:id', [
     });
   } catch (error) {
     console.error('Erreur lors de la suppression du rendez-vous:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la suppression du rendez-vous'
     });
@@ -399,7 +400,7 @@ router.delete('/appointments/:id', [
 // ===========================================
 
 // POST /api/v1/calendar/google/sync - Synchroniser avec Google Calendar
-router.post('/google/sync', authenticateToken, async (req: Request, res: Response) => {
+router.post('/google/sync', verifyToken, async (req: Request, res: Response) => {
   try {
     // TODO: Implémenter la synchronisation avec Google Calendar API
     // 1. Authentification OAuth2
@@ -412,7 +413,7 @@ router.post('/google/sync', authenticateToken, async (req: Request, res: Respons
     });
   } catch (error) {
     console.error('Erreur lors de la synchronisation Google Calendar:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la synchronisation Google Calendar'
     });

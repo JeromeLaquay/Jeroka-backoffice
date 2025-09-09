@@ -261,7 +261,7 @@ router.get('/', [
       data: filteredAnnouncements
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des annonces',
       error: {
@@ -342,7 +342,7 @@ router.post('/', [
       data: newAnnouncement
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la création de l\'annonce',
       error: {
@@ -376,7 +376,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       data: announcement
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération de l\'annonce',
       error: {
@@ -422,7 +422,7 @@ router.put('/:id', async (req: Request, res: Response) => {
       data: updatedAnnouncement
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour',
       error: {
@@ -458,7 +458,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
       message: 'Annonce supprimée avec succès'
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression',
       error: {
@@ -498,7 +498,7 @@ router.post('/:id/publish', async (req: Request, res: Response) => {
       data: announcement
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la publication',
       error: {
@@ -535,7 +535,7 @@ router.post('/:id/view', async (req: Request, res: Response) => {
       data: { views: announcement.views }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la comptabilisation de la vue',
       error: {
@@ -586,7 +586,7 @@ router.get('/public', async (req: Request, res: Response) => {
       data: publicAnnouncements
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des annonces publiques',
       error: {
@@ -662,7 +662,7 @@ router.get('/stats', async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des statistiques',
       error: {

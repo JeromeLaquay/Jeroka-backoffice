@@ -1,255 +1,197 @@
-import { apiService } from './api'
-
-export interface Invoice {
-  id: string
-  invoiceNumber: string
-  orderId?: string
-  order?: {
-    id: string
-    orderNumber: string
-  }
-  clientId: string
-  client: {
-    id: string
-    name: string
-    email: string
-    avatar: string
-    phone?: string
-    company?: string
-    address?: {
-      line1?: string
-      line2?: string
-      city?: string
-      postalCode?: string
-      country?: string
-    }
-  }
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
-  items: InvoiceItem[]
-  subtotalHt: number
-  discountAmount: number
-  taxAmount: number
-  totalAmount: number
-  currency: string
-  issueDate: string
-  dueDate: string
-  paidDate?: string
-  paymentMethod?: string
-  paymentTerms: number // Nombre de jours
-  notes?: string
-  termsAndConditions?: string
-  footerText?: string
-  createdAt: string
-  updatedAt: string
-}
+import { apiService, ApiResponse } from './api'
 
 export interface InvoiceItem {
-  id: string
+  id: number
   description: string
   quantity: number
   unitPrice: number
-  discountPercent: number
-  vatRate: number
-  totalHt: number
-  totalVat: number
-  totalTtc: number
+  total: number
+}
+
+export interface Invoice {
+  id: number
+  invoiceNumber: string
+  clientId: number
+  clientName: string
+  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+  total: number
+  tax: number
+  subtotal: number
+  dueDate: string
+  issueDate: string
+  paidDate?: string
+  items: InvoiceItem[]
+  notes?: string
+  createdAt: string
 }
 
 export interface CreateInvoiceRequest {
-  orderId?: string
-  clientId: string
-  items: {
-    description: string
-    quantity: number
-    unitPrice: number
-    discountPercent?: number
-    vatRate?: number
-  }[]
-  status?: string
-  issueDate: string
+  clientId: number
+  items: Omit<InvoiceItem, 'id'>[]
   dueDate: string
-  paymentTerms?: number
   notes?: string
-  termsAndConditions?: string
-  footerText?: string
 }
 
-export interface UpdateInvoiceRequest extends Partial<CreateInvoiceRequest> {
+export interface UpdateInvoiceRequest {
+  clientId?: number
+  items?: Omit<InvoiceItem, 'id'>[]
+  dueDate?: string
+  notes?: string
   status?: string
-  paidDate?: string
-  paymentMethod?: string
-}
-
-export interface InvoicesListParams {
-  page?: number
-  limit?: number
-  search?: string
-  status?: string
-  period?: string
-  clientId?: string
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
 }
 
 export interface InvoiceStats {
   total: number
-  draft: number
-  sent: number
   paid: number
+  pending: number
   overdue: number
-  totalAmount: number
-  paidAmount: number
-  pendingAmount: number
-  overdueAmount: number
+  totalRevenue: number
+  averageInvoice: number
 }
 
-class InvoicesService {
+export interface InvoicesListResponse {
+  invoices: Invoice[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+class InvoiceService {
   /**
-   * Récupérer la liste des factures avec filtres et pagination
+   * Récupère la liste des factures avec pagination et filtres
    */
-  async getInvoices(params: InvoicesListParams = {}) {
-    const response = await apiService.axiosInstance.get('/invoices', { params })
-    return response.data
+  async getInvoices(params?: {
+    page?: number
+    limit?: number
+    status?: string
+    clientId?: number
+    dateFrom?: string
+    dateTo?: string
+  }): Promise<ApiResponse<InvoicesListResponse>> {
+    return await apiService.getInvoices(params)
   }
 
   /**
-   * Récupérer une facture par son ID
+   * Récupère une facture par son ID
    */
-  async getInvoice(id: string) {
-    const response = await apiService.axiosInstance.get(`/invoices/${id}`)
-    return response.data
+  async getInvoice(id: string): Promise<ApiResponse<Invoice>> {
+    return await apiService.getInvoice(id)
   }
 
   /**
-   * Créer une nouvelle facture
+   * Crée une nouvelle facture
    */
-  async createInvoice(data: CreateInvoiceRequest) {
-    const response = await apiService.axiosInstance.post('/invoices', data)
-    return response.data
+  async createInvoice(data: CreateInvoiceRequest): Promise<ApiResponse<Invoice>> {
+    return await apiService.createInvoice(data)
   }
 
   /**
-   * Créer une facture depuis une commande
+   * Met à jour une facture
    */
-  async createInvoiceFromOrder(orderId: string) {
-    const response = await apiService.axiosInstance.post(`/invoices/from-order/${orderId}`)
-    return response.data
+  async updateInvoice(id: string, data: UpdateInvoiceRequest): Promise<ApiResponse<Invoice>> {
+    return await apiService.updateInvoice(id, data)
   }
 
   /**
-   * Mettre à jour une facture
+   * Supprime une facture
    */
-  async updateInvoice(id: string, data: UpdateInvoiceRequest) {
-    const response = await apiService.axiosInstance.put(`/invoices/${id}`, data)
-    return response.data
+  async deleteInvoice(id: string): Promise<ApiResponse> {
+    return await apiService.deleteInvoice(id)
   }
 
   /**
-   * Supprimer une facture
+   * Met à jour le statut d'une facture
    */
-  async deleteInvoice(id: string) {
-    const response = await apiService.axiosInstance.delete(`/invoices/${id}`)
-    return response.data
+  async updateInvoiceStatus(id: string, status: string): Promise<ApiResponse<Invoice>> {
+    return await apiService.updateInvoiceStatus(id, status)
   }
 
   /**
-   * Changer le statut d'une facture
+   * Récupère les statistiques des factures
    */
-  async updateInvoiceStatus(id: string, status: string) {
-    const response = await apiService.axiosInstance.patch(`/invoices/${id}/status`, { status })
-    return response.data
+  async getInvoiceStats(): Promise<ApiResponse<InvoiceStats>> {
+    return await apiService.getInvoiceStats()
   }
 
   /**
-   * Marquer une facture comme payée
+   * Marque une facture comme payée
    */
-  async markInvoiceAsPaid(id: string, paymentData?: { method?: string; paidDate?: string }) {
-    const response = await apiService.axiosInstance.patch(`/invoices/${id}/payment`, {
-      status: 'paid',
-      paidDate: paymentData?.paidDate || new Date().toISOString(),
-      paymentMethod: paymentData?.method
-    })
-    return response.data
+  async markAsPaid(id: string): Promise<ApiResponse<Invoice>> {
+    return await this.updateInvoiceStatus(id, 'paid')
   }
 
   /**
-   * Envoyer une facture par email
+   * Marque une facture comme envoyée
    */
-  async sendInvoice(id: string, emailData?: { to?: string; subject?: string; message?: string }) {
-    const response = await apiService.axiosInstance.post(`/invoices/${id}/send`, emailData)
-    return response.data
+  async markAsSent(id: string): Promise<ApiResponse<Invoice>> {
+    return await this.updateInvoiceStatus(id, 'sent')
   }
 
   /**
-   * Télécharger une facture en PDF
+   * Annule une facture
    */
-  async downloadInvoicePdf(id: string) {
-    const response = await apiService.axiosInstance.get(`/invoices/${id}/pdf`, {
-      responseType: 'blob'
-    })
-    return response.data
+  async cancelInvoice(id: string): Promise<ApiResponse<Invoice>> {
+    return await this.updateInvoiceStatus(id, 'cancelled')
   }
 
   /**
-   * Dupliquer une facture
+   * Récupère les factures par statut
    */
-  async duplicateInvoice(id: string) {
-    const response = await apiService.axiosInstance.post(`/invoices/${id}/duplicate`)
-    return response.data
+  async getInvoicesByStatus(status: string): Promise<ApiResponse<InvoicesListResponse>> {
+    return await this.getInvoices({ status, limit: 100 })
   }
 
   /**
-   * Récupérer les statistiques des factures
+   * Récupère les factures d'un client
    */
-  async getInvoiceStats(period?: string) {
-    const params = period ? { period } : {}
-    const response = await apiService.axiosInstance.get('/invoices/stats', { params })
-    return response.data
+  async getInvoicesByClient(clientId: number): Promise<ApiResponse<InvoicesListResponse>> {
+    return await this.getInvoices({ clientId, limit: 100 })
   }
 
   /**
-   * Exporter les factures en CSV/Excel
+   * Récupère les factures en retard
    */
-  async exportInvoices(params: InvoicesListParams & { format: 'csv' | 'excel' }) {
-    const response = await apiService.axiosInstance.get('/invoices/export', {
-      params,
-      responseType: 'blob'
-    })
-    return response.data
+  async getOverdueInvoices(): Promise<ApiResponse<InvoicesListResponse>> {
+    return await this.getInvoicesByStatus('overdue')
   }
 
   /**
-   * Récupérer le prochain numéro de facture
+   * Récupère les factures en attente
    */
-  async getNextInvoiceNumber() {
-    const response = await apiService.axiosInstance.get('/invoices/next-number')
-    return response.data
+  async getPendingInvoices(): Promise<ApiResponse<InvoicesListResponse>> {
+    return await this.getInvoicesByStatus('pending')
   }
 
   /**
-   * Envoyer un rappel de paiement
+   * Récupère les factures payées
    */
-  async sendPaymentReminder(id: string, reminderData?: { type?: 'first' | 'second' | 'final'; message?: string }) {
-    const response = await apiService.axiosInstance.post(`/invoices/${id}/reminder`, reminderData)
-    return response.data
+  async getPaidInvoices(): Promise<ApiResponse<InvoicesListResponse>> {
+    return await this.getInvoicesByStatus('paid')
   }
 
   /**
-   * Récupérer l'historique des paiements
+   * Récupère les factures par période
    */
-  async getPaymentHistory(id: string) {
-    const response = await apiService.axiosInstance.get(`/invoices/${id}/payments`)
-    return response.data
+  async getInvoicesByDateRange(dateFrom: string, dateTo: string): Promise<ApiResponse<InvoicesListResponse>> {
+    return await this.getInvoices({ dateFrom, dateTo, limit: 100 })
   }
 
   /**
-   * Ajouter un paiement partiel
+   * Calcule le total d'une facture
    */
-  async addPartialPayment(id: string, paymentData: { amount: number; date: string; method: string; reference?: string }) {
-    const response = await apiService.axiosInstance.post(`/invoices/${id}/payments`, paymentData)
-    return response.data
+  calculateInvoiceTotal(items: Omit<InvoiceItem, 'id'>[], taxRate: number = 0.2): {
+    subtotal: number
+    tax: number
+    total: number
+  } {
+    const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
+    const tax = subtotal * taxRate
+    const total = subtotal + tax
+
+    return { subtotal, tax, total }
   }
 }
 
-export const invoicesService = new InvoicesService()
-export default invoicesService
+export const invoiceService = new InvoiceService()
+export default invoiceService

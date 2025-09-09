@@ -1,280 +1,238 @@
-import { apiService } from './api'
-
-export interface Quote {
-  id: string
-  quoteNumber: string
-  clientId: string
-  client: {
-    id: string
-    name: string
-    email: string
-    avatar: string
-    phone?: string
-    company?: string
-    address?: {
-      line1?: string
-      line2?: string
-      city?: string
-      postalCode?: string
-      country?: string
-    }
-  }
-  status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'
-  items: QuoteItem[]
-  subtotalHt: number
-  discountAmount: number
-  taxAmount: number
-  totalAmount: number
-  currency: string
-  issueDate: string
-  validUntil: string
-  acceptedDate?: string
-  rejectedDate?: string
-  notes?: string
-  termsAndConditions?: string
-  footerText?: string
-  validityDays: number
-  convertedToInvoice?: boolean
-  invoiceId?: string
-  createdAt: string
-  updatedAt: string
-}
+import { apiService, ApiResponse } from './api'
 
 export interface QuoteItem {
-  id: string
+  id: number
   description: string
   quantity: number
   unitPrice: number
-  discountPercent: number
-  vatRate: number
-  totalHt: number
-  totalVat: number
-  totalTtc: number
+  total: number
+}
+
+export interface Quote {
+  id: number
+  quoteNumber: string
+  clientId: number
+  clientName: string
+  status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted'
+  total: number
+  tax: number
+  subtotal: number
+  validUntil: string
+  issueDate: string
+  items: QuoteItem[]
+  notes?: string
+  createdAt: string
 }
 
 export interface CreateQuoteRequest {
-  clientId: string
-  items: {
-    description: string
-    quantity: number
-    unitPrice: number
-    discountPercent?: number
-    vatRate?: number
-  }[]
-  status?: string
-  issueDate: string
-  validityDays?: number
+  clientId: number
+  items: Omit<QuoteItem, 'id'>[]
+  validUntil: string
+  notes?: string
+}
+
+export interface UpdateQuoteRequest {
+  clientId?: number
+  items?: Omit<QuoteItem, 'id'>[]
   validUntil?: string
   notes?: string
-  termsAndConditions?: string
-  footerText?: string
-}
-
-export interface UpdateQuoteRequest extends Partial<CreateQuoteRequest> {
   status?: string
-  acceptedDate?: string
-  rejectedDate?: string
-}
-
-export interface QuotesListParams {
-  page?: number
-  limit?: number
-  search?: string
-  status?: string
-  period?: string
-  clientId?: string
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
 }
 
 export interface QuoteStats {
   total: number
-  draft: number
   sent: number
   accepted: number
-  rejected: number
   expired: number
-  totalAmount: number
-  acceptedAmount: number
-  pendingAmount: number
-  conversionRate: number
+  totalValue: number
+  averageQuote: number
 }
 
-class QuotesService {
+export interface QuotesListResponse {
+  quotes: Quote[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface ConvertQuoteResponse {
+  quote: Quote
+  invoice: any // Invoice type from invoice service
+}
+
+class QuoteService {
   /**
-   * Récupérer la liste des devis avec filtres et pagination
+   * Récupère la liste des devis avec pagination et filtres
    */
-  async getQuotes(params: QuotesListParams = {}) {
-    const response = await apiService.axiosInstance.get('/quotes', { params })
-    return response.data
+  async getQuotes(params?: {
+    page?: number
+    limit?: number
+    status?: string
+    clientId?: number
+    dateFrom?: string
+    dateTo?: string
+  }): Promise<ApiResponse<QuotesListResponse>> {
+    return await apiService.getQuotes(params)
   }
 
   /**
-   * Récupérer un devis par son ID
+   * Récupère un devis par son ID
    */
-  async getQuote(id: string) {
-    const response = await apiService.axiosInstance.get(`/quotes/${id}`)
-    return response.data
+  async getQuote(id: string): Promise<ApiResponse<Quote>> {
+    return await apiService.getQuote(id)
   }
 
   /**
-   * Créer un nouveau devis
+   * Crée un nouveau devis
    */
-  async createQuote(data: CreateQuoteRequest) {
-    const response = await apiService.axiosInstance.post('/quotes', data)
-    return response.data
+  async createQuote(data: CreateQuoteRequest): Promise<ApiResponse<Quote>> {
+    return await apiService.createQuote(data)
   }
 
   /**
-   * Mettre à jour un devis
+   * Met à jour un devis
    */
-  async updateQuote(id: string, data: UpdateQuoteRequest) {
-    const response = await apiService.axiosInstance.put(`/quotes/${id}`, data)
-    return response.data
+  async updateQuote(id: string, data: UpdateQuoteRequest): Promise<ApiResponse<Quote>> {
+    return await apiService.updateQuote(id, data)
   }
 
   /**
-   * Supprimer un devis
+   * Supprime un devis
    */
-  async deleteQuote(id: string) {
-    const response = await apiService.axiosInstance.delete(`/quotes/${id}`)
-    return response.data
+  async deleteQuote(id: string): Promise<ApiResponse> {
+    return await apiService.deleteQuote(id)
   }
 
   /**
-   * Changer le statut d'un devis
+   * Met à jour le statut d'un devis
    */
-  async updateQuoteStatus(id: string, status: string) {
-    const response = await apiService.axiosInstance.patch(`/quotes/${id}/status`, { status })
-    return response.data
+  async updateQuoteStatus(id: string, status: string): Promise<ApiResponse<Quote>> {
+    return await apiService.updateQuoteStatus(id, status)
   }
 
   /**
-   * Accepter un devis
+   * Convertit un devis en facture
    */
-  async acceptQuote(id: string, acceptanceData?: { acceptedDate?: string; notes?: string }) {
-    const response = await apiService.axiosInstance.patch(`/quotes/${id}/accept`, {
-      status: 'accepted',
-      acceptedDate: acceptanceData?.acceptedDate || new Date().toISOString(),
-      notes: acceptanceData?.notes
-    })
-    return response.data
+  async convertQuoteToInvoice(id: string): Promise<ApiResponse<ConvertQuoteResponse>> {
+    return await apiService.convertQuoteToInvoice(id)
   }
 
   /**
-   * Rejeter un devis
+   * Récupère les statistiques des devis
    */
-  async rejectQuote(id: string, rejectionData?: { rejectedDate?: string; reason?: string }) {
-    const response = await apiService.axiosInstance.patch(`/quotes/${id}/reject`, {
-      status: 'rejected',
-      rejectedDate: rejectionData?.rejectedDate || new Date().toISOString(),
-      reason: rejectionData?.reason
-    })
-    return response.data
+  async getQuoteStats(): Promise<ApiResponse<QuoteStats>> {
+    return await apiService.getQuoteStats()
   }
 
   /**
-   * Convertir un devis en facture
+   * Envoie un devis (change le statut à 'sent')
    */
-  async convertToInvoice(id: string, invoiceData?: { issueDate?: string; dueDate?: string }) {
-    const response = await apiService.axiosInstance.post(`/quotes/${id}/convert-to-invoice`, invoiceData)
-    return response.data
+  async sendQuote(id: string): Promise<ApiResponse<Quote>> {
+    return await this.updateQuoteStatus(id, 'sent')
   }
 
   /**
-   * Envoyer un devis par email
+   * Accepte un devis
    */
-  async sendQuote(id: string, emailData?: { to?: string; subject?: string; message?: string }) {
-    const response = await apiService.axiosInstance.post(`/quotes/${id}/send`, emailData)
-    return response.data
+  async acceptQuote(id: string): Promise<ApiResponse<Quote>> {
+    return await this.updateQuoteStatus(id, 'accepted')
   }
 
   /**
-   * Télécharger un devis en PDF
+   * Rejette un devis
    */
-  async downloadQuotePdf(id: string) {
-    const response = await apiService.axiosInstance.get(`/quotes/${id}/pdf`, {
-      responseType: 'blob'
-    })
-    return response.data
+  async rejectQuote(id: string): Promise<ApiResponse<Quote>> {
+    return await this.updateQuoteStatus(id, 'rejected')
   }
 
   /**
-   * Dupliquer un devis
+   * Récupère les devis par statut
    */
-  async duplicateQuote(id: string) {
-    const response = await apiService.axiosInstance.post(`/quotes/${id}/duplicate`)
-    return response.data
+  async getQuotesByStatus(status: string): Promise<ApiResponse<QuotesListResponse>> {
+    return await this.getQuotes({ status, limit: 100 })
   }
 
   /**
-   * Récupérer les statistiques des devis
+   * Récupère les devis d'un client
    */
-  async getQuoteStats(period?: string) {
-    const params = period ? { period } : {}
-    const response = await apiService.axiosInstance.get('/quotes/stats', { params })
-    return response.data
+  async getQuotesByClient(clientId: number): Promise<ApiResponse<QuotesListResponse>> {
+    return await this.getQuotes({ clientId, limit: 100 })
   }
 
   /**
-   * Exporter les devis en CSV/Excel
+   * Récupère les devis expirés
    */
-  async exportQuotes(params: QuotesListParams & { format: 'csv' | 'excel' }) {
-    const response = await apiService.axiosInstance.get('/quotes/export', {
-      params,
-      responseType: 'blob'
-    })
-    return response.data
+  async getExpiredQuotes(): Promise<ApiResponse<QuotesListResponse>> {
+    return await this.getQuotesByStatus('expired')
   }
 
   /**
-   * Récupérer le prochain numéro de devis
+   * Récupère les devis en attente
    */
-  async getNextQuoteNumber() {
-    const response = await apiService.axiosInstance.get('/quotes/next-number')
-    return response.data
+  async getPendingQuotes(): Promise<ApiResponse<QuotesListResponse>> {
+    return await this.getQuotesByStatus('sent')
   }
 
   /**
-   * Envoyer un rappel pour un devis
+   * Récupère les devis acceptés
    */
-  async sendQuoteReminder(id: string, reminderData?: { type?: 'follow-up' | 'expiration'; message?: string }) {
-    const response = await apiService.axiosInstance.post(`/quotes/${id}/reminder`, reminderData)
-    return response.data
+  async getAcceptedQuotes(): Promise<ApiResponse<QuotesListResponse>> {
+    return await this.getQuotesByStatus('accepted')
   }
 
   /**
-   * Récupérer l'historique d'un devis
+   * Récupère les devis par période
    */
-  async getQuoteHistory(id: string) {
-    const response = await apiService.axiosInstance.get(`/quotes/${id}/history`)
-    return response.data
+  async getQuotesByDateRange(dateFrom: string, dateTo: string): Promise<ApiResponse<QuotesListResponse>> {
+    return await this.getQuotes({ dateFrom, dateTo, limit: 100 })
   }
 
   /**
-   * Prolonger la validité d'un devis
+   * Vérifie si un devis est expiré
    */
-  async extendQuoteValidity(id: string, extensionData: { validUntil: string; notifyClient?: boolean }) {
-    const response = await apiService.axiosInstance.patch(`/quotes/${id}/extend`, extensionData)
-    return response.data
+  isQuoteExpired(validUntil: string): boolean {
+    return new Date(validUntil) < new Date()
   }
 
   /**
-   * Récupérer les modèles de devis
+   * Calcule le nombre de jours restants avant expiration
    */
-  async getQuoteTemplates() {
-    const response = await apiService.axiosInstance.get('/quotes/templates')
-    return response.data
+  getDaysUntilExpiration(validUntil: string): number {
+    const now = new Date()
+    const expiration = new Date(validUntil)
+    const diffTime = expiration.getTime() - now.getTime()
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   }
 
   /**
-   * Créer un devis à partir d'un modèle
+   * Calcule le total d'un devis
    */
-  async createQuoteFromTemplate(templateId: string, data: { clientId: string; customizations?: any }) {
-    const response = await apiService.axiosInstance.post(`/quotes/templates/${templateId}/create`, data)
-    return response.data
+  calculateQuoteTotal(items: Omit<QuoteItem, 'id'>[], taxRate: number = 0.2): {
+    subtotal: number
+    tax: number
+    total: number
+  } {
+    const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
+    const tax = subtotal * taxRate
+    const total = subtotal + tax
+
+    return { subtotal, tax, total }
+  }
+
+  /**
+   * Génère un numéro de devis unique
+   */
+  generateQuoteNumber(): string {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+    
+    return `QUO-${year}-${month}${day}-${random}`
   }
 }
 
-export const quotesService = new QuotesService()
-export default quotesService
+export const quoteService = new QuoteService()
+export default quoteService
