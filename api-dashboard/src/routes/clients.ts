@@ -268,7 +268,7 @@ router.get('/', [
     const offset = ((page as number) - 1) * (limit as number);
     const paginatedClients = filteredClients.slice(offset, offset + (limit as number));
 
-    res.json({
+    return res.json({
       success: true,
       data: paginatedClients,
       pagination: {
@@ -359,7 +359,7 @@ router.post('/', [
 
     clients.unshift(newClient);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Client créé avec succès',
       data: newClient
@@ -416,7 +416,7 @@ router.get('/stats', async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         total,
@@ -430,7 +430,7 @@ router.get('/stats', async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des statistiques',
       error: {
@@ -459,7 +459,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: client
     });
@@ -543,7 +543,7 @@ router.put('/:id', [
 
     clients[clientIndex] = updatedClient;
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Client mis à jour avec succès',
       data: updatedClient
@@ -580,7 +580,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     clients.splice(clientIndex, 1);
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Client supprimé avec succès'
     });

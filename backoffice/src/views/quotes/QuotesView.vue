@@ -374,7 +374,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import QuoteStatusBadge from '@/components/quotes/QuoteStatusBadge.vue'
 import DeleteConfirmModal from '@/components/common/DeleteConfirmModal.vue'
-import { quotesService } from '@/services/quotes'
+import { quoteService } from '@/services/quotes'
 import { debounce } from 'lodash-es'
 
 // Types
@@ -447,12 +447,12 @@ const loadQuotes = async () => {
       period: filters.period || undefined
     }
 
-    const response = await quotesService.getQuotes(params)
+    const response = await quoteService.getQuotes(params)
     quotes.value = response.data.quotes
     pagination.total = response.data.total
 
     // Charger les statistiques
-    const statsResponse = await quotesService.getQuoteStats()
+    const statsResponse = await quoteService.getQuoteStats()
     stats.value = statsResponse.data
   } catch (error) {
     console.error('Erreur lors du chargement des devis:', error)
@@ -494,7 +494,7 @@ const deleteQuote = async () => {
   if (!quoteToDelete.value) return
 
   try {
-    await quotesService.deleteQuote(quoteToDelete.value.id)
+    await quoteService.deleteQuote(quoteToDelete.value.id)
     loadQuotes() // Recharger la liste
     showDeleteConfirmation.value = false
     quoteToDelete.value = null
@@ -505,7 +505,7 @@ const deleteQuote = async () => {
 
 const downloadPdf = async (quoteId: string) => {
   try {
-    const blob = await quotesService.downloadQuotePdf(quoteId)
+    const blob = await quoteService.downloadQuotePdf(quoteId)
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
@@ -519,7 +519,7 @@ const downloadPdf = async (quoteId: string) => {
 
 const sendQuote = async (quoteId: string) => {
   try {
-    await quotesService.sendQuote(quoteId)
+    await quoteService.sendQuote(quoteId)
     // Afficher un message de succès
     loadQuotes() // Recharger pour mettre à jour le statut
   } catch (error) {
@@ -529,7 +529,7 @@ const sendQuote = async (quoteId: string) => {
 
 const convertToInvoice = async (quoteId: string) => {
   try {
-    await quotesService.convertToInvoice(quoteId)
+    await quoteService.convertToInvoice(quoteId)
     // Afficher un message de succès
     loadQuotes() // Recharger pour mettre à jour
   } catch (error) {

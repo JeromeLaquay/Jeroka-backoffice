@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture - Documentation Jeroka</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>📚 Documentation Jeroka</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="architecture.html" class="active">Architecture</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="deployment.html">Déploiement</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>🏗️ Architecture du Système</h1>
+            <p>Vue d'ensemble de l'architecture technique du projet Jeroka</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Architecture Globale</h2>
+            <p>Le projet Jeroka est composé de plusieurs microservices et applications frontend qui communiquent via des APIs REST.</p>
+            
+            <h3>Composants Principaux</h3>
+            <ul>
+                <li><strong>API Dashboard</strong> - Backend principal avec Node.js/Express</li>
+                <li><strong>Backoffice</strong> - Interface d'administration en Vue.js</li>
+                <li><strong>E-boutique</strong> - Site e-commerce en Vue.js</li>
+                <li><strong>Site Principal (Jeroka)</strong> - Site vitrine en Vue.js</li>
+                <li><strong>Base de données PostgreSQL</strong> - Stockage des données</li>
+                <li><strong>Nginx</strong> - Reverse proxy et serveur web</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Stack Technologique</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Composant</th>
+                        <th>Technologie</th>
+                        <th>Version</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Backend API</td>
+                        <td>Node.js + Express + TypeScript</td>
+                        <td>Node 18+</td>
+                        <td>API REST avec authentification JWT</td>
+                    </tr>
+                    <tr>
+                        <td>Frontend Backoffice</td>
+                        <td>Vue.js 3 + TypeScript</td>
+                        <td>Vue 3.x</td>
+                        <td>Interface d'administration</td>
+                    </tr>
+                    <tr>
+                        <td>Frontend E-boutique</td>
+                        <td>Vue.js 3 + JavaScript</td>
+                        <td>Vue 3.x</td>
+                        <td>Site e-commerce</td>
+                    </tr>
+                    <tr>
+                        <td>Site Principal</td>
+                        <td>Vue.js 3 + TypeScript</td>
+                        <td>Vue 3.x</td>
+                        <td>Site vitrine</td>
+                    </tr>
+                    <tr>
+                        <td>Base de données</td>
+                        <td>PostgreSQL</td>
+                        <td>15+</td>
+                        <td>Base de données relationnelle</td>
+                    </tr>
+                    <tr>
+                        <td>Reverse Proxy</td>
+                        <td>Nginx</td>
+                        <td>1.20+</td>
+                        <td>Routage et load balancing</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2>Architecture des Services</h2>
+            <h3>API Dashboard</h3>
+            <ul>
+                <li>Authentification et autorisation</li>
+                <li>Gestion des utilisateurs</li>
+                <li>Gestion des produits et services</li>
+                <li>Gestion des devis et factures</li>
+                <li>Gestion des clients</li>
+                <li>Gestion des messages et emails</li>
+                <li>Gestion du calendrier</li>
+                <li>Gestion des publications</li>
+            </ul>
+
+            <h3>Structure des Routes API</h3>
+            <div class="code-block">
+                <pre><code>/api/auth          - Authentification
+/api/users         - Gestion des utilisateurs
+/api/clients       - Gestion des clients
+/api/products      - Gestion des produits
+/api/quotes        - Gestion des devis
+/api/invoices      - Gestion des factures
+/api/messages      - Gestion des messages
+/api/emails        - Gestion des emails
+/api/calendar      - Gestion du calendrier
+/api/publications  - Gestion des publications
+/api/announcements - Gestion des annonces</code></pre>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Base de Données</h2>
+            <p>La base de données PostgreSQL contient les tables suivantes :</p>
+            <ul>
+                <li><strong>users</strong> - Utilisateurs du système</li>
+                <li><strong>clients</strong> - Clients de l'entreprise</li>
+                <li><strong>products</strong> - Produits et services</li>
+                <li><strong>quotes</strong> - Devis</li>
+                <li><strong>invoices</strong> - Factures</li>
+                <li><strong>messages</strong> - Messages et communications</li>
+                <li><strong>calendar_events</strong> - Événements du calendrier</li>
+                <li><strong>publications</strong> - Publications et articles</li>
+                <li><strong>announcements</strong> - Annonces</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Communication Inter-Services</h2>
+            <p>Les différents composants communiquent via :</p>
+            <ul>
+                <li><strong>HTTP/HTTPS</strong> - Communication entre frontend et backend</li>
+                <li><strong>JWT Tokens</strong> - Authentification et autorisation</li>
+                <li><strong>REST APIs</strong> - Interface de communication standardisée</li>
+                <li><strong>WebSockets</strong> - Communication temps réel (si nécessaire)</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Sécurité</h2>
+            <ul>
+                <li>Authentification JWT avec refresh tokens</li>
+                <li>Validation des données d'entrée</li>
+                <li>Middleware de sécurité (CORS, Helmet)</li>
+                <li>Chiffrement des mots de passe (bcrypt)</li>
+                <li>Rate limiting sur les APIs</li>
+                <li>Logs de sécurité et monitoring</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Jeroka - Documentation Technique</p>
+    </footer>
+</body>
+</html>

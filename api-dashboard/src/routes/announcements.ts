@@ -256,7 +256,7 @@ router.get('/', [
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-    res.json({
+    return res.json({
       success: true,
       data: filteredAnnouncements
     });
@@ -336,7 +336,7 @@ router.post('/', [
 
     announcements.unshift(newAnnouncement);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Annonce créée avec succès',
       data: newAnnouncement
@@ -371,7 +371,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: announcement
     });
@@ -416,7 +416,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 
     announcements[announcementIndex] = updatedAnnouncement;
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Annonce mise à jour avec succès',
       data: updatedAnnouncement
@@ -453,7 +453,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     announcements.splice(announcementIndex, 1);
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Annonce supprimée avec succès'
     });
@@ -492,7 +492,7 @@ router.post('/:id/publish', async (req: Request, res: Response) => {
     announcement.publishedAt = new Date().toISOString();
     announcement.updatedAt = new Date().toISOString();
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Annonce publiée avec succès',
       data: announcement
@@ -529,7 +529,7 @@ router.post('/:id/view', async (req: Request, res: Response) => {
 
     announcement.views = (announcement.views || 0) + 1;
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Vue comptabilisée',
       data: { views: announcement.views }
@@ -579,7 +579,7 @@ router.get('/public', async (req: Request, res: Response) => {
       publicAnnouncements = publicAnnouncements.slice(0, Number(limit));
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: publicAnnouncements
     });
@@ -644,7 +644,7 @@ router.get('/stats', async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         total,

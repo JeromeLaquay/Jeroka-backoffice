@@ -87,7 +87,7 @@ router.get('/availability', verifyToken, async (req: Request, res: Response) => 
       }
     ];
 
-    res.json({
+    return res.json({
       success: true,
       data: availabilityRules
     });
@@ -131,7 +131,7 @@ router.post('/availability', [
       updatedAt: new Date()
     };
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Règle de disponibilité créée avec succès',
       data: newRule
@@ -174,7 +174,7 @@ router.put('/availability/:id', [
       updatedAt: new Date()
     };
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Règle de disponibilité mise à jour avec succès',
       data: updatedRule
@@ -198,7 +198,7 @@ router.delete('/availability/:id', [
 
     // TODO: Supprimer de la base de données
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Règle de disponibilité supprimée avec succès'
     });
@@ -235,7 +235,7 @@ router.get('/slots', [
     // TODO: Générer les créneaux basés sur les règles de disponibilité
     const slots = generateTimeSlots(startDate as string, endDate as string);
 
-    res.json({
+    return res.json({
       success: true,
       data: slots
     });
@@ -264,7 +264,7 @@ router.get('/appointments', [
     // TODO: Récupérer depuis la base de données
     const appointments: TimeSlot[] = [];
 
-    res.json({
+    return res.json({
       success: true,
       data: appointments
     });
@@ -319,7 +319,7 @@ router.post('/appointments', [
       updatedAt: new Date()
     };
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Rendez-vous créé avec succès',
       data: newAppointment
@@ -358,7 +358,7 @@ router.put('/appointments/:id', [
     // TODO: Mettre à jour en base de données
     // TODO: Synchroniser avec Google Calendar
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Rendez-vous mis à jour avec succès'
     });
@@ -382,7 +382,7 @@ router.delete('/appointments/:id', [
     // TODO: Supprimer de la base de données
     // TODO: Synchroniser avec Google Calendar
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Rendez-vous supprimé avec succès'
     });
@@ -407,7 +407,7 @@ router.post('/google/sync', verifyToken, async (req: Request, res: Response) => 
     // 2. Récupération des événements
     // 3. Synchronisation bidirectionnelle
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Synchronisation avec Google Calendar en cours...'
     });

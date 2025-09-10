@@ -163,7 +163,7 @@ router.get('/', [
     const total = filteredPublications.length;
     const paginatedPublications = filteredPublications.slice(offset as number, (offset as number) + (limit as number));
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         publications: paginatedPublications,
@@ -174,7 +174,7 @@ router.get('/', [
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des publications',
       error: {
@@ -232,13 +232,13 @@ router.post('/', [
 
     publications.unshift(newPublication);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Publication créée avec succès',
       data: newPublication
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la création de la publication',
       error: {
@@ -267,12 +267,12 @@ router.get('/:id', async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: publication
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération de la publication',
       error: {
@@ -310,13 +310,13 @@ router.put('/:id', async (req: Request, res: Response) => {
 
     publications[publicationIndex] = updatedPublication;
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Publication mise à jour avec succès',
       data: updatedPublication
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour',
       error: {
@@ -347,12 +347,12 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     publications.splice(publicationIndex, 1);
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Publication supprimée avec succès'
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression',
       error: {
@@ -386,13 +386,13 @@ router.post('/:id/publish', async (req: Request, res: Response) => {
     publication.publishedAt = new Date().toISOString();
     publication.updatedAt = new Date().toISOString();
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Publication publiée avec succès',
       data: publication
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la publication',
       error: {
@@ -420,7 +420,7 @@ router.post('/uploads/image', upload.single('image'), async (req: Request, res: 
 
     const imageUrl = `/uploads/publications/${req.file.filename}`;
     
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Image uploadée avec succès',
       data: {
@@ -431,7 +431,7 @@ router.post('/uploads/image', upload.single('image'), async (req: Request, res: 
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de l\'upload de l\'image',
       error: {
@@ -550,7 +550,7 @@ router.post('/generate-content', [
       // Continuer sans image si erreur
     }
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Contenu généré avec succès',
       data: {
@@ -569,7 +569,7 @@ router.post('/generate-content', [
 
   } catch (error) {
     console.error('Erreur génération IA:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la génération du contenu',
       error: {

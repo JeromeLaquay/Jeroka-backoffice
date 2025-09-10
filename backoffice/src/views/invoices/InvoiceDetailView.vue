@@ -230,7 +230,7 @@ import {
   ExclamationTriangleIcon
 } from '@heroicons/vue/24/outline'
 import InvoiceStatusBadge from '@/components/invoices/InvoiceStatusBadge.vue'
-import { invoicesService, type Invoice } from '@/services/invoices'
+import { invoiceService, type Invoice } from '@/services/invoices'
 
 const route = useRoute()
 const router = useRouter()
@@ -249,7 +249,7 @@ const isOverdue = computed(() => {
 const loadInvoice = async () => {
   try {
     loading.value = true
-    const response = await invoicesService.getInvoice(route.params.id as string)
+    const response = await invoiceService.getInvoice(route.params.id as string)
     invoice.value = response.data
   } catch (error) {
     console.error('Erreur lors du chargement de la facture:', error)
@@ -262,7 +262,7 @@ const loadInvoice = async () => {
 const downloadPdf = async () => {
   if (!invoice.value) return
   try {
-    const blob = await invoicesService.downloadInvoicePdf(invoice.value.id)
+    const blob = await invoiceService.downloadInvoicePdf(invoice.value.id)
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
@@ -277,7 +277,7 @@ const downloadPdf = async () => {
 const sendInvoice = async () => {
   if (!invoice.value) return
   try {
-    await invoicesService.sendInvoice(invoice.value.id)
+    await invoiceService.sendInvoice(invoice.value.id)
     loadInvoice() // Recharger pour mettre à jour le statut
   } catch (error) {
     console.error('Erreur lors de l\'envoi:', error)
@@ -287,7 +287,7 @@ const sendInvoice = async () => {
 const markAsPaid = async () => {
   if (!invoice.value) return
   try {
-    await invoicesService.markInvoiceAsPaid(invoice.value.id)
+    await invoiceService.markInvoiceAsPaid(invoice.value.id)
     loadInvoice() // Recharger pour mettre à jour
   } catch (error) {
     console.error('Erreur lors du marquage:', error)
@@ -297,7 +297,7 @@ const markAsPaid = async () => {
 const sendReminder = async () => {
   if (!invoice.value) return
   try {
-    await invoicesService.sendPaymentReminder(invoice.value.id)
+    await invoiceService.sendPaymentReminder(invoice.value.id)
     // Afficher un message de succès
   } catch (error) {
     console.error('Erreur lors de l\'envoi du rappel:', error)

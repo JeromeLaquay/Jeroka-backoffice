@@ -1,9 +1,6 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
-
-# Install dependencies
-RUN npm install -g @vue/cli
 
 # Copy package.json and install dependencies
 COPY package*.json ./
@@ -12,11 +9,14 @@ RUN npm install
 # Copy project files
 COPY . .
 
-# Build for production
-RUN npm run build
+# Build for production using Vite
+RUN npm run build-prod
+
+# Install serve to serve the built files
+RUN npm install -g serve
 
 # Expose port for the application
-EXPOSE 8090
+EXPOSE 80
 
-# Command to run the application
-CMD ["npm", "run", "serve"] 
+# Command to serve the built application
+CMD ["serve", "-s", "dist", "-l", "80"] 

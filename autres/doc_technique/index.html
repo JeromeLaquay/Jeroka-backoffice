@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation Technique - Jeroka</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>📚 Documentation Jeroka</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Accueil</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="deployment.html">Déploiement</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h2>Documentation Technique Jeroka</h2>
+            <p>Bienvenue dans la documentation technique du projet Jeroka. Cette documentation couvre l'architecture, les APIs et les procédures de déploiement.</p>
+        </section>
+
+        <section class="overview">
+            <h3>Vue d'ensemble du projet</h3>
+            <div class="cards">
+                <div class="card">
+                    <h4>🏗️ Architecture</h4>
+                    <p>Découvrez l'architecture globale du système avec ses différents composants et leurs interactions.</p>
+                    <a href="architecture.html" class="btn">Voir l'architecture</a>
+                </div>
+                <div class="card">
+                    <h4>🔌 API</h4>
+                    <p>Documentation complète des endpoints API, authentification et exemples d'utilisation.</p>
+                    <a href="api.html" class="btn">Voir l'API</a>
+                </div>
+                <div class="card">
+                    <h4>🚀 Déploiement</h4>
+                    <p>Guide de déploiement, configuration Docker et procédures de mise en production.</p>
+                    <a href="deployment.html" class="btn">Voir le déploiement</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-start">
+            <h3>Démarrage rapide</h3>
+            <div class="code-block">
+                <h4>Installation et lancement</h4>
+                <pre><code># Cloner le repository
+git clone [url-du-repo]
+
+# Lancer avec Docker Compose
+docker-compose up -d
+
+# Accéder aux services
+# API: http://localhost:3000
+# Backoffice: http://localhost:3001
+# E-boutique: http://localhost:3002</code></pre>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Jeroka - Documentation Technique</p>
+    </footer>
+</body>
+</html>

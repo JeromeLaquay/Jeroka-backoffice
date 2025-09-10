@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API - Documentation Jeroka</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>📚 Documentation Jeroka</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="api.html" class="active">API</a></li>
+                <li><a href="deployment.html">Déploiement</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>🔌 Documentation API</h1>
+            <p>Guide complet des endpoints API du système Jeroka</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Base URL</h2>
+            <div class="code-block">
+                <pre><code>Développement: http://localhost:3000/api
+Production: https://api.jeroka.com/api</code></pre>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Authentification</h2>
+            <p>L'API utilise l'authentification JWT. Incluez le token dans l'en-tête Authorization :</p>
+            <div class="code-block">
+                <pre><code>Authorization: Bearer &lt;your-jwt-token&gt;</code></pre>
+            </div>
+
+            <h3>Endpoints d'Authentification</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Body</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/auth/login</td>
+                        <td>Connexion utilisateur</td>
+                        <td>{ email, password }</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/auth/register</td>
+                        <td>Inscription utilisateur</td>
+                        <td>{ email, password, name }</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/auth/refresh</td>
+                        <td>Rafraîchir le token</td>
+                        <td>{ refreshToken }</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/auth/logout</td>
+                        <td>Déconnexion</td>
+                        <td>{}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2>Gestion des Utilisateurs</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Auth</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/users</td>
+                        <td>Liste des utilisateurs</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/users/:id</td>
+                        <td>Détails d'un utilisateur</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>PUT</td>
+                        <td>/api/users/:id</td>
+                        <td>Modifier un utilisateur</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>DELETE</td>
+                        <td>/api/users/:id</td>
+                        <td>Supprimer un utilisateur</td>
+                        <td>✅</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2>Gestion des Clients</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Auth</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/clients</td>
+                        <td>Liste des clients</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/clients</td>
+                        <td>Créer un client</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/clients/:id</td>
+                        <td>Détails d'un client</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>PUT</td>
+                        <td>/api/clients/:id</td>
+                        <td>Modifier un client</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>DELETE</td>
+                        <td>/api/clients/:id</td>
+                        <td>Supprimer un client</td>
+                        <td>✅</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2>Gestion des Produits</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Auth</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/products</td>
+                        <td>Liste des produits</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/products</td>
+                        <td>Créer un produit</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/products/:id</td>
+                        <td>Détails d'un produit</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>PUT</td>
+                        <td>/api/products/:id</td>
+                        <td>Modifier un produit</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>DELETE</td>
+                        <td>/api/products/:id</td>
+                        <td>Supprimer un produit</td>
+                        <td>✅</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2>Gestion des Devis</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Auth</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/quotes</td>
+                        <td>Liste des devis</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/quotes</td>
+                        <td>Créer un devis</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/quotes/:id</td>
+                        <td>Détails d'un devis</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>PUT</td>
+                        <td>/api/quotes/:id</td>
+                        <td>Modifier un devis</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/quotes/:id/convert</td>
+                        <td>Convertir en facture</td>
+                        <td>✅</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2>Gestion des Factures</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Auth</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/invoices</td>
+                        <td>Liste des factures</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/invoices</td>
+                        <td>Créer une facture</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/invoices/:id</td>
+                        <td>Détails d'une facture</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>PUT</td>
+                        <td>/api/invoices/:id</td>
+                        <td>Modifier une facture</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/invoices/:id/send</td>
+                        <td>Envoyer une facture</td>
+                        <td>✅</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2>Codes de Réponse HTTP</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Description</th>
+                        <th>Utilisation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>200</td>
+                        <td>OK</td>
+                        <td>Requête réussie</td>
+                    </tr>
+                    <tr>
+                        <td>201</td>
+                        <td>Created</td>
+                        <td>Ressource créée avec succès</td>
+                    </tr>
+                    <tr>
+                        <td>400</td>
+                        <td>Bad Request</td>
+                        <td>Données invalides</td>
+                    </tr>
+                    <tr>
+                        <td>401</td>
+                        <td>Unauthorized</td>
+                        <td>Token manquant ou invalide</td>
+                    </tr>
+                    <tr>
+                        <td>403</td>
+                        <td>Forbidden</td>
+                        <td>Accès refusé</td>
+                    </tr>
+                    <tr>
+                        <td>404</td>
+                        <td>Not Found</td>
+                        <td>Ressource non trouvée</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td>Internal Server Error</td>
+                        <td>Erreur serveur</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2>Exemples d'Utilisation</h2>
+            <h3>Connexion</h3>
+            <div class="code-block">
+                <pre><code>POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+Response:
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "refresh_token_here",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "John Doe"
+  }
+}</code></pre>
+            </div>
+
+            <h3>Créer un client</h3>
+            <div class="code-block">
+                <pre><code>POST /api/clients
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+  "name": "Entreprise ABC",
+  "email": "contact@abc.com",
+  "phone": "0123456789",
+  "address": "123 Rue Example, 75001 Paris"
+}
+
+Response:
+{
+  "success": true,
+  "client": {
+    "id": 1,
+    "name": "Entreprise ABC",
+    "email": "contact@abc.com",
+    "phone": "0123456789",
+    "address": "123 Rue Example, 75001 Paris",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+}</code></pre>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Jeroka - Documentation Technique</p>
+    </footer>
+</body>
+</html>

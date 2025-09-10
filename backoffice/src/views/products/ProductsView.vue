@@ -422,7 +422,7 @@ import ProductSummary from '@/components/products/ProductSummary.vue'
 import ProductStatusBadge from '@/components/products/ProductStatusBadge.vue'
 import ProductStockBadge from '@/components/products/ProductStockBadge.vue'
 import DeleteConfirmModal from '@/components/common/DeleteConfirmModal.vue'
-import { productsService } from '@/services/products'
+import { productService } from '@/services/products'
 // Fonction debounce simple
 const debounce = (func: Function, wait: number) => {
   let timeout: NodeJS.Timeout
@@ -520,13 +520,13 @@ const loadProducts = async () => {
       lowStock: filters.type === 'low-stock' ? true : undefined
     }
 
-    const response = await productsService.getProducts(params)
+    const response = await productService.getProducts(params)
     products.value = response.data.products || []
     pagination.total = response.data.total || 0
 
     // Charger les statistiques
     try {
-      const statsResponse = await productsService.getProductStats()
+      const statsResponse = await productService.getProductStats()
       stats.value = statsResponse.data || {}
     } catch (statsError) {
       console.error('Erreur lors du chargement des statistiques:', statsError)
@@ -544,7 +544,7 @@ const loadProducts = async () => {
 
 const loadCategories = async () => {
   try {
-    const response = await productsService.getCategories()
+    const response = await productService.getCategories()
     categories.value = response.data || []
   } catch (error) {
     console.error('Erreur lors du chargement des catégories:', error)
@@ -586,7 +586,7 @@ const editProduct = (id: string) => {
 
 const duplicateProduct = async (id: string) => {
   try {
-    await productsService.duplicateProduct(id)
+    await productService.duplicateProduct(id)
     loadProducts() // Recharger la liste
   } catch (error) {
     console.error('Erreur lors de la duplication:', error)
@@ -607,7 +607,7 @@ const deleteProduct = async () => {
   if (!productToDelete.value) return
 
   try {
-    await productsService.deleteProduct(productToDelete.value.id)
+    await productService.deleteProduct(productToDelete.value.id)
     loadProducts() // Recharger la liste
     showDeleteConfirmation.value = false
     productToDelete.value = null

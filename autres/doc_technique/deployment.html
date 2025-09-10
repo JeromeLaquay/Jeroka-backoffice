@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Déploiement - Documentation Jeroka</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>📚 Documentation Jeroka</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="deployment.html" class="active">Déploiement</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>🚀 Guide de Déploiement</h1>
+            <p>Instructions complètes pour déployer le système Jeroka</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Prérequis</h2>
+            <ul>
+                <li>Docker et Docker Compose installés</li>
+                <li>Git pour cloner le repository</li>
+                <li>Accès à un serveur (local ou cloud)</li>
+                <li>Ports disponibles : 80, 443, 3000, 3001, 3002, 5432</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Environnements de Déploiement</h2>
+            <h3>Développement Local</h3>
+            <div class="code-block">
+                <pre><code># Cloner le repository
+git clone [url-du-repository]
+cd test-lq
+
+# Lancer l'environnement de développement
+docker-compose -f docker-compose.local.yml up -d
+
+# Vérifier que tous les services sont démarrés
+docker-compose ps</code></pre>
+            </div>
+
+            <h3>Production</h3>
+            <div class="code-block">
+                <pre><code># Lancer l'environnement de production
+docker-compose -f docker-compose.prod.yml up -d
+
+# Vérifier les logs
+docker-compose -f docker-compose.prod.yml logs -f</code></pre>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Configuration des Services</h2>
+            <h3>Variables d'Environnement</h3>
+            <p>Créez un fichier <code>.env</code> à la racine du projet :</p>
+            <div class="code-block">
+                <pre><code># Base de données
+POSTGRES_DB=jeroka_db
+POSTGRES_USER=jeroka_user
+POSTGRES_PASSWORD=your_secure_password
+
+# API
+JWT_SECRET=your_jwt_secret_key
+JWT_REFRESH_SECRET=your_refresh_secret_key
+API_PORT=3000
+
+# Frontend
+BACKOFFICE_PORT=3001
+EBOUTIQUE_PORT=3002
+JEROKA_PORT=3003
+
+# Nginx
+NGINX_PORT=80
+NGINX_SSL_PORT=443</code></pre>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Services Docker</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Port</th>
+                        <th>Description</th>
+                        <th>Dépendances</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>postgres</td>
+                        <td>5432</td>
+                        <td>Base de données PostgreSQL</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>api-dashboard</td>
+                        <td>3000</td>
+                        <td>API Backend</td>
+                        <td>postgres</td>
+                    </tr>
+                    <tr>
+                        <td>backoffice</td>
+                        <td>3001</td>
+                        <td>Interface d'administration</td>
+                        <td>api-dashboard</td>
+                    </tr>
+                    <tr>
+                        <td>eboutique</td>
+                        <td>3002</td>
+                        <td>Site e-commerce</td>
+                        <td>api-dashboard</td>
+                    </tr>
+                    <tr>
+                        <td>jeroka</td>
+                        <td>3003</td>
+                        <td>Site vitrine</td>
+                        <td>api-dashboard</td>
+                    </tr>
+                    <tr>
+                        <td>nginx</td>
+                        <td>80/443</td>
+                        <td>Reverse proxy</td>
+                        <td>Tous les services</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2>Procédure de Déploiement</h2>
+            <h3>1. Préparation du Serveur</h3>
+            <div class="code-block">
+                <pre><code># Mettre à jour le système
+sudo apt update && sudo apt upgrade -y
+
+# Installer Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+# Installer Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose</code></pre>
+            </div>
+
+            <h3>2. Déploiement de l'Application</h3>
+            <div class="code-block">
+                <pre><code># Cloner le repository
+git clone [url-du-repository]
+cd test-lq
+
+# Copier et configurer les variables d'environnement
+cp .env.example .env
+# Éditer le fichier .env avec vos valeurs
+
+# Construire et lancer les services
+docker-compose -f docker-compose.prod.yml up -d --build
+
+# Vérifier le statut des services
+docker-compose -f docker-compose.prod.yml ps</code></pre>
+            </div>
+
+            <h3>3. Configuration de la Base de Données</h3>
+            <div class="code-block">
+                <pre><code># Exécuter les migrations
+docker-compose -f docker-compose.prod.yml exec api-dashboard npm run migrate
+
+# Exécuter les seeds (données de test)
+docker-compose -f docker-compose.prod.yml exec api-dashboard npm run seed</code></pre>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Configuration SSL/HTTPS</h2>
+            <h3>Avec Let's Encrypt</h3>
+            <div class="code-block">
+                <pre><code># Installer Certbot
+sudo apt install certbot python3-certbot-nginx
+
+# Obtenir un certificat SSL
+sudo certbot --nginx -d yourdomain.com
+
+# Configurer le renouvellement automatique
+sudo crontab -e
+# Ajouter : 0 12 * * * /usr/bin/certbot renew --quiet</code></pre>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Monitoring et Logs</h2>
+            <h3>Vérification des Logs</h3>
+            <div class="code-block">
+                <pre><code># Voir tous les logs
+docker-compose -f docker-compose.prod.yml logs
+
+# Voir les logs d'un service spécifique
+docker-compose -f docker-compose.prod.yml logs api-dashboard
+
+# Suivre les logs en temps réel
+docker-compose -f docker-compose.prod.yml logs -f</code></pre>
+            </div>
+
+            <h3>Monitoring des Ressources</h3>
+            <div class="code-block">
+                <pre><code># Voir l'utilisation des ressources
+docker stats
+
+# Voir l'espace disque utilisé
+docker system df
+
+# Nettoyer les images inutilisées
+docker system prune -a</code></pre>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Sauvegarde et Restauration</h2>
+            <h3>Sauvegarde de la Base de Données</h3>
+            <div class="code-block">
+                <pre><code># Créer une sauvegarde
+docker-compose -f docker-compose.prod.yml exec postgres pg_dump -U jeroka_user jeroka_db > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Restaurer une sauvegarde
+docker-compose -f docker-compose.prod.yml exec -T postgres psql -U jeroka_user jeroka_db < backup_file.sql</code></pre>
+            </div>
+
+            <h3>Sauvegarde des Fichiers</h3>
+            <div class="code-block">
+                <pre><code># Sauvegarder les uploads
+tar -czf uploads_backup_$(date +%Y%m%d_%H%M%S).tar.gz uploads/
+
+# Sauvegarder la configuration
+tar -czf config_backup_$(date +%Y%m%d_%H%M%S).tar.gz .env docker-compose.prod.yml nginx.conf</code></pre>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Mise à Jour</h2>
+            <h3>Procédure de Mise à Jour</h3>
+            <div class="code-block">
+                <pre><code># 1. Sauvegarder la base de données
+docker-compose -f docker-compose.prod.yml exec postgres pg_dump -U jeroka_user jeroka_db > backup_before_update.sql
+
+# 2. Arrêter les services
+docker-compose -f docker-compose.prod.yml down
+
+# 3. Récupérer les dernières modifications
+git pull origin main
+
+# 4. Reconstruire et relancer
+docker-compose -f docker-compose.prod.yml up -d --build
+
+# 5. Exécuter les migrations si nécessaire
+docker-compose -f docker-compose.prod.yml exec api-dashboard npm run migrate</code></pre>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Dépannage</h2>
+            <h3>Problèmes Courants</h3>
+            <ul>
+                <li><strong>Service ne démarre pas</strong> : Vérifier les logs avec <code>docker-compose logs [service]</code></li>
+                <li><strong>Erreur de connexion à la base</strong> : Vérifier que PostgreSQL est démarré et accessible</li>
+                <li><strong>Port déjà utilisé</strong> : Changer le port dans docker-compose.yml ou arrêter le service qui utilise le port</li>
+                <li><strong>Problème de permissions</strong> : Vérifier les permissions des volumes Docker</li>
+            </ul>
+
+            <h3>Commandes Utiles</h3>
+            <div class="code-block">
+                <pre><code># Redémarrer un service
+docker-compose -f docker-compose.prod.yml restart [service]
+
+# Reconstruire un service
+docker-compose -f docker-compose.prod.yml up -d --build [service]
+
+# Accéder au shell d'un conteneur
+docker-compose -f docker-compose.prod.yml exec [service] sh
+
+# Voir les processus en cours
+docker-compose -f docker-compose.prod.yml top</code></pre>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Jeroka - Documentation Technique</p>
+    </footer>
+</body>
+</html>

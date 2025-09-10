@@ -63,7 +63,7 @@ router.get('/', async (req, res) => {
     const endIndex = startIndex + (limit as number);
     const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
     
-    res.json({
+    return res.json({
       success: true,
       data: {
         products: paginatedProducts,
@@ -74,7 +74,7 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la récupération des produits',
@@ -92,12 +92,12 @@ router.get('/', async (req, res) => {
  */
 router.get('/categories', async (req, res) => {
   try {
-    res.json({
+    return res.json({
       success: true,
       data: mockCategories
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la récupération des catégories',
@@ -120,7 +120,7 @@ router.get('/stats', async (req, res) => {
     const lowStockProducts = mockProducts.filter(p => p.stock < 5).length;
     const totalValue = mockProducts.reduce((sum, p) => sum + (p.price * p.stock), 0);
     
-    res.json({
+    return res.json({
       success: true,
       data: {
         total: totalProducts,
@@ -132,7 +132,7 @@ router.get('/stats', async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la récupération des statistiques',
@@ -164,7 +164,7 @@ router.get('/:id', async (req, res) => {
       });
     }
     
-    res.json({
+    return res.json({
       success: true,
       data: product
     });
@@ -201,7 +201,7 @@ router.post('/', async (req, res) => {
       createdAt: new Date()
     };
     
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Produit créé avec succès',
       data: newProduct
@@ -246,7 +246,7 @@ router.put('/:id', async (req, res) => {
       id: parseInt(id)
     };
     
-    res.json({
+    return res.json({
       success: true,
       message: 'Produit mis à jour avec succès',
       data: updatedProduct
@@ -285,7 +285,7 @@ router.delete('/:id', async (req, res) => {
     }
     
     // TODO: Implement product deletion with database
-    res.json({
+    return res.json({
       success: true,
       message: 'Produit supprimé avec succès'
     });
@@ -348,13 +348,13 @@ router.put('/:id/stock', async (req, res) => {
         });
     }
     
-    res.json({
+    return res.json({
       success: true,
       message: 'Stock mis à jour avec succès',
       data: { id: parseInt(id), stock: newStock }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la mise à jour du stock',

@@ -372,7 +372,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import ProductStatusBadge from '@/components/products/ProductStatusBadge.vue'
 import ProductStockBadge from '@/components/products/ProductStockBadge.vue'
-import { productsService } from '@/services/products'
+import { productService } from '@/services/products'
 
 const route = useRoute()
 const router = useRouter()
@@ -387,7 +387,7 @@ const showStockModal = ref(false)
 const loadProduct = async () => {
   try {
     loading.value = true
-    const response = await productsService.getProduct(route.params.id as string)
+    const response = await productService.getProduct(route.params.id as string)
     product.value = response.data
   } catch (error) {
     console.error('Erreur lors du chargement du produit:', error)
@@ -401,7 +401,7 @@ const loadStockHistory = async () => {
   if (product.value?.isService) return
   
   try {
-    const response = await productsService.getStockHistory(route.params.id as string, { limit: 10 })
+    const response = await productService.getStockHistory(route.params.id as string, { limit: 10 })
     stockHistory.value = response.data.movements
   } catch (error) {
     console.error('Erreur lors du chargement de l\'historique:', error)
@@ -410,7 +410,7 @@ const loadStockHistory = async () => {
 
 const duplicateProduct = async () => {
   try {
-    await productsService.duplicateProduct(route.params.id as string)
+    await productService.duplicateProduct(route.params.id as string)
     router.push('/produits')
   } catch (error) {
     console.error('Erreur lors de la duplication:', error)

@@ -1,0 +1,229 @@
+<mxfile host="65bd71144e">
+    <diagram name="GitHub Actions CI/CD Integration" id="github-actions-integration">
+        <mxGraphModel dx="2092" dy="1618" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="1400" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                
+                <!-- Titre -->
+                <mxCell id="title" value="🚀 Jeroka Xperience - Intégration GitHub Actions CI/CD" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;fontColor=#000103;" parent="1" vertex="1">
+                    <mxGeometry x="700" y="20" width="600" height="40" as="geometry"/>
+                </mxCell>
+
+                <!-- GitHub Repository -->
+                <mxCell id="github-repo" value="📦 GitHub Repository&lt;br&gt;jeroka/test-sh&lt;br&gt;Main Branch&lt;br&gt;Feature Branches" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f0f8ff;strokeColor=#0066cc;fontStyle=1;fontSize=14;startSize=30;fontColor=#000103;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="80" width="200" height="120" as="geometry"/>
+                </mxCell>
+
+                <!-- GitHub Actions Workflows -->
+                <mxCell id="github-actions" value="⚙️ GitHub Actions Workflows" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=16;startSize=30;fontColor=#000103;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="80" width="400" height="300" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="workflow-pr" value="🔄 PR Workflow&lt;br&gt;• Lint &amp; Format&lt;br&gt;• Unit Tests&lt;br&gt;• Build Check&lt;br&gt;• Security Scan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="github-actions" vertex="1">
+                    <mxGeometry x="20" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="workflow-main" value="🚀 Main Workflow&lt;br&gt;• Full Build&lt;br&gt;• Integration Tests&lt;br&gt;• Docker Build&lt;br&gt;• Deploy Staging" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="github-actions" vertex="1">
+                    <mxGeometry x="160" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="workflow-release" value="🏷️ Release Workflow&lt;br&gt;• E2E Tests (Cypress)&lt;br&gt;• Production Build&lt;br&gt;• Deploy Production&lt;br&gt;• Health Checks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="github-actions" vertex="1">
+                    <mxGeometry x="300" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="workflow-schedule" value="⏰ Scheduled Workflow&lt;br&gt;• Security Updates&lt;br&gt;• Dependency Check&lt;br&gt;• Performance Tests&lt;br&gt;• Backup Verification" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="github-actions" vertex="1">
+                    <mxGeometry x="20" y="140" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="workflow-hotfix" value="🔥 Hotfix Workflow&lt;br&gt;• Emergency Deploy&lt;br&gt;• Rollback Capability&lt;br&gt;• Monitoring Alert&lt;br&gt;• Post-deploy Tests" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="github-actions" vertex="1">
+                    <mxGeometry x="160" y="140" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="workflow-cleanup" value="🧹 Cleanup Workflow&lt;br&gt;• Old Images Cleanup&lt;br&gt;• Log Rotation&lt;br&gt;• Cache Management&lt;br&gt;• Resource Optimization" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="github-actions" vertex="1">
+                    <mxGeometry x="300" y="140" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <!-- Docker Registry -->
+                <mxCell id="docker-registry" value="🐳 Docker Registry&lt;br&gt;GitHub Container Registry&lt;br&gt;• jeroka/api:latest&lt;br&gt;• jeroka/backoffice:latest&lt;br&gt;• jeroka/eboutique:latest&lt;br&gt;• jeroka/jeroka-site:latest" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontStyle=1;fontSize=14;startSize=30;fontColor=#000103;" parent="1" vertex="1">
+                    <mxGeometry x="750" y="80" width="200" height="120" as="geometry"/>
+                </mxCell>
+
+                <!-- Environnements -->
+                <mxCell id="environments" value="🌍 Environnements de Déploiement" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontStyle=1;fontSize=16;startSize=30;fontColor=#000103;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="450" width="1900" height="400" as="geometry"/>
+                </mxCell>
+
+                <!-- Environnement Local -->
+                <mxCell id="local-env" value="💻 Environnement Local" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=14;startSize=25;fontColor=#000103;" parent="environments" vertex="1">
+                    <mxGeometry x="20" y="40" width="300" height="320" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="local-docker" value="🐳 Docker Compose Local&lt;br&gt;docker-compose.local.yml&lt;br&gt;• PostgreSQL:5432&lt;br&gt;• API:3002&lt;br&gt;• Backoffice:3001&lt;br&gt;• E-boutique:3000&lt;br&gt;• Jeroka Site:3003&lt;br&gt;• Adminer:8080" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="local-env" vertex="1">
+                    <mxGeometry x="20" y="30" width="260" height="120" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="local-dev" value="🛠️ Développement Local&lt;br&gt;• Hot Reload&lt;br&gt;• Debug Mode&lt;br&gt;• Test Data&lt;br&gt;• Local SSL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="local-env" vertex="1">
+                    <mxGeometry x="20" y="160" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="local-cypress" value="🧪 Tests Cypress Local&lt;br&gt;• E2E Tests&lt;br&gt;• Visual Testing&lt;br&gt;• API Testing&lt;br&gt;• Performance Tests" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="local-env" vertex="1">
+                    <mxGeometry x="160" y="160" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <!-- Environnement Staging -->
+                <mxCell id="staging-env" value="🧪 Environnement Staging" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontStyle=1;fontSize=14;startSize=25;fontColor=#000103;" parent="environments" vertex="1">
+                    <mxGeometry x="350" y="40" width="300" height="320" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="staging-server" value="🖥️ Serveur Staging&lt;br&gt;staging.jerokaxperience.fr&lt;br&gt;• Auto-deploy from main&lt;br&gt;• Test Database&lt;br&gt;• SSL Certificates&lt;br&gt;• Monitoring" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontStyle=1;fontSize=10;fontColor=#000103;" parent="staging-env" vertex="1">
+                    <mxGeometry x="20" y="30" width="260" height="100" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="staging-tests" value="🧪 Tests Staging&lt;br&gt;• Integration Tests&lt;br&gt;• Load Tests&lt;br&gt;• Security Tests&lt;br&gt;• User Acceptance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontStyle=1;fontSize=10;fontColor=#000103;" parent="staging-env" vertex="1">
+                    <mxGeometry x="20" y="140" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="staging-cypress" value="🎭 Cypress Staging&lt;br&gt;• Automated E2E&lt;br&gt;• Cross-browser&lt;br&gt;• Mobile Testing&lt;br&gt;• Performance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontStyle=1;fontSize=10;fontColor=#000103;" parent="staging-env" vertex="1">
+                    <mxGeometry x="160" y="140" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <!-- Environnement Production -->
+                <mxCell id="prod-env" value="🚀 Environnement Production" style="swimlane;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#c62828;fontStyle=1;fontSize=14;startSize=25;fontColor=#000103;" parent="environments" vertex="1">
+                    <mxGeometry x="680" y="40" width="300" height="320" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="prod-server" value="🌐 Serveur Production&lt;br&gt;jerokaxperience.fr&lt;br&gt;• High Availability&lt;br&gt;• Load Balancing&lt;br&gt;• SSL/TLS&lt;br&gt;• CDN CloudFlare" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#c62828;fontStyle=1;fontSize=10;fontColor=#000103;" parent="prod-env" vertex="1">
+                    <mxGeometry x="20" y="30" width="260" height="100" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="prod-monitoring" value="📊 Monitoring Prod&lt;br&gt;• Health Checks&lt;br&gt;• Performance Metrics&lt;br&gt;• Error Tracking&lt;br&gt;• Uptime Monitoring" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#c62828;fontStyle=1;fontSize=10;fontColor=#000103;" parent="prod-env" vertex="1">
+                    <mxGeometry x="20" y="140" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="prod-backup" value="💾 Backup &amp; Recovery&lt;br&gt;• Automated Backups&lt;br&gt;• Point-in-time Recovery&lt;br&gt;• Disaster Recovery&lt;br&gt;• Data Integrity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#c62828;fontStyle=1;fontSize=10;fontColor=#000103;" parent="prod-env" vertex="1">
+                    <mxGeometry x="160" y="140" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <!-- Infrastructure -->
+                <mxCell id="infrastructure" value="🏗️ Infrastructure &amp; Services" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontStyle=1;fontSize=16;startSize=30;fontColor=#000103;" parent="environments" vertex="1">
+                    <mxGeometry x="1010" y="40" width="300" height="320" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="nginx-proxy" value="🔀 Nginx Reverse Proxy&lt;br&gt;• SSL Termination&lt;br&gt;• Load Balancing&lt;br&gt;• Rate Limiting&lt;br&gt;• Static Files" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontStyle=1;fontSize=10;fontColor=#000103;" parent="infrastructure" vertex="1">
+                    <mxGeometry x="20" y="30" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="database" value="🗄️ PostgreSQL&lt;br&gt;• Primary Database&lt;br&gt;• Replication&lt;br&gt;• Backup Strategy&lt;br&gt;• Performance Tuning" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontStyle=1;fontSize=10;fontColor=#000103;" parent="infrastructure" vertex="1">
+                    <mxGeometry x="160" y="30" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="redis-cache" value="🔴 Redis Cache&lt;br&gt;• Session Storage&lt;br&gt;• API Caching&lt;br&gt;• Pub/Sub&lt;br&gt;• Queue System" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontStyle=1;fontSize=10;fontColor=#000103;" parent="infrastructure" vertex="1">
+                    <mxGeometry x="20" y="120" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="monitoring-stack" value="📈 Monitoring Stack&lt;br&gt;• Prometheus&lt;br&gt;• Grafana&lt;br&gt;• ELK Stack&lt;br&gt;• Alerting" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontStyle=1;fontSize=10;fontColor=#000103;" parent="infrastructure" vertex="1">
+                    <mxGeometry x="160" y="120" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <!-- Pipeline CI/CD -->
+                <mxCell id="pipeline" value="🔄 Pipeline CI/CD Détaillé" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;fontStyle=1;fontSize=16;startSize=30;fontColor=#000103;" parent="environments" vertex="1">
+                    <mxGeometry x="1340" y="40" width="300" height="320" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="pipeline-steps" value="1️⃣ Code Push&lt;br&gt;2️⃣ Lint &amp; Test&lt;br&gt;3️⃣ Build Docker&lt;br&gt;4️⃣ Push Registry&lt;br&gt;5️⃣ Deploy Staging&lt;br&gt;6️⃣ E2E Tests&lt;br&gt;7️⃣ Deploy Prod&lt;br&gt;8️⃣ Health Check" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;fontStyle=1;fontSize=10;fontColor=#000103;" parent="pipeline" vertex="1">
+                    <mxGeometry x="20" y="30" width="260" height="200" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="pipeline-rollback" value="🔄 Rollback Strategy&lt;br&gt;• Blue-Green Deploy&lt;br&gt;• Canary Releases&lt;br&gt;• Automated Rollback&lt;br&gt;• Health Monitoring" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;fontStyle=1;fontSize=10;fontColor=#000103;" parent="pipeline" vertex="1">
+                    <mxGeometry x="20" y="240" width="260" height="60" as="geometry"/>
+                </mxCell>
+
+                <!-- Tests et Qualité -->
+                <mxCell id="testing" value="🧪 Stratégie de Tests &amp; Qualité" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=16;startSize=30;fontColor=#000103;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="900" width="1900" height="200" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="unit-tests" value="🔬 Tests Unitaires&lt;br&gt;• Jest/Vitest&lt;br&gt;• Coverage &gt; 80%&lt;br&gt;• Fast Feedback&lt;br&gt;• Mock Services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="testing" vertex="1">
+                    <mxGeometry x="20" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="integration-tests" value="🔗 Tests d'Intégration&lt;br&gt;• API Testing&lt;br&gt;• Database Tests&lt;br&gt;• Service Integration&lt;br&gt;• Contract Testing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="testing" vertex="1">
+                    <mxGeometry x="160" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="cypress-e2e" value="🎭 Cypress E2E&lt;br&gt;• User Journeys&lt;br&gt;• Cross-browser&lt;br&gt;• Visual Regression&lt;br&gt;• API Testing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="testing" vertex="1">
+                    <mxGeometry x="300" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="performance-tests" value="⚡ Tests Performance&lt;br&gt;• Load Testing&lt;br&gt;• Stress Testing&lt;br&gt;• Memory Leaks&lt;br&gt;• Response Times" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="testing" vertex="1">
+                    <mxGeometry x="440" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="security-tests" value="🔒 Tests Sécurité&lt;br&gt;• SAST/DAST&lt;br&gt;• Dependency Scan&lt;br&gt;• OWASP Top 10&lt;br&gt;• Penetration Tests" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="testing" vertex="1">
+                    <mxGeometry x="580" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="accessibility-tests" value="♿ Tests Accessibilité&lt;br&gt;• WCAG 2.1 AA&lt;br&gt;• Screen Readers&lt;br&gt;• Keyboard Navigation&lt;br&gt;• Color Contrast" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontStyle=1;fontSize=10;fontColor=#000103;" parent="testing" vertex="1">
+                    <mxGeometry x="720" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <!-- Monitoring et Observabilité -->
+                <mxCell id="monitoring" value="📊 Monitoring &amp; Observabilité" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;fontStyle=1;fontSize=16;startSize=30;fontColor=#000103;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="1150" width="1900" height="150" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="metrics" value="📈 Métriques&lt;br&gt;• Application Metrics&lt;br&gt;• Infrastructure Metrics&lt;br&gt;• Business Metrics&lt;br&gt;• Custom Dashboards" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;fontStyle=1;fontSize=10;fontColor=#000103;" parent="monitoring" vertex="1">
+                    <mxGeometry x="20" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="logging" value="📝 Logging&lt;br&gt;• Structured Logs&lt;br&gt;• Log Aggregation&lt;br&gt;• Error Tracking&lt;br&gt;• Audit Trails" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;fontStyle=1;fontSize=10;fontColor=#000103;" parent="monitoring" vertex="1">
+                    <mxGeometry x="160" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="tracing" value="🔍 Tracing&lt;br&gt;• Distributed Tracing&lt;br&gt;• Request Flow&lt;br&gt;• Performance Analysis&lt;br&gt;• Dependency Mapping" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;fontStyle=1;fontSize=10;fontColor=#000103;" parent="monitoring" vertex="1">
+                    <mxGeometry x="300" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="alerting" value="🚨 Alerting&lt;br&gt;• Real-time Alerts&lt;br&gt;• Escalation Policies&lt;br&gt;• On-call Rotation&lt;br&gt;• Incident Response" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;fontStyle=1;fontSize=10;fontColor=#000103;" parent="monitoring" vertex="1">
+                    <mxGeometry x="440" y="40" width="120" height="80" as="geometry"/>
+                </mxCell>
+
+                <!-- Connexions -->
+                <mxCell id="edge1" style="fontColor=#000103;" parent="1" source="github-repo" target="github-actions" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="edge2" style="fontColor=#000103;" parent="1" source="github-actions" target="docker-registry" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="edge3" style="fontColor=#000103;" parent="1" source="docker-registry" target="staging-env" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="edge4" style="fontColor=#000103;" parent="1" source="staging-env" target="prod-env" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="edge5" style="fontColor=#000103;" parent="1" source="local-env" target="staging-env" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="edge6" style="fontColor=#000103;" parent="1" source="cypress-e2e" target="staging-env" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <mxCell id="edge7" style="fontColor=#000103;" parent="1" source="prod-env" target="monitoring" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <!-- Légende -->
+                <mxCell id="legend" value="Légende:&lt;br&gt;🔵 GitHub &amp; CI/CD&lt;br&gt;🟢 Environnements&lt;br&gt;🟣 Infrastructure&lt;br&gt;🟠 Tests &amp; Qualité&lt;br&gt;🔴 Monitoring&lt;br&gt;🟡 Docker &amp; Registry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;align=left;fontStyle=1;fontColor=#000103;" parent="1" vertex="1">
+                    <mxGeometry x="1700" y="80" width="200" height="120" as="geometry"/>
+                </mxCell>
+
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

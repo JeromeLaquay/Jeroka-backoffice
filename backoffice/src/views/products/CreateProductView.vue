@@ -368,7 +368,7 @@ import {
   ArrowPathIcon,
   XMarkIcon
 } from '@heroicons/vue/24/outline'
-import { productsService } from '@/services/products'
+import { productService } from '@/services/products'
 
 const route = useRoute()
 const router = useRouter()
@@ -410,7 +410,7 @@ const isFormValid = computed(() => {
 // Méthodes
 const loadCategories = async () => {
   try {
-    const response = await productsService.getCategories()
+    const response = await productService.getCategories()
     categories.value = response.data
   } catch (error) {
     console.error('Erreur lors du chargement des catégories:', error)
@@ -422,7 +422,7 @@ const loadProduct = async () => {
   
   try {
     loading.value = true
-    const response = await productsService.getProduct(route.params.id as string)
+    const response = await productService.getProduct(route.params.id as string)
     product.value = response.data
     
     // Remplir le formulaire
@@ -457,7 +457,7 @@ const loadProduct = async () => {
 
 const generateSKU = async () => {
   try {
-    const response = await productsService.generateSKU(form.categoryId)
+    const response = await productService.generateSKU(form.categoryId)
     form.sku = response.data.sku
   } catch (error) {
     console.error('Erreur lors de la génération du SKU:', error)
@@ -489,9 +489,9 @@ const handleSubmit = async () => {
     }
 
     if (isEdit.value) {
-      await productsService.updateProduct(route.params.id as string, data)
+      await productService.updateProduct(route.params.id as string, data)
     } else {
-      await productsService.createProduct(data)
+      await productService.createProduct(data)
     }
 
     router.push('/produits')

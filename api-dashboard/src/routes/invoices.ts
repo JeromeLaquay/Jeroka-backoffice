@@ -68,7 +68,7 @@ router.get('/', async (req, res) => {
     const endIndex = startIndex + (limit as number);
     const paginatedInvoices = filteredInvoices.slice(startIndex, endIndex);
     
-    res.json({
+    return res.json({
       success: true,
       data: {
         invoices: paginatedInvoices,
@@ -79,7 +79,7 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la récupération des factures',
@@ -111,7 +111,7 @@ router.get('/:id', async (req, res) => {
       });
     }
     
-    res.json({
+    return res.json({
       success: true,
       data: invoice
     });
@@ -157,13 +157,13 @@ router.post('/', async (req, res) => {
       createdAt: new Date()
     };
     
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Facture créée avec succès',
       data: newInvoice
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la création de la facture',
@@ -202,7 +202,7 @@ router.put('/:id', async (req, res) => {
       id: parseInt(id)
     };
     
-    res.json({
+    return res.json({
       success: true,
       message: 'Facture mise à jour avec succès',
       data: updatedInvoice
@@ -241,7 +241,7 @@ router.delete('/:id', async (req, res) => {
     }
     
     // TODO: Implement invoice deletion with database
-    res.json({
+    return res.json({
       success: true,
       message: 'Facture supprimée avec succès'
     });
@@ -287,7 +287,7 @@ router.put('/:id/status', async (req, res) => {
       paidDate: status === 'paid' ? new Date() : null
     };
     
-    res.json({
+    return res.json({
       success: true,
       message: `Facture ${status === 'paid' ? 'marquée comme payée' : 'mise à jour'}`,
       data: updatedInvoice
@@ -321,7 +321,7 @@ router.get('/stats', async (req, res) => {
       .filter(inv => inv.status === 'paid')
       .reduce((sum, inv) => sum + inv.total, 0);
     
-    res.json({
+    return res.json({
       success: true,
       data: {
         total: totalInvoices,
@@ -333,7 +333,7 @@ router.get('/stats', async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la récupération des statistiques',

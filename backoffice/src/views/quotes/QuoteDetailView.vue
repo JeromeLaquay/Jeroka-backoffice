@@ -253,7 +253,7 @@ import {
   DocumentTextIcon
 } from '@heroicons/vue/24/outline'
 import QuoteStatusBadge from '@/components/quotes/QuoteStatusBadge.vue'
-import { quotesService, type Quote } from '@/services/quotes'
+import { quoteService, type Quote } from '@/services/quotes'
 
 const route = useRoute()
 const router = useRouter()
@@ -280,7 +280,7 @@ const isExpiringSoon = computed(() => {
 const loadQuote = async () => {
   try {
     loading.value = true
-    const response = await quotesService.getQuote(route.params.id as string)
+    const response = await quoteService.getQuote(route.params.id as string)
     quote.value = response.data
   } catch (error) {
     console.error('Erreur lors du chargement du devis:', error)
@@ -293,7 +293,7 @@ const loadQuote = async () => {
 const downloadPdf = async () => {
   if (!quote.value) return
   try {
-    const blob = await quotesService.downloadQuotePdf(quote.value.id)
+    const blob = await quoteService.downloadQuotePdf(quote.value.id)
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
@@ -308,7 +308,7 @@ const downloadPdf = async () => {
 const sendQuote = async () => {
   if (!quote.value) return
   try {
-    await quotesService.sendQuote(quote.value.id)
+    await quoteService.sendQuote(quote.value.id)
     loadQuote() // Recharger pour mettre à jour le statut
   } catch (error) {
     console.error('Erreur lors de l\'envoi:', error)
@@ -318,7 +318,7 @@ const sendQuote = async () => {
 const acceptQuote = async () => {
   if (!quote.value) return
   try {
-    await quotesService.acceptQuote(quote.value.id)
+    await quoteService.acceptQuote(quote.value.id)
     loadQuote() // Recharger pour mettre à jour
   } catch (error) {
     console.error('Erreur lors de l\'acceptation:', error)
@@ -328,7 +328,7 @@ const acceptQuote = async () => {
 const rejectQuote = async () => {
   if (!quote.value) return
   try {
-    await quotesService.rejectQuote(quote.value.id)
+    await quoteService.rejectQuote(quote.value.id)
     loadQuote() // Recharger pour mettre à jour
   } catch (error) {
     console.error('Erreur lors du rejet:', error)
@@ -338,7 +338,7 @@ const rejectQuote = async () => {
 const convertToInvoice = async () => {
   if (!quote.value) return
   try {
-    const response = await quotesService.convertToInvoice(quote.value.id)
+    const response = await quoteService.convertToInvoice(quote.value.id)
     // Rediriger vers la facture créée
     router.push(`/factures/${response.data.invoiceId}`)
   } catch (error) {
@@ -351,7 +351,7 @@ const extendValidity = async () => {
   try {
     const newValidUntil = new Date()
     newValidUntil.setDate(newValidUntil.getDate() + 30) // +30 jours
-    await quotesService.extendQuoteValidity(quote.value.id, {
+    await quoteService.extendQuoteValidity(quote.value.id, {
       validUntil: newValidUntil.toISOString(),
       notifyClient: true
     })

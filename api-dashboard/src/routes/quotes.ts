@@ -68,7 +68,7 @@ router.get('/', async (req, res) => {
     const endIndex = startIndex + (limit as number);
     const paginatedQuotes = filteredQuotes.slice(startIndex, endIndex);
     
-    res.json({
+    return res.json({
       success: true,
       data: {
         quotes: paginatedQuotes,
@@ -79,7 +79,7 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la récupération des devis',
@@ -111,7 +111,7 @@ router.get('/:id', async (req, res) => {
       });
     }
     
-    res.json({
+    return res.json({
       success: true,
       data: quote
     });
@@ -157,13 +157,13 @@ router.post('/', async (req, res) => {
       createdAt: new Date()
     };
     
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Devis créé avec succès',
       data: newQuote
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la création du devis',
@@ -202,7 +202,7 @@ router.put('/:id', async (req, res) => {
       id: parseInt(id)
     };
     
-    res.json({
+    return res.json({
       success: true,
       message: 'Devis mis à jour avec succès',
       data: updatedQuote
@@ -241,7 +241,7 @@ router.delete('/:id', async (req, res) => {
     }
     
     // TODO: Implement quote deletion with database
-    res.json({
+    return res.json({
       success: true,
       message: 'Devis supprimé avec succès'
     });
@@ -286,7 +286,7 @@ router.put('/:id/status', async (req, res) => {
       status
     };
     
-    res.json({
+    return res.json({
       success: true,
       message: `Devis ${status === 'sent' ? 'envoyé' : 'mis à jour'}`,
       data: updatedQuote
@@ -352,7 +352,7 @@ router.post('/:id/convert', async (req, res) => {
       createdAt: new Date()
     };
     
-    res.json({
+    return res.json({
       success: true,
       message: 'Devis converti en facture avec succès',
       data: {
@@ -361,7 +361,7 @@ router.post('/:id/convert', async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la conversion du devis',
@@ -389,7 +389,7 @@ router.get('/stats', async (req, res) => {
       .filter(quote => quote.status === 'accepted')
       .reduce((sum, quote) => sum + quote.total, 0);
     
-    res.json({
+    return res.json({
       success: true,
       data: {
         total: totalQuotes,
@@ -401,7 +401,7 @@ router.get('/stats', async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la récupération des statistiques',

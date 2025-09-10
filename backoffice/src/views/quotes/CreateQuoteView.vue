@@ -251,7 +251,7 @@ import {
 import ClientSelector from '@/components/orders/ClientSelector.vue'
 import QuoteItemRow from '@/components/quotes/QuoteItemRow.vue'
 import QuoteSummary from '@/components/quotes/QuoteSummary.vue'
-import { quotesService, type CreateQuoteRequest, type Quote } from '@/services/quotes'
+import { quoteService, type CreateQuoteRequest, type Quote } from '@/services/quotes'
 
 const route = useRoute()
 const router = useRouter()
@@ -291,7 +291,7 @@ const loadQuote = async () => {
 
   try {
     loading.value = true
-    const response = await quotesService.getQuote(route.params.id as string)
+    const response = await quoteService.getQuote(route.params.id as string)
     quote.value = response.data
     
     // Pré-remplir le formulaire
@@ -323,7 +323,7 @@ const loadQuote = async () => {
 
 const generateQuoteNumber = async () => {
   try {
-    const response = await quotesService.getNextQuoteNumber()
+    const response = await quoteService.getNextQuoteNumber()
     form.quoteNumber = response.data.quoteNumber
   } catch (error) {
     console.error('Erreur lors de la génération du numéro:', error)
@@ -370,9 +370,9 @@ const handleSubmit = async () => {
     loading.value = true
 
     if (isEdit.value) {
-      await quotesService.updateQuote(route.params.id as string, form)
+      await quoteService.updateQuote(route.params.id as string, form)
     } else {
-      await quotesService.createQuote(form)
+      await quoteService.createQuote(form)
     }
 
     router.push('/devis')

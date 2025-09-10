@@ -349,7 +349,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import InvoiceStatusBadge from '@/components/invoices/InvoiceStatusBadge.vue'
 import DeleteConfirmModal from '@/components/common/DeleteConfirmModal.vue'
-import { invoicesService } from '@/services/invoices'
+import { invoiceService } from '@/services/invoices'
 import { debounce } from 'lodash-es'
 
 // Types
@@ -423,12 +423,12 @@ const loadInvoices = async () => {
       period: filters.period || undefined
     }
 
-    const response = await invoicesService.getInvoices(params)
+    const response = await invoiceService.getInvoices(params)
     invoices.value = response.data.invoices
     pagination.total = response.data.total
 
     // Charger les statistiques
-    const statsResponse = await invoicesService.getInvoiceStats()
+    const statsResponse = await invoiceService.getInvoiceStats()
     stats.value = statsResponse.data
   } catch (error) {
     console.error('Erreur lors du chargement des factures:', error)
@@ -470,7 +470,7 @@ const deleteInvoice = async () => {
   if (!invoiceToDelete.value) return
 
   try {
-    await invoicesService.deleteInvoice(invoiceToDelete.value.id)
+    await invoiceService.deleteInvoice(invoiceToDelete.value.id)
     loadInvoices() // Recharger la liste
     showDeleteConfirmation.value = false
     invoiceToDelete.value = null
@@ -481,7 +481,7 @@ const deleteInvoice = async () => {
 
 const downloadPdf = async (invoiceId: string) => {
   try {
-    const blob = await invoicesService.downloadInvoicePdf(invoiceId)
+    const blob = await invoiceService.downloadInvoicePdf(invoiceId)
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
@@ -495,7 +495,7 @@ const downloadPdf = async (invoiceId: string) => {
 
 const sendInvoice = async (invoiceId: string) => {
   try {
-    await invoicesService.sendInvoice(invoiceId)
+    await invoiceService.sendInvoice(invoiceId)
     // Afficher un message de succès
     loadInvoices() // Recharger pour mettre à jour le statut
   } catch (error) {

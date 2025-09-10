@@ -267,7 +267,7 @@ import {
 import ClientSelector from '@/components/orders/ClientSelector.vue'
 import InvoiceItemRow from '@/components/invoices/InvoiceItemRow.vue'
 import InvoiceSummary from '@/components/invoices/InvoiceSummary.vue'
-import { invoicesService, type CreateInvoiceRequest, type Invoice } from '@/services/invoices'
+import { invoiceService, type CreateInvoiceRequest, type Invoice } from '@/services/invoices'
 
 const route = useRoute()
 const router = useRouter()
@@ -309,7 +309,7 @@ const loadInvoice = async () => {
 
   try {
     loading.value = true
-    const response = await invoicesService.getInvoice(route.params.id as string)
+    const response = await invoiceService.getInvoice(route.params.id as string)
     invoice.value = response.data
     
     // Pré-remplir le formulaire
@@ -342,7 +342,7 @@ const loadInvoice = async () => {
 
 const generateInvoiceNumber = async () => {
   try {
-    const response = await invoicesService.getNextInvoiceNumber()
+    const response = await invoiceService.getNextInvoiceNumber()
     form.invoiceNumber = response.data.invoiceNumber
   } catch (error) {
     console.error('Erreur lors de la génération du numéro:', error)
@@ -396,9 +396,9 @@ const handleSubmit = async () => {
     loading.value = true
 
     if (isEdit.value) {
-      await invoicesService.updateInvoice(route.params.id as string, form)
+      await invoiceService.updateInvoice(route.params.id as string, form)
     } else {
-      await invoicesService.createInvoice(form)
+      await invoiceService.createInvoice(form)
     }
 
     router.push('/factures')
