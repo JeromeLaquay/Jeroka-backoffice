@@ -217,8 +217,8 @@ CREATE TABLE quote_items (
     discount_percent DECIMAL(5,2) DEFAULT 0,
     vat_rate DECIMAL(5,2) DEFAULT 20.00,
     total_ht DECIMAL(10,2) GENERATED ALWAYS AS (quantity * unit_price_ht * (1 - discount_percent/100)) STORED,
-    total_vat DECIMAL(10,2) GENERATED ALWAYS AS (total_ht * vat_rate/100) STORED,
-    total_ttc DECIMAL(10,2) GENERATED ALWAYS AS (total_ht + total_vat) STORED,
+    total_vat DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * vat_rate/100) STORED,
+    total_ttc DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * (1 + vat_rate/100)) STORED,
     sort_order INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -245,7 +245,7 @@ CREATE TABLE invoices (
     total_vat DECIMAL(10,2) DEFAULT 0,
     total_ttc DECIMAL(10,2) DEFAULT 0,
     amount_paid DECIMAL(10,2) DEFAULT 0,
-    amount_due DECIMAL(10,2) GENERATED ALWAYS AS (total_ttc - amount_paid) STORED,
+    amount_due DECIMAL(10,2) DEFAULT 0,
     issue_date DATE NOT NULL DEFAULT CURRENT_DATE,
     due_date DATE,
     payment_terms VARCHAR(255),
@@ -279,8 +279,8 @@ CREATE TABLE invoice_items (
     discount_percent DECIMAL(5,2) DEFAULT 0,
     vat_rate DECIMAL(5,2) DEFAULT 20.00,
     total_ht DECIMAL(10,2) GENERATED ALWAYS AS (quantity * unit_price_ht * (1 - discount_percent/100)) STORED,
-    total_vat DECIMAL(10,2) GENERATED ALWAYS AS (total_ht * vat_rate/100) STORED,
-    total_ttc DECIMAL(10,2) GENERATED ALWAYS AS (total_ht + total_vat) STORED,
+    total_vat DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * vat_rate/100) STORED,
+    total_ttc DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * (1 + vat_rate/100)) STORED,
     sort_order INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
