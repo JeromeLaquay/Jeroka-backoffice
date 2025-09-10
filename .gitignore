@@ -167,8 +167,6 @@ test-results/
 # ===========================================
 # ENVIRONNEMENT ET CONFIGURATION
 # ===========================================
-.env
-.env.*
 !.env.example
 config/local.json
 config/production.json
