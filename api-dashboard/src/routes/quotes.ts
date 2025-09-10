@@ -116,7 +116,7 @@ router.get('/:id', async (req, res) => {
       data: quote
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la récupération du devis',
@@ -208,7 +208,7 @@ router.put('/:id', async (req, res) => {
       data: updatedQuote
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la mise à jour du devis',
@@ -246,7 +246,7 @@ router.delete('/:id', async (req, res) => {
       message: 'Devis supprimé avec succès'
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la suppression du devis',
@@ -292,7 +292,7 @@ router.put('/:id/status', async (req, res) => {
       data: updatedQuote
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la mise à jour du statut',

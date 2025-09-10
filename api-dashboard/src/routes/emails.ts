@@ -162,7 +162,7 @@ router.post('/categories', verifyToken, async (req: Request, res: Response) => {
       updatedAt: new Date()
     };
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: newCategory,
       message: 'Catégorie créée avec succès'

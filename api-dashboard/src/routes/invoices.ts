@@ -116,7 +116,7 @@ router.get('/:id', async (req, res) => {
       data: invoice
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la récupération de la facture',
@@ -208,7 +208,7 @@ router.put('/:id', async (req, res) => {
       data: updatedInvoice
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la mise à jour de la facture',
@@ -246,7 +246,7 @@ router.delete('/:id', async (req, res) => {
       message: 'Facture supprimée avec succès'
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la suppression de la facture',
@@ -293,7 +293,7 @@ router.put('/:id/status', async (req, res) => {
       data: updatedInvoice
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la mise à jour du statut',
