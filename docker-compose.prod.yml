@@ -69,7 +69,6 @@ services:
       JWT_REFRESH_EXPIRES_IN: 30d
       
       # CORS
-     
       BACKOFFICE_URL: https://admin.jeroka.fr FRONTEND_URL: https://shop.jeroka.fr
       
       # Upload
