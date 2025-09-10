@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeroka Xperience - Business Plan Multi-Pages</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0ea5e9;
+            --secondary-color: #d946ef;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --text-color: #374151;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .header-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-item a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item a:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Page Navigation */
+        .page-nav {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            z-index: 1000;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            padding: 20px 15px;
+        }
+
+        .page-nav-item {
+            display: block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .page-nav-item.active {
+            background: var(--primary-color);
+            transform: scale(1.3);
+        }
+
+        .page-nav-item:hover {
+            background: var(--secondary-color);
+            transform: scale(1.2);
+        }
+
+        .page-nav-item::after {
+            content: attr(title);
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--dark-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .page-nav-item:hover::after {
+            opacity: 1;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding: 60px 0;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .grid {
+            display: grid;
+            gap: 30px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .card-icon.primary {
+            background: linear-gradient(135deg, var(--primary-color), #0284c7);
+            color: white;
+        }
+
+        .card-icon.secondary {
+            background: linear-gradient(135deg, var(--secondary-color), #a855f7);
+            color: white;
+        }
+
+        .card-icon.success {
+            background: linear-gradient(135deg, var(--success-color), #16a34a);
+            color: white;
+        }
+
+        .card-icon.warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+            color: white;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .card-content {
+            color: var(--text-color);
+            line-height: 1.7;
+        }
+
+        /* Prospecting Strategy */
+        .prospecting-level {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .prospecting-level.local {
+            border-left-color: var(--success-color);
+        }
+
+        .prospecting-level.departmental {
+            border-left-color: var(--warning-color);
+        }
+
+        .prospecting-level.regional {
+            border-left-color: var(--secondary-color);
+        }
+
+        .prospecting-level.national {
+            border-left-color: var(--danger-color);
+        }
+
+        .level-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .level-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .level-icon.local {
+            background: var(--success-color);
+        }
+
+        .level-icon.departmental {
+            background: var(--warning-color);
+        }
+
+        .level-icon.regional {
+            background: var(--secondary-color);
+        }
+
+        .level-icon.national {
+            background: var(--danger-color);
+        }
+
+        .level-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .level-subtitle {
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .strategy-item {
+            background: var(--light-color);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .strategy-item h4 {
+            color: var(--dark-color);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .strategy-item p {
+            color: var(--text-color);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 60px 0 30px;
+            margin-top: 100px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .footer-section p, .footer-section li {
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding-top: 30px;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-list {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .page-nav {
+                display: none;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Print Styles */
+        @media print {
+            .nav, .footer, .page-nav {
+                display: none;
+            }
+            
+            .page {
+                display: block !important;
+                page-break-after: always;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🏢 Jeroka Xperience</h1>
+                <p class="tagline">L'IA qui transforme votre PME en entreprise digitale performante</p>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">1.2M</div>
+                        <div class="stat-label">PME/TPE en France</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">60%</div>
+                        <div class="stat-label">Réduction des coûts IT</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">+150%</div>
+                        <div class="stat-label">Gain de productivité</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">48h</div>
+                        <div class="stat-label">Digitalisation complète</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="#" onclick="showPage(0)">Résumé Exécutif</a></li>
+                    <li class="nav-item"><a href="#" onclick="showPage(1)">Analyse de Marché</a></li>
+                    <li class="nav-item"><a href="#" onclick="showPage(2)">Modèle d'Affaires</a></li>
+                    <li class="nav-item"><a href="#" onclick="showPage(3)">Stratégie de Prospection</a></li>
+                    <li class="nav-item"><a href="#" onclick="showPage(4)">Projections Financières</a></li>
+                    <li class="nav-item"><a href="#" onclick="showPage(5)">Plan d'Implémentation</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Page Navigation -->
+    <div class="page-nav">
+        <div class="page-nav-item active" onclick="showPage(0)" title="Résumé Exécutif"></div>
+        <div class="page-nav-item" onclick="showPage(1)" title="Analyse de Marché"></div>
+        <div class="page-nav-item" onclick="showPage(2)" title="Modèle d'Affaires"></div>
+        <div class="page-nav-item" onclick="showPage(3)" title="Stratégie de Prospection"></div>
+        <div class="page-nav-item" onclick="showPage(4)" title="Projections Financières"></div>
+        <div class="page-nav-item" onclick="showPage(5)" title="Plan d'Implémentation"></div>
+    </div>
+
+    <!-- Page 1: Résumé Exécutif -->
+    <div class="page active" id="page-0">
+        <div class="container">
+            <div class="page-header">
+                <h2 class="page-title">Résumé Exécutif</h2>
+                <p class="page-subtitle">Vision, mission et objectifs stratégiques de Jeroka Xperience</p>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-eye"></i>
+                    Notre Vision
+                </h3>
+                <div class="card">
+                    <div class="card-content">
+                        <p>Devenir le leader français de la digitalisation des PME/TPE en proposant des solutions IA intégrées qui transforment radicalement la productivité et la compétitivité des entreprises du Nord de la France et au-delà.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-bullseye"></i>
+                    Notre Mission
+                </h3>
+                <div class="card">
+                    <div class="card-content">
+                        <p>Démocratiser l'intelligence artificielle pour les PME/TPE en proposant des solutions clés en main, abordables et personnalisées qui permettent à chaque entreprise de bénéficier des avantages de la transformation digitale sans complexité technique.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Objectifs Stratégiques
+                </h3>
+                <div class="grid grid-3">
+                    <div class="card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4 class="card-title">Croissance Client</h4>
+                        <div class="card-content">
+                            <p>Atteindre 500 clients actifs dans les 3 premières années, avec une croissance de 200% par an.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h4 class="card-title">Expansion Géographique</h4>
+                        <div class="card-content">
+                            <p>Établir une présence forte dans le Nord-Pas-de-Calais, puis étendre vers la Picardie et la Belgique.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon success">
+                            <i class="fas fa-euro-sign"></i>
+                        </div>
+                        <h4 class="card-title">Rentabilité</h4>
+                        <div class="card-content">
+                            <p>Atteindre la rentabilité dès la 2ème année avec un CA de 2M€ et une marge de 40%.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Proposition de Valeur Unique
+                </h3>
+                <div class="card">
+                    <div class="card-content">
+                        <p><strong>Digitalisation Express en 48h :</strong> Contrairement aux solutions traditionnelles qui prennent des mois, Jeroka Xperience propose une digitalisation complète de votre entreprise en seulement 48 heures.</p>
+                        <br>
+                        <p><strong>IA Intégrée :</strong> Toutes nos solutions incluent l'intelligence artificielle pour automatiser les tâches répétitives et optimiser les processus métier.</p>
+                        <br>
+                        <p><strong>Accompagnement Personnalisé :</strong> Une équipe dédiée basée à Wormhout pour un suivi de proximité et une compréhension des enjeux locaux.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 2: Analyse de Marché -->
+    <div class="page" id="page-1">
+        <div class="container">
+            <div class="page-header">
+                <h2 class="page-title">Analyse de Marché</h2>
+                <p class="page-subtitle">Opportunités et défis du marché de la digitalisation PME/TPE</p>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Taille du Marché
+                </h3>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h4 class="card-title">Marché Français</h4>
+                        <div class="card-content">
+                            <p><strong>1,2 million de PME/TPE</strong> en France, dont 85% ont encore des processus manuels ou semi-automatisés.</p>
+                            <br>
+                            <p>Le marché de la digitalisation PME représente <strong>8,5 milliards d'euros</strong> avec une croissance annuelle de 12%.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h4 class="card-title">Marché Local (Nord-Pas-de-Calais)</h4>
+                        <div class="card-content">
+                            <p><strong>45 000 PME/TPE</strong> dans la région, avec un potentiel de 15 000 clients cibles dans un rayon de 100km autour de Wormhout.</p>
+                            <br>
+                            <p>Marché local estimé à <strong>180 millions d'euros</strong> avec une pénétration digitale encore faible (35%).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-users"></i>
+                    Segmentation Client
+                </h3>
+                <div class="grid grid-3">
+                    <div class="card">
+                        <div class="card-icon success">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <h4 class="card-title">Commerce de Proximité</h4>
+                        <div class="card-content">
+                            <p>Boulangeries, boucheries, pharmacies, commerces de détail. Besoin de gestion de stock, CRM client, et présence digitale.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <h4 class="card-title">Artisans & Services</h4>
+                        <div class="card-content">
+                            <p>Plombiers, électriciens, coiffeurs, garagistes. Besoin de prise de RDV en ligne, facturation, et suivi client.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-industry"></i>
+                        </div>
+                        <h4 class="card-title">Industrie Légère</h4>
+                        <div class="card-content">
+                            <p>PME manufacturières, agroalimentaire. Besoin d'optimisation des processus, gestion de production, et traçabilité.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Défis du Marché
+                </h3>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-icon danger">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h4 class="card-title">Résistance au Changement</h4>
+                        <div class="card-content">
+                            <p>65% des dirigeants de PME/TPE sont réticents à la digitalisation par peur de la complexité et du coût.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-euro-sign"></i>
+                        </div>
+                        <h4 class="card-title">Contraintes Budgétaires</h4>
+                        <div class="card-content">
+                            <p>Budget IT moyen d'une PME : 2-5% du CA, soit 5 000-15 000€/an pour une PME de 500K€ de CA.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 3: Modèle d'Affaires -->
+    <div class="page" id="page-2">
+        <div class="container">
+            <div class="page-header">
+                <h2 class="page-title">Modèle d'Affaires</h2>
+                <p class="page-subtitle">Stratégie commerciale et sources de revenus</p>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-cogs"></i>
+                    Modèle de Revenus
+                </h3>
+                <div class="grid grid-3">
+                    <div class="card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h4 class="card-title">Digitalisation Express</h4>
+                        <div class="card-content">
+                            <p><strong>Prix : 2 500€ - 8 000€</strong></p>
+                            <p>Package complet de digitalisation en 48h : site web, CRM, outils de gestion, formation.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <h4 class="card-title">Abonnements Mensuels</h4>
+                        <div class="card-content">
+                            <p><strong>Prix : 99€ - 299€/mois</strong></p>
+                            <p>Maintenance, support, mises à jour, et nouvelles fonctionnalités IA.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon success">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h4 class="card-title">Formation & Conseil</h4>
+                        <div class="card-content">
+                            <p><strong>Prix : 150€ - 500€/jour</strong></p>
+                            <p>Formation des équipes, conseil en transformation digitale, audit de processus.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-handshake"></i>
+                    Canaux de Distribution
+                </h3>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h4 class="card-title">Vente Directe</h4>
+                        <div class="card-content">
+                            <p>Équipe commerciale dédiée basée à Wormhout pour la prospection locale et régionale. Visites terrain, démonstrations, et accompagnement personnalisé.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h4 class="card-title">Vente en Ligne</h4>
+                        <div class="card-content">
+                            <p>Site web avec formulaire de contact, prise de RDV en ligne, chatbot IA pour qualification des leads, et démonstrations virtuelles.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-heart"></i>
+                    Relations Client
+                </h3>
+                <div class="card">
+                    <div class="card-content">
+                        <p><strong>Accompagnement Personnalisé :</strong> Chaque client bénéficie d'un chargé de compte dédié basé à Wormhout pour un suivi de proximité.</p>
+                        <br>
+                        <p><strong>Support 7j/7 :</strong> Hotline téléphonique et chat en ligne pour résoudre rapidement les problèmes.</p>
+                        <br>
+                        <p><strong>Communauté :</strong> Groupe Facebook privé pour échanges entre clients et partage de bonnes pratiques.</p>
+                        <br>
+                        <p><strong>Événements :</strong> Ateliers mensuels à Wormhout et webinaires pour formation continue.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 4: Stratégie de Prospection -->
+    <div class="page" id="page-3">
+        <div class="container">
+            <div class="page-header">
+                <h2 class="page-title">Stratégie de Prospection</h2>
+                <p class="page-subtitle">Approche multi-niveaux pour conquérir le marché du Nord de la France</p>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-map-marked-alt"></i>
+                    Prospection Locale - Wormhout & Environs (Rayon 20km)
+                </h3>
+                <div class="prospecting-level local">
+                    <div class="level-header">
+                        <div class="level-icon local">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div>
+                            <h4 class="level-title">Proximité & Relations Humaines</h4>
+                            <p class="level-subtitle">Ciblage : 2 500 PME/TPE dans un rayon de 20km autour de Wormhout</p>
+                        </div>
+                    </div>
+                    <div class="strategy-grid">
+                        <div class="strategy-item">
+                            <h4>🎯 Cartes de Visite Premium</h4>
+                            <p>Cartes de visite avec QR code vers démonstration vidéo personnalisée. Distribution lors d'événements locaux (marchés, foires, salons professionnels).</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>🏢 Visites de Proximité</h4>
+                            <p>Tournée systématique des zones d'activité : ZA de Wormhout, Bergues, Cassel. Présentation de 15 minutes avec démonstration live sur tablette.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>🤝 Partenariats Locaux</h4>
+                            <p>Accords avec CCI Dunkerque, Chambre des Métiers, syndicats professionnels. Présentations lors de leurs événements et formations.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>📞 Appels Téléphoniques Ciblés</h4>
+                            <p>Base de données des 2 500 entreprises locales. Script personnalisé mentionnant la proximité géographique et les références locales.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>🎪 Événements Locaux</h4>
+                            <p>Stand aux Fêtes de Wormhout, Marché de Noël, Foire aux Vins. Démonstrations interactives et jeux concours avec lots (audit digital gratuit).</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>📧 Email Marketing Local</h4>
+                            <p>Newsletter mensuelle "Digitalisation du Nord" avec actualités locales, témoignages clients, et offres exclusives pour les entreprises du secteur.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-newspaper"></i>
+                    Prospection Départementale - Nord (59)
+                </h3>
+                <div class="prospecting-level departmental">
+                    <div class="level-header">
+                        <div class="level-icon departmental">
+                            <i class="fas fa-map"></i>
+                        </div>
+                        <div>
+                            <h4 class="level-title">Médias Traditionnels & Réseaux</h4>
+                            <p class="level-subtitle">Ciblage : 15 000 PME/TPE dans le département du Nord</p>
+                        </div>
+                    </div>
+                    <div class="strategy-grid">
+                        <div class="strategy-item">
+                            <h4>📰 Voix du Nord - Partenariat Editorial</h4>
+                            <p>Rubrique mensuelle "Digital Nord" avec conseils pratiques, témoignages clients, et encarts publicitaires ciblés. Budget : 2 000€/mois.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>📻 Radio Contact Lille</h4>
+                            <p>Chronique hebdomadaire "Entrepreneur du Nord" avec conseils digitalisation. Publicité ciblée aux heures de pointe (7h-9h, 17h-19h).</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>🏢 Salons Professionnels</h4>
+                            <p>Participation aux salons : Salon des Entrepreneurs Lille, Salon PME Nord, Salon de l'Artisanat Dunkerque. Stand avec démonstrations live.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>🤝 Réseaux d'Affaires</h4>
+                            <p>Adhésion BNI (Business Network International), Rotary Club, Lions Club. Présentations mensuelles et recommandations croisées.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>📱 Google Ads Local</h4>
+                            <p>Campagnes ciblées géographiquement sur le Nord. Mots-clés : "digitalisation entreprise Lille", "CRM Dunkerque", "site web PME Nord".</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>📧 LinkedIn Départemental</h4>
+                            <p>Campagnes LinkedIn Ads ciblées sur dirigeants PME du Nord. Contenu : études de cas, webinaires, et invitations à des événements exclusifs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-share-alt"></i>
+                    Prospection Régionale - Hauts-de-France
+                </h3>
+                <div class="prospecting-level regional">
+                    <div class="level-header">
+                        <div class="level-icon regional">
+                            <i class="fas fa-globe-europe"></i>
+                        </div>
+                        <div>
+                            <h4 class="level-title">Digital & Réseaux Sociaux</h4>
+                            <p class="level-subtitle">Ciblage : 45 000 PME/TPE dans les Hauts-de-France</p>
+                        </div>
+                    </div>
+                    <div class="strategy-grid">
+                        <div class="strategy-item">
+                            <h4>📘 Facebook Business</h4>
+                            <p>Page "Jeroka Xperience Nord" avec contenu local : témoignages clients, conseils digitalisation, événements régionaux. Publicités ciblées sur dirigeants PME.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>📸 Instagram Stories</h4>
+                            <p>Stories quotidiennes : "Entreprise du jour", conseils rapides, coulisses des interventions. Hashtags locaux : #PMENord #DigitalHautsDeFrance.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>🎥 YouTube Channel</h4>
+                            <p>Chaîne "Digitalisation PME Nord" : tutoriels, témoignages clients, visites d'entreprises. SEO local pour apparaître dans les recherches régionales.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>📧 Newsletter Régionale</h4>
+                            <p>Newsletter "Digital Hauts-de-France" : actualités régionales, subventions digitalisation, événements, conseils sectoriels (industrie, commerce, services).</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>🤝 Partenariats Institutionnels</h4>
+                            <p>Accords avec Région Hauts-de-France, ADEME, BPI France. Présentations lors de leurs événements et formations sur les aides à la digitalisation.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>📱 TikTok B2B</h4>
+                            <p>Contenu court et engageant : "Avant/Après digitalisation", conseils rapides, témoignages clients. Ciblage sur dirigeants 25-45 ans.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-flag"></i>
+                    Prospection Nationale - France Entière
+                </h3>
+                <div class="prospecting-level national">
+                    <div class="level-header">
+                        <div class="level-icon national">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div>
+                            <h4 class="level-title">Digital & Automatisation</h4>
+                            <p class="level-subtitle">Ciblage : 1,2 million de PME/TPE en France</p>
+                        </div>
+                    </div>
+                    <div class="strategy-grid">
+                        <div class="strategy-item">
+                            <h4>🌐 Site Web Optimisé</h4>
+                            <p>Site jeroka.fr avec formulaire de contact intelligent, chatbot IA pour qualification, et système de prise de RDV en ligne. SEO national sur "digitalisation PME".</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>📅 Prise de RDV Automatisée</h4>
+                            <p>Calendly intégré au site web. Disponibilités en temps réel, rappels automatiques, et préparation personnalisée selon le secteur d'activité.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>📧 Email Marketing National</h4>
+                            <p>Campagnes automatisées : onboarding, nurturing, retargeting. Segmentation par secteur, taille d'entreprise, et niveau de maturité digitale.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>🎯 Google Ads National</h4>
+                            <p>Campagnes Search et Display sur mots-clés stratégiques. Retargeting des visiteurs du site web et audiences similaires aux clients existants.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>📱 LinkedIn B2B</h4>
+                            <p>Campagnes LinkedIn Ads nationales, contenu thought leadership, et prospection directe via Sales Navigator. Ciblage dirigeants PME par secteur.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h4>🤖 Chatbot IA Avancé</h4>
+                            <p>Chatbot sur le site web capable de qualifier les leads, programmer des démonstrations, et répondre aux questions courantes 24h/24.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Objectifs de Prospection par Niveau
+                </h3>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-target"></i>
+                        </div>
+                        <h4 class="card-title">Objectifs Quantitatifs</h4>
+                        <div class="card-content">
+                            <p><strong>Local (Wormhout) :</strong> 50 nouveaux clients/an</p>
+                            <p><strong>Départemental (Nord) :</strong> 200 nouveaux clients/an</p>
+                            <p><strong>Régional (Hauts-de-France) :</strong> 500 nouveaux clients/an</p>
+                            <p><strong>National :</strong> 1 000 nouveaux clients/an</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-euro-sign"></i>
+                        </div>
+                        <h4 class="card-title">Objectifs Financiers</h4>
+                        <div class="card-content">
+                            <p><strong>Local :</strong> 125 000€ CA/an</p>
+                            <p><strong>Départemental :</strong> 500 000€ CA/an</p>
+                            <p><strong>Régional :</strong> 1 250 000€ CA/an</p>
+                            <p><strong>National :</strong> 2 500 000€ CA/an</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 5: Projections Financières -->
+    <div class="page" id="page-4">
+        <div class="container">
+            <div class="page-header">
+                <h2 class="page-title">Projections Financières</h2>
+                <p class="page-subtitle">Prévisions financières sur 5 ans et analyse de rentabilité</p>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Chiffre d'Affaires Prévisionnel
+                </h3>
+                <div class="grid grid-3">
+                    <div class="card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h4 class="card-title">Année 1</h4>
+                        <div class="card-content">
+                            <p><strong>CA : 500 000€</strong></p>
+                            <p>• 100 clients digitalisation express</p>
+                            <p>• 50 abonnements mensuels</p>
+                            <p>• 20 formations</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h4 class="card-title">Année 2</h4>
+                        <div class="card-content">
+                            <p><strong>CA : 1 200 000€</strong></p>
+                            <p>• 200 clients digitalisation express</p>
+                            <p>• 150 abonnements mensuels</p>
+                            <p>• 50 formations</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon success">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h4 class="card-title">Année 3</h4>
+                        <div class="card-content">
+                            <p><strong>CA : 2 500 000€</strong></p>
+                            <p>• 400 clients digitalisation express</p>
+                            <p>• 300 abonnements mensuels</p>
+                            <p>• 100 formations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-coins"></i>
+                    Structure des Coûts
+                </h3>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4 class="card-title">Coûts Opérationnels</h4>
+                        <div class="card-content">
+                            <p><strong>Personnel :</strong> 60% du CA</p>
+                            <p>• 5 développeurs : 300 000€/an</p>
+                            <p>• 3 commerciaux : 180 000€/an</p>
+                            <p>• 2 support client : 80 000€/an</p>
+                            <p>• 1 marketing : 50 000€/an</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon danger">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <h4 class="card-title">Coûts Techniques</h4>
+                        <div class="card-content">
+                            <p><strong>Infrastructure :</strong> 15% du CA</p>
+                            <p>• Serveurs cloud : 50 000€/an</p>
+                            <p>• Licences logiciels : 30 000€/an</p>
+                            <p>• Outils marketing : 20 000€/an</p>
+                            <p>• Maintenance : 25 000€/an</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Analyse de Rentabilité
+                </h3>
+                <div class="card">
+                    <div class="card-content">
+                        <p><strong>Marge Brute :</strong> 75% (revenus récurrents élevés)</p>
+                        <p><strong>Marge Nette :</strong> 25% (après tous les coûts)</p>
+                        <p><strong>Seuil de Rentabilité :</strong> 400 000€ CA (mois 8)</p>
+                        <p><strong>ROI Investisseurs :</strong> 300% sur 3 ans</p>
+                        <p><strong>Cash Flow Positif :</strong> Dès l'année 2</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 6: Plan d'Implémentation -->
+    <div class="page" id="page-5">
+        <div class="container">
+            <div class="page-header">
+                <h2 class="page-title">Plan d'Implémentation</h2>
+                <p class="page-subtitle">Roadmap détaillée et jalons de développement</p>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-road"></i>
+                    Roadmap 2024-2026
+                </h3>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h4 class="card-title">Phase 1 - Lancement (Q1-Q2 2024)</h4>
+                        <div class="card-content">
+                            <p>• Finalisation du produit MVP</p>
+                            <p>• Recrutement équipe commerciale</p>
+                            <p>• Lancement prospection locale Wormhout</p>
+                            <p>• Premiers clients pilotes</p>
+                            <p>• Mise en place infrastructure</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                        </div>
+                        <h4 class="card-title">Phase 2 - Expansion (Q3-Q4 2024)</h4>
+                        <div class="card-content">
+                            <p>• Déploiement départemental (Nord)</p>
+                            <p>• Partenariat Voix du Nord</p>
+                            <p>• Lancement campagnes digitales</p>
+                            <p>• Recrutement développeurs</p>
+                            <p>• Optimisation processus</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon success">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h4 class="card-title">Phase 3 - Régional (2025)</h4>
+                        <div class="card-content">
+                            <p>• Expansion Hauts-de-France</p>
+                            <p>• Ouverture bureau Lille</p>
+                            <p>• Partenariats institutionnels</p>
+                            <p>• Développement IA avancée</p>
+                            <p>• International Belgique</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-flag"></i>
+                        </div>
+                        <h4 class="card-title">Phase 4 - National (2026)</h4>
+                        <div class="card-content">
+                            <p>• Déploiement national</p>
+                            <p>• Franchise régionale</p>
+                            <p>• Levée de fonds série A</p>
+                            <p>• Innovation produits</p>
+                            <p>• IPO préparation</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-users"></i>
+                    Équipe & Recrutement
+                </h3>
+                <div class="grid grid-3">
+                    <div class="card">
+                        <div class="card-icon primary">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h4 class="card-title">Équipe Technique</h4>
+                        <div class="card-content">
+                            <p>• 1 CTO senior</p>
+                            <p>• 3 développeurs full-stack</p>
+                            <p>• 1 DevOps</p>
+                            <p>• 1 UX/UI Designer</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h4 class="card-title">Équipe Commerciale</h4>
+                        <div class="card-content">
+                            <p>• 1 Directeur Commercial</p>
+                            <p>• 2 Business Developers</p>
+                            <p>• 1 Account Manager</p>
+                            <p>• 1 Marketing Manager</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon success">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h4 class="card-title">Support & Opérations</h4>
+                        <div class="card-content">
+                            <p>• 2 Support Client</p>
+                            <p>• 1 Formateur</p>
+                            <p>• 1 Comptable</p>
+                            <p>• 1 RH</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Risques & Mitigation
+                </h3>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-icon danger">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4 class="card-title">Risques Identifiés</h4>
+                        <div class="card-content">
+                            <p>• Concurrence des grands acteurs</p>
+                            <p>• Résistance au changement PME</p>
+                            <p>• Évolution technologique rapide</p>
+                            <p>• Recrutement talents locaux</p>
+                            <p>• Réglementation RGPD</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h4 class="card-title">Stratégies de Mitigation</h4>
+                        <div class="card-content">
+                            <p>• Différenciation par proximité</p>
+                            <p>• Formation et accompagnement</p>
+                            <p>• Veille technologique continue</p>
+                            <p>• Partenariats écoles/universités</p>
+                            <p>• Conformité dès la conception</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Jeroka Xperience</h3>
+                    <p>L'IA qui transforme votre PME en entreprise digitale performante.</p>
+                    <p>Basé à Wormhout, au service des entreprises du Nord de la France.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>📍 123 Rue de la Digitalisation, 59470 Wormhout</p>
+                    <p>📞 03 28 XX XX XX</p>
+                    <p>📧 contact@jeroka.fr</p>
+                    <p>🌐 www.jeroka.fr</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="#">Digitalisation Express</a></li>
+                        <li><a href="#">Solutions IA</a></li>
+                        <li><a href="#">Formation</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Réseaux Sociaux</h3>
+                    <ul>
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">LinkedIn</a></li>
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Jeroka Xperience. Tous droits réservés. | Business Plan v2.0</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 6;
+
+        function showPage(pageIndex) {
+            // Hide all pages
+            for (let i = 0; i < totalPages; i++) {
+                document.getElementById(`page-${i}`).classList.remove('active');
+                document.querySelectorAll('.page-nav-item')[i].classList.remove('active');
+            }
+            
+            // Show selected page
+            document.getElementById(`page-${pageIndex}`).classList.add('active');
+            document.querySelectorAll('.page-nav-item')[pageIndex].classList.add('active');
+            
+            currentPage = pageIndex;
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' && currentPage < totalPages - 1) {
+                showPage(currentPage + 1);
+            } else if (e.key === 'ArrowLeft' && currentPage > 0) {
+                showPage(currentPage - 1);
+            }
+        });
+
+        // Auto-scroll navigation
+        let isScrolling = false;
+        window.addEventListener('wheel', function(e) {
+            if (isScrolling) return;
+            
+            isScrolling = true;
+            setTimeout(() => { isScrolling = false; }, 1000);
+            
+            if (e.deltaY > 0 && currentPage < totalPages - 1) {
+                showPage(currentPage + 1);
+            } else if (e.deltaY < 0 && currentPage > 0) {
+                showPage(currentPage - 1);
+            }
+        });
+    </script>
+</body>
+</html>

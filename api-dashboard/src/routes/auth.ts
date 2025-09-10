@@ -2,8 +2,26 @@ import { Router } from 'express';
 import authController from '@/controllers/authController';
 import { validate, userSchemas } from '@/middleware/validation';
 import { verifyToken } from '@/middleware/auth';
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
+
+// Auth-specific rate limiters
+const registerLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  message: { error: 'Trop de tentatives d\'inscription, réessayez plus tard.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: 'Trop de tentatives de connexion, réessayez plus tard.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 /**
  * @route POST /api/v1/auth/register
@@ -11,6 +29,7 @@ const router = Router();
  * @access Public
  */
 router.post('/register', 
+  registerLimiter,
   validate({ body: userSchemas.register }),
   authController.register
 );
@@ -21,6 +40,7 @@ router.post('/register',
  * @access Public
  */
 router.post('/login',
+  loginLimiter,
   validate({ body: userSchemas.login }),
   authController.login
 );

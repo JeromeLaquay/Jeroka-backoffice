@@ -142,7 +142,7 @@ services:
     container_name: jeroka-site
     restart: unless-stopped
     environment:
-      VITE_API_URL: https://apibackoffice.jerokaxperience.fr
+      VITE_API_URL: https://api.jeroka.fr
       NODE_ENV: production
     networks:
       - jeroka-network
