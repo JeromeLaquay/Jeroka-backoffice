@@ -169,7 +169,7 @@ router.post('/categories', verifyToken, async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Erreur lors de la création de la catégorie:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur interne du serveur',

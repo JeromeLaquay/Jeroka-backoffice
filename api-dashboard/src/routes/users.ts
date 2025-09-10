@@ -94,7 +94,7 @@ router.get('/:id', requireAdmin, async (req, res) => {
  */
 router.post('/', 
   requireAdmin,
-  validate({ body: userSchemas.createUser }),
+  validate({ body: userSchemas.register }),
   async (req, res) => {
     try {
       // TODO: Implement user creation
@@ -126,7 +126,7 @@ router.post('/',
  */
 router.put('/:id',
   requireAdmin,
-  validate({ body: userSchemas.updateUser }),
+  validate({ body: userSchemas.updateProfile }),
   async (req, res) => {
     try {
       const { id } = req.params;

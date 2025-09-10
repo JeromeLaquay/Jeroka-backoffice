@@ -557,16 +557,14 @@ router.get('/public', async (req: Request, res: Response) => {
     const { targetAudience, limit = 10, includeArchived = false } = req.query;
     
     let publicAnnouncements = announcements.filter(announcement => {
-      // Seulement les annonces publiées
-      if (announcement.status !== 'published') return false;
+      // Seulement les annonces publiées ou archivées (selon le paramètre)
+      if (announcement.status === 'published' || (includeArchived && announcement.status === 'archived')) {
+        // Filtrer par public cible
+        if (targetAudience && !announcement.targetAudience.includes(targetAudience as string)) return false;
+        return true;
+      }
       
-      // Exclure les archivées sauf si demandé
-      if (!includeArchived && announcement.status === 'archived') return false;
-      
-      // Filtrer par public cible
-      if (targetAudience && !announcement.targetAudience.includes(targetAudience as string)) return false;
-      
-      return true;
+      return false;
     });
 
     // Tri par épinglage puis date

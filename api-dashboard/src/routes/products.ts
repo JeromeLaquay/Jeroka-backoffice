@@ -169,7 +169,7 @@ router.get('/:id', async (req, res) => {
       data: product
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la récupération du produit',
@@ -207,7 +207,7 @@ router.post('/', async (req, res) => {
       data: newProduct
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la création du produit',
@@ -252,7 +252,7 @@ router.put('/:id', async (req, res) => {
       data: updatedProduct
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la mise à jour du produit',
@@ -290,7 +290,7 @@ router.delete('/:id', async (req, res) => {
       message: 'Produit supprimé avec succès'
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         message: 'Erreur lors de la suppression du produit',

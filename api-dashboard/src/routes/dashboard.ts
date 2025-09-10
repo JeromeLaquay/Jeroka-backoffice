@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { verifyToken } from '@/middleware/auth';
 import { query } from '@/database/connection';
 import { asyncHandler } from '@/middleware/errorHandler';
@@ -13,7 +13,7 @@ router.use(verifyToken);
  * @desc Get dashboard statistics
  * @access Private
  */
-router.get('/stats', asyncHandler(async (req, res) => {
+router.get('/stats', asyncHandler(async (req: Request, res: Response) => {
   // Get dashboard statistics from the view
   const statsResult = await query('SELECT * FROM dashboard_stats');
   const stats = statsResult.rows[0] || {};
@@ -49,7 +49,7 @@ router.get('/stats', asyncHandler(async (req, res) => {
  * @desc Get recent activity for dashboard
  * @access Private
  */
-router.get('/recent-activity', asyncHandler(async (req, res) => {
+router.get('/recent-activity', asyncHandler(async (req: Request, res: Response) => {
   // TODO: Implement recent activity aggregation
   
   res.json({

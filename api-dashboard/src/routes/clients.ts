@@ -279,7 +279,7 @@ router.get('/', [
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des clients',
       error: {
@@ -365,7 +365,7 @@ router.post('/', [
       data: newClient
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la création du client',
       error: {
@@ -464,7 +464,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       data: client
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération du client',
       error: {
@@ -549,7 +549,7 @@ router.put('/:id', [
       data: updatedClient
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour',
       error: {
@@ -585,7 +585,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
       message: 'Client supprimé avec succès'
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression',
       error: {

@@ -1,0 +1,64 @@
+# Jeroka Xperience - Planning MVP pour Démarrer les Ventes
+## Équipe : 1 personne temps partiel (soir/week-end) + 1 personne 10h/semaine + IA
+
+## Phase 1 - Infrastructure MVP (Septembre-Octobre 2025)
+2025-09-15 / 2025-10-01: Configuration Docker
+- Docker containers 
+- Docker Compose 
+- Environnement dev 
+- cypress sur environnement dev 
+- backup bdd
+*Estimation : 6h/semaine × 3 semaines = 18h*
+
+## Phase 2 - Premier module: Gestion administrateurs (Octobre-Novembre 2025)
+2025-10-15 / 2025-11-01: Gestion administrateurs
+- backoffice et api: crud création de compte et affectation de rôles
+- modification de compte et de rôles
+- suppression de compte
+- toggle en haut à droite USER/ADMIN pour changer de rôle 
+*Estimation : 6h/semaine × 3 semaines = 18h*
+
+
+## Gestion clients et messages (Novembre-Décembre 2025)
+2025-11-15 / 2025-12-31: gestion clients et messages
+- clients : exporter ou importer en csv
+- lors de l'import, vérifier si client existe déjà, si oui, mettre à jour, sinon créer
+- messages: réception des messages du site web
+- réponse en brouillon par IA
+    - connexion à l'api de chatGpt -> aiservice.ts
+    - alimenter les données de l'entreprise pour la génération du prompt ->
+    - générer un prompt
+    - appeler l'api de chatGpt
+    - récupérer la réponse
+    - afficher la réponse
+    - marquer comme lu lors du clic sur le message
+
+## Réalisation business plan (Novembre-Décembre 2025)
+2025-11-15 / 2025-12-31: partie
+- sommaire et différentes parties
+- premiere partie: vision
+- deuxieme partie: marché
+- troisieme partie: produits
+- quatrieme partie: finance
+- cinquieme partie: equipe
+- sixieme partie: contact
+
+## Modules Supprimés (Phase 2)
+- Module Comptabilité avancé
+- Module Calendrier
+- Module Emails avancé
+- Module Messages
+- Module Publications
+- Module Annonces
+- Module Paramètres avancé
+- Profil client détaillé
+- Gestion stock avancée
+- Tests E2E complets
+- Documentation complète
+
+## Objectif : Démarrer les Ventes en Janvier 2026
+- **Backoffice fonctionnel** pour gérer clients, produits, factures, devis
+- **E-boutique basique** pour vendre en ligne
+- **Site web** pour la visibilité
+- **Système de paiement** opérationnel
+- **Tests essentiels** pour la stabilité

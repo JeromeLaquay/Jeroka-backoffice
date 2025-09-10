@@ -97,13 +97,13 @@ router.post('/', async (req: Request, res: Response) => {
     // In production, save to database
     mockMessages.unshift(newMessage)
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Message de contact créé avec succès',
       data: { id: newMessage.id, createdAt: newMessage.createdAt }
     })
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la création du message',
       error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
@@ -150,7 +150,7 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
     const offset = (Number(page) - 1) * Number(limit)
     const paginatedMessages = filteredMessages.slice(offset, offset + Number(limit))
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         messages: paginatedMessages,
@@ -164,7 +164,7 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
       }
     })
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des messages'
     })
@@ -194,7 +194,7 @@ router.get('/stats', verifyToken, async (req: Request, res: Response) => {
     const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
     const monthCount = mockMessages.filter(m => new Date(m.createdAt) >= monthAgo).length
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         total,
@@ -210,7 +210,7 @@ router.get('/stats', verifyToken, async (req: Request, res: Response) => {
       }
     })
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des statistiques'
     })
@@ -234,9 +234,9 @@ router.get('/:id', verifyToken, async (req: Request, res: Response) => {
       })
     }
 
-    res.json({ success: true, data: message })
+    return res.json({ success: true, data: message })
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération du message'
     })
@@ -279,13 +279,13 @@ router.put('/:id', verifyToken, async (req: Request, res: Response) => {
 
     message.updatedAt = new Date().toISOString()
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Message mis à jour avec succès',
       data: message
     })
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour du message'
     })
@@ -315,13 +315,13 @@ router.post('/:id/mark-read', verifyToken, async (req: Request, res: Response) =
       message.updatedAt = new Date().toISOString()
     }
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Message marqué comme lu',
       data: message
     })
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors du marquage du message'
     })
@@ -345,13 +345,13 @@ router.post('/mark-all-read', verifyToken, async (req: Request, res: Response) =
       }
     })
 
-    res.json({
+    return res.json({
       success: true,
       message: `${updatedCount} message(s) marqué(s) comme lu(s)`,
       data: { updatedCount }
     })
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors du marquage des messages'
     })
@@ -377,12 +377,12 @@ router.delete('/:id', verifyToken, async (req: Request, res: Response) => {
 
     mockMessages.splice(messageIndex, 1)
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Message supprimé avec succès'
     })
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression du message'
     })
@@ -411,20 +411,23 @@ router.post('/:id/ai-draft', verifyToken, async (req: Request, res: Response) =>
     const generateAIDraft = (msg: any, options: any) => {
       const { tone, language } = options
       
-      const greetings = {
+      const greetings: { fr: string; en: string } = {
         fr: 'Bonjour',
         en: 'Hello'
       }
       
-      const thanks = {
+      const thanks: { fr: string; en: string } = {
         fr: 'Merci pour votre message.',
         en: 'Thank you for your message.'
       }
       
-      const signatures = {
+      const signatures: { fr: string; en: string } = {
         fr: 'Cordialement,\nL\'équipe Jeroka',
         en: 'Kind regards,\nJeroka Team'
       }
+
+      // Normaliser la langue
+      const lang: 'fr' | 'en' = language === 'en' ? 'en' : 'fr'
 
       // Détection du type de message
       let responseContent = ''
@@ -465,9 +468,9 @@ router.post('/:id/ai-draft', verifyToken, async (req: Request, res: Response) =>
         ? 'Prochaine étape:\n- Nous revenons vers vous sous 24-48h avec les informations demandées\n- Si urgent, vous pouvez répondre à cet email en précisant votre disponibilité'
         : 'Next steps:\n- We will get back to you within 24-48 hours with the requested information\n- If urgent, you can reply to this email specifying your availability'
 
-      return `${greetings[language]} ${clientName},
+        return `${greetings[lang]} ${clientName},
 
-${thanks}
+${thanks[lang]}
 
 ${responseContent}
 
@@ -476,7 +479,7 @@ ${messageSummary}
 
 ${nextSteps}
 
-${signatures[language]}`
+${signatures[lang]}`
     }
 
     // Simulation d'un délai de traitement IA
@@ -484,7 +487,7 @@ ${signatures[language]}`
 
     const draft = generateAIDraft(message, { tone, language, template })
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         draft,
@@ -495,7 +498,7 @@ ${signatures[language]}`
       message: 'Brouillon IA généré avec succès'
     })
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erreur lors de la génération du brouillon IA',
       error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined

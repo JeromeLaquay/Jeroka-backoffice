@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram name="Architecture Jeroka Complete" id="jeroka-complete">
-        <mxGraphModel dx="4043" dy="3897" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+        <mxGraphModel dx="2631" dy="1999" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -77,7 +77,7 @@
                     <mxGeometry x="610" y="30" width="100" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="backoffice-section" value="🎨 Backoffice (Frontend)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#1b5e20;fontStyle=1;fontSize=18;startSize=30;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-590" y="-290" width="1760" height="340" as="geometry"/>
+                    <mxGeometry x="-510" y="-290" width="1760" height="340" as="geometry"/>
                 </mxCell>
                 <mxCell id="backoffice-services" value="🔧 Services Frontend" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontStyle=1;fontSize=14;startSize=25;fontColor=#000000;" parent="backoffice-section" vertex="1">
                     <mxGeometry x="10" y="130" width="990" height="190" as="geometry"/>
@@ -112,12 +112,6 @@
                 <mxCell id="other-services" value="📱 Autres Services" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#4a148c;fontStyle=1;fontSize=14;startSize=25;fontColor=#000000;" parent="backoffice-section" vertex="1">
                     <mxGeometry x="1020" y="130" width="680" height="130" as="geometry"/>
                 </mxCell>
-                <mxCell id="calendar-service" value="📅 calendar.ts&lt;br&gt;Appointments&lt;br&gt;Availability&lt;br&gt;Google Sync" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;fontSize=10;fontColor=#000000;" parent="other-services" vertex="1">
-                    <mxGeometry x="10" y="30" width="90" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="publications-service" value="📱 publications.ts&lt;br&gt;Social Media&lt;br&gt;Content Management&lt;br&gt;Scheduling" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#f9a825;fontSize=10;fontColor=#000000;" parent="other-services" vertex="1">
-                    <mxGeometry x="110" y="30" width="90" height="60" as="geometry"/>
-                </mxCell>
                 <mxCell id="emails-service" value="📧 emails.ts&lt;br&gt;Email Campaigns&lt;br&gt;Templates&lt;br&gt;Analytics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#4a148c;fontSize=10;fontColor=#000000;" parent="other-services" vertex="1">
                     <mxGeometry x="210" y="30" width="90" height="60" as="geometry"/>
                 </mxCell>
@@ -129,6 +123,12 @@
                 </mxCell>
                 <mxCell id="announcements-service" value="📢 announcements.ts&lt;br&gt;Notifications&lt;br&gt;Alerts&lt;br&gt;System Messages" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontSize=10;fontColor=#000000;" parent="other-services" vertex="1">
                     <mxGeometry x="510" y="30" width="90" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="calendar-service" value="📅 calendar.ts&lt;br&gt;Appointments&lt;br&gt;Availability&lt;br&gt;Google Sync" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;fontSize=10;fontColor=#000000;" parent="backoffice-section" vertex="1">
+                    <mxGeometry x="1030" y="280" width="90" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="publications-service" value="📱 publications.ts&lt;br&gt;Social Media&lt;br&gt;Content Management&lt;br&gt;Scheduling" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#f9a825;fontSize=10;fontColor=#000000;" parent="backoffice-section" vertex="1">
+                    <mxGeometry x="1140" y="280" width="90" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="connection1" style="fontColor=#000000;" parent="1" source="api-service" target="auth-route" edge="1">
                     <mxGeometry relative="1" as="geometry"/>

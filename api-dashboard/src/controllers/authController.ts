@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import type { SignOptions, Secret } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { query, transaction } from '@/database/connection';
 import { createError, asyncHandler } from '@/middleware/errorHandler';
@@ -31,12 +31,11 @@ const generateTokens = (payload: { id: string; email: string; role: string }) =>
   const jwtSecret = process.env.JWT_SECRET || 'default-secret-key';
   const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET || 'default-refresh-secret-key';
 
-  const accessToken = jwt.sign(payload, jwtSecret, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+  const accessToken = jwt.sign(payload, jwtSecret as Secret, {
+    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as SignOptions['expiresIn']
   });
-
-  const refreshToken = jwt.sign(payload, jwtRefreshSecret, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d'
+  const refreshToken = jwt.sign(payload, jwtRefreshSecret as Secret, {
+    expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '30d') as SignOptions['expiresIn']
   });
 
   return { accessToken, refreshToken };
