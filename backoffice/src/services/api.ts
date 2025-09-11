@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 
 // Configuration de base de l'API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api/v1'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://apibackoffice.jerokaxperience.fr/api/v1'
 
 // Types pour les réponses API
 export interface ApiResponse<T = any> {
