@@ -1,0 +1,64 @@
+import { defineConfig } from 'cypress'
+import { config } from 'dotenv'
+
+// Charger les variables d'environnement
+config()
+
+export default defineConfig({
+  e2e: {
+    baseUrl: process.env.CYPRESS_BASE_URL || 'http://localhost:3000',
+    viewportWidth: 1280,
+    viewportHeight: 720,
+    video: true,
+    screenshotOnRunFailure: true,
+    defaultCommandTimeout: 10000,
+    requestTimeout: 10000,
+    responseTimeout: 10000,
+    pageLoadTimeout: 30000,
+    supportFile: 'cypress/support/e2e.ts',
+    specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
+    fixturesFolder: 'cypress/fixtures',
+    screenshotsFolder: 'cypress/screenshots',
+    videosFolder: 'cypress/videos',
+    downloadsFolder: 'cypress/downloads',
+    setupNodeEvents(on, config) {
+      // Configuration pour les rapports
+      require('cypress-mochawesome-reporter/plugin')(on)
+      
+      // Configuration pour les variables d'environnement
+      config.env = {
+        ...config.env,
+        ...process.env
+      }
+      
+      return config
+    },
+  },
+  component: {
+    devServer: {
+      framework: 'vue',
+      bundler: 'vite',
+    },
+  },
+  reporter: 'cypress-mochawesome-reporter',
+  reporterOptions: {
+    reportDir: 'cypress/reports',
+    overwrite: false,
+    html: true,
+    json: true,
+    timestamp: 'mmddyyyy_HHMMss',
+    reportTitle: 'Rapport de Tests Jeroka Backoffice',
+    embeddedScreenshots: true,
+    inlineAssets: true,
+    saveAllAttempts: false,
+  },
+  env: {
+    // Variables d'environnement pour les tests
+    API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:3001',
+    BACKOFFICE_URL: process.env.BACKOFFICE_URL || 'http://localhost:3000',
+    TEST_USER_EMAIL: process.env.TEST_USER_EMAIL || 'test@jeroka.com',
+    TEST_USER_PASSWORD: process.env.TEST_USER_PASSWORD || 'testpassword123',
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@jeroka.com',
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'adminpassword123'
+  }
+})

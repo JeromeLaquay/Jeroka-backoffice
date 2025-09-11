@@ -4,10 +4,20 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch: # Permet de déclencher manuellement le déploiement
+    inputs:
+      run_tests:
+        description: 'Exécuter les tests Cypress après déploiement'
+        required: false
+        default: true
+        type: boolean
 
 env:
   NODE_VERSION: '18'
   DOCKER_COMPOSE_FILE: 'docker-compose.prod.yml'
+  # Configuration des tests Cypress
+  CYPRESS_BASE_URL: 'https://backoffice.jerokaxperience.fr'
+  API_BASE_URL: 'https://apibackoffice.jerokaxperience.fr'
+  BACKOFFICE_URL: 'https://backoffice.jerokaxperience.fr'
 
 jobs:
   deploy:
@@ -99,12 +109,63 @@ jobs:
             fi
           EOF
       
+      - name: 🧪 Exécution des tests Cypress
+        if: success() && (github.event.inputs.run_tests != 'false')
+        run: |
+          echo "🧪 Début des tests Cypress sur le serveur déployé"
+          
+          # Configuration des variables d'environnement pour les tests
+          export CYPRESS_BASE_URL="${{ env.CYPRESS_BASE_URL }}"
+          export API_BASE_URL="${{ env.API_BASE_URL }}"
+          export BACKOFFICE_URL="${{ env.BACKOFFICE_URL }}"
+          export TEST_USER_EMAIL="${{ secrets.TEST_USER_EMAIL }}"
+          export TEST_USER_PASSWORD="${{ secrets.TEST_USER_PASSWORD }}"
+          export ADMIN_EMAIL="${{ secrets.ADMIN_EMAIL }}"
+          export ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD }}"
+          
+          # Installation des dépendances Cypress
+          cd cypress
+          npm ci
+          
+          # Attendre que les services soient complètement prêts
+          echo "⏳ Attente de la disponibilité des services..."
+          sleep 60
+          
+          # Vérifier que les services sont accessibles
+          echo "🔍 Vérification de l'accessibilité des services..."
+          curl -f "${{ env.BACKOFFICE_URL }}" || echo "⚠️ Backoffice non accessible"
+          curl -f "${{ env.API_BASE_URL }}/health" || echo "⚠️ API non accessible"
+          
+          # Exécuter les tests Cypress
+          echo "🚀 Exécution des tests Cypress..."
+          npm run test:ci:chrome
+          
+          # Générer le rapport consolidé
+          echo "📊 Génération du rapport de tests..."
+          npm run test:report
+          
+          echo "✅ Tests Cypress terminés !"
+      
+      - name: 📤 Upload des rapports de tests
+        if: always() && (github.event.inputs.run_tests != 'false')
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-test-reports-${{ github.run_number }}
+          path: |
+            cypress/reports/
+            cypress/screenshots/
+            cypress/videos/
+          retention-days: 30
+      
       - name: 📊 Notification de succès
         if: success()
         run: |
           echo "🎉 Déploiement réussi !"
           echo "🌐 Backoffice: https://backoffice.jerokaxperience.fr"
           echo "🔗 API: https://apibackoffice.jerokaxperience.fr"
+          if [ "${{ github.event.inputs.run_tests }}" != "false" ]; then
+            echo "🧪 Tests Cypress exécutés avec succès"
+          fi
       
       - name: ❌ Notification d'échec
         if: failure()

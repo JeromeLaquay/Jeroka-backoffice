@@ -1,0 +1,140 @@
+# docker-compose.staging.yml
+# Configuration pour l'environnement de staging
+
+services:
+  # Base de données PostgreSQL pour staging
+  postgres-staging:
+    image: postgres:15-alpine
+    container_name: jeroka-postgres-staging
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: jeroka_dashboard_staging
+      POSTGRES_USER: jeroka_staging
+      POSTGRES_PASSWORD: ${DB_PASSWORD_STAGING}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+      - ./api-dashboard/src/database/migrations.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - jeroka-staging-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jeroka_staging -d jeroka_dashboard_staging"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # API Backend pour staging
+  api-staging:
+    build:
+      context: ./api-dashboard
+      dockerfile: Dockerfile
+      target: production
+    container_name: jeroka-api-staging
+    restart: unless-stopped
+    environment:
+      NODE_ENV: staging
+      PORT: 3003
+      
+      # Database
+      DB_HOST: postgres-staging
+      DB_PORT: 5432
+      DB_NAME: jeroka_dashboard_staging
+      DB_USER: jeroka_staging
+      DB_PASSWORD: ${DB_PASSWORD_STAGING}
+      DB_SSL: false
+      
+      # JWT (clés de staging)
+      JWT_SECRET: ${JWT_SECRET_STAGING}
+      JWT_EXPIRES_IN: 7d
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET_STAGING}
+      JWT_REFRESH_EXPIRES_IN: 30d
+      
+      # CORS
+      BACKOFFICE_URL: https://staging-backoffice.jerokaxperience.fr
+      FRONTEND_URL: https://staging-api.jerokaxperience.fr
+      
+      # Upload
+      UPLOAD_DIR: /app/uploads
+      MAX_FILE_SIZE: 10485760
+      
+      # Rate Limiting
+      RATE_LIMIT_WINDOW_MS: 900000
+      RATE_LIMIT_MAX_REQUESTS: 100
+      
+      # Logs
+      LOG_LEVEL: debug
+      
+      # Email (optionnel)
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      
+    volumes:
+      - uploads_staging_data:/app/uploads
+      - logs_staging_data:/app/logs
+    networks:
+      - jeroka-staging-network
+    depends_on:
+      postgres-staging:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    ports:
+      - "3003:3003"  # Exposer le port 3003 pour staging
+
+  # Backoffice Vue.js pour staging
+  backoffice-staging:
+    build:
+      context: ./backoffice
+      dockerfile: Dockerfile
+    container_name: jeroka-backoffice-staging
+    ports:
+      - "3004:80"
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: https://staging-api.jerokaxperience.fr
+      NODE_ENV: staging
+    networks:
+      - jeroka-staging-network
+    depends_on:
+      - api-staging
+
+  # Adminer pour la gestion de la base de données staging
+  adminer-staging:
+    image: adminer:4.8.1
+    container_name: jeroka-adminer-staging
+    restart: unless-stopped
+    ports:
+      - "8089:8080"
+    networks:
+      - jeroka-staging-network
+    depends_on:
+      - postgres-staging
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres-staging
+      ADMINER_DESIGN: dracula
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8089"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  jeroka-staging-network:
+    driver: bridge
+    name: jeroka-staging-network
+
+volumes:
+  postgres_staging_data:
+    name: jeroka-postgres-staging-data
+  uploads_staging_data:
+    name: jeroka-uploads-staging-data
+  logs_staging_data:
+    name: jeroka-logs-staging-data
