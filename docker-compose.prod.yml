@@ -83,6 +83,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+    ports:
+      - "3002:3002"  # Exposer le port 3002
 
   # Backoffice Vue.js
   backoffice:
