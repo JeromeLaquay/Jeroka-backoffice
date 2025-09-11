@@ -5,8 +5,12 @@
  * Utilisé quand les services sont déjà démarrés et accessibles
  */
 
-const { execSync } = require('child_process');
-const path = require('path');
+import { execSync } from 'child_process';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 console.log('🧪 Exécution des tests Cypress (mode simple)...');
 
@@ -21,7 +25,7 @@ try {
   console.log('🔍 Vérification rapide des services locaux...');
   
   try {
-    const http = require('http');
+    import http from 'http';
     
     // Test rapide du backoffice
     const backofficeTest = new Promise((resolve) => {

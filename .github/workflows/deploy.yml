@@ -141,9 +141,19 @@ jobs:
           curl -f http://localhost:3001 || echo "⚠️ Backoffice non accessible"
           curl -f http://localhost:3002/health || echo "⚠️ API non accessible"
           
-          # Exécuter les tests Cypress
+          
+          # Vérifier que les services sont démarrés
+          echo "🔍 Vérification des conteneurs..."
+          docker ps
+          
+          # Attendre que les services soient prêts
+          echo "⏳ Attente des services..."
+          sleep 30
+          
+          # Exécuter les tests Cypress directement
           echo "🚀 Exécution des tests Cypress..."
-          npm run test:simple:chrome
+          cd cypress
+          CYPRESS_BASE_URL=http://localhost:3001 API_BASE_URL=http://localhost:3002 npm run cypress:run:chrome
           
           # Générer le rapport consolidé
           echo "📊 Génération du rapport de tests..."
