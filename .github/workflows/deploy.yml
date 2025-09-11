@@ -15,9 +15,9 @@ env:
   NODE_VERSION: '18'
   DOCKER_COMPOSE_FILE: 'docker-compose.prod.yml'
   # Configuration des tests Cypress
-  CYPRESS_BASE_URL: 'https://backoffice.jerokaxperience.fr'
-  API_BASE_URL: 'https://apibackoffice.jerokaxperience.fr'
-  BACKOFFICE_URL: 'https://backoffice.jerokaxperience.fr'
+  CYPRESS_BASE_URL: 'http://localhost:3001'
+  API_BASE_URL: 'http://localhost:3002'
+  BACKOFFICE_URL: 'http://localhost:3001'
 
 jobs:
   deploy:
@@ -133,8 +133,8 @@ jobs:
           
           # Vérifier que les services sont accessibles
           echo "🔍 Vérification de l'accessibilité des services..."
-          curl -f "${{ env.BACKOFFICE_URL }}" || echo "⚠️ Backoffice non accessible"
-          curl -f "${{ env.API_BASE_URL }}/health" || echo "⚠️ API non accessible"
+          curl -k -f "${{ env.BACKOFFICE_URL }}" || echo "⚠️ Backoffice non accessible"
+          curl -k -f "${{ env.API_BASE_URL }}/health" || echo "⚠️ API non accessible"
           
           # Exécuter les tests Cypress
           echo "🚀 Exécution des tests Cypress..."

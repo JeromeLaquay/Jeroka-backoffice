@@ -12,12 +12,12 @@ const https = require('https');
 const SERVICES = [
   {
     name: 'Backoffice',
-    url: process.env.BACKOFFICE_URL || 'http://localhost:3000',
+    url: process.env.BACKOFFICE_URL || 'http://localhost:3001',
     timeout: 10000
   },
   {
     name: 'API Dashboard',
-    url: process.env.API_BASE_URL || 'http://localhost:3001',
+    url: process.env.API_BASE_URL || 'http://localhost:3002',
     timeout: 10000
   }
 ];
