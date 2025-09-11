@@ -29,14 +29,24 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Récupère tout l'historique Git
-      - name: 🔐 Configuration SSH
+      - name:  Configuration SSH
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
       
-      - name: 📋 Ajout de la clé SSH au known_hosts
+      - name: 🔍 Test de connectivité au serveur
         run: |
-          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          echo "🔍 Test de connectivité au serveur ${{ secrets.SERVER_HOST }}..."
+          timeout 10 ping -c 3 ${{ secrets.SERVER_HOST }} || echo "⚠️ Serveur non accessible via ping"
+          timeout 10 nc -zv ${{ secrets.SERVER_HOST }} 22 || echo "⚠️ Port SSH (22) non accessible"
+      
+      - name: 📋 Configuration SSH
+        run: |
+          echo "🔧 Configuration SSH..."
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts || echo "⚠️ Impossible d'ajouter la clé d'hôte"
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} -p 22 >> ~/.ssh/known_hosts || echo "⚠️ Impossible d'ajouter la clé d'hôte (port 22)"
       
       - name: 🚀 Déploiement sur le serveur
         run: |
