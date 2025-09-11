@@ -123,14 +123,6 @@ jobs:
           export ADMIN_EMAIL="${{ secrets.ADMIN_EMAIL }}"
           export ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD }}"
           
-          # Vérifier et démarrer les services Docker si nécessaire
-          echo "🔍 Vérification des services Docker..."
-          if ! docker ps | grep -q "jeroka-backoffice\|jeroka-api"; then
-            echo "🚀 Démarrage des services Docker..."
-            cd /var/www/jeroka-backoffice
-            docker compose -f docker-compose.prod.yml up -d
-            sleep 30
-          fi
           
           # Installation des dépendances Cypress
           cd cypress
