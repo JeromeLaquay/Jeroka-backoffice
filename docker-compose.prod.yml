@@ -41,6 +41,7 @@ services:
       DB_NAME: jeroka_dashboard
       DB_USER: jeroka
       DB_PASSWORD: ${DB_PASSWORD}
+      DB_SSL: false
       
       # JWT (clés de production - à générer)
       JWT_SECRET: ${JWT_SECRET}
