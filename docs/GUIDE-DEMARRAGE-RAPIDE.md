@@ -34,7 +34,7 @@ Connectez-vous au serveur et exécutez :
 
 ```bash
 # Télécharger et exécuter le script d'installation
-curl -fsSL https://raw.githubusercontent.com/votre-repo/scripts/install-cypress-dependencies.sh | bash
+curl -fsSL https://raw.githubusercontent.com/JeromeLaquay/Jeroka-backoffice/main/scripts/install-cypress-dependencies.sh | bash
 
 # Configurer l'environnement de test
 cd /var/www/jeroka-backoffice
