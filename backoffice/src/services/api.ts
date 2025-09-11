@@ -1,7 +1,15 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 
 // Configuration de base de l'API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://apibackoffice.jerokaxperience.fr/api/v1'
+// En développement, utilisez localhost pour éviter les problèmes de certificat SSL
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 
+  ((import.meta as any).env?.DEV ? 'http://localhost:3002/api/v1' : 'https://apibackoffice.jerokaxperience.fr/api/v1')
+
+// URLs disponibles pour basculer entre les environnements
+export const API_URLS = {
+  LOCAL: 'http://localhost:3002/api/v1',
+  PRODUCTION: 'https://apibackoffice.jerokaxperience.fr/api/v1'
+} as const
 
 // Types pour les réponses API
 export interface ApiResponse<T = any> {
@@ -411,6 +419,36 @@ class ApiService {
   async healthCheck(): Promise<any> {
     const response = await axios.get(`${API_BASE_URL.replace('/api/v1', '')}/health`)
     return response.data
+  }
+
+  // ===== CONFIGURATION =====
+
+  /**
+   * Change l'URL de base de l'API (utile pour basculer entre local et production)
+   */
+  setBaseURL(newBaseURL: string): void {
+    this.api.defaults.baseURL = newBaseURL
+  }
+
+  /**
+   * Retourne l'URL de base actuelle
+   */
+  getBaseURL(): string {
+    return this.api.defaults.baseURL || API_BASE_URL
+  }
+
+  /**
+   * Bascule vers l'environnement local
+   */
+  switchToLocal(): void {
+    this.setBaseURL(API_URLS.LOCAL)
+  }
+
+  /**
+   * Bascule vers l'environnement de production
+   */
+  switchToProduction(): void {
+    this.setBaseURL(API_URLS.PRODUCTION)
   }
 }
 
