@@ -124,6 +124,9 @@ jobs:
             echo "📦 Installation des dépendances Cypress"
             npm install
             
+            echo "🔧 Installation de TypeScript pour Cypress"
+            npm install --save-dev typescript
+            
             echo "⏳ Attente de la disponibilité des services..."
             sleep 30
             
@@ -142,6 +145,7 @@ jobs:
           
           # Récupération des rapports depuis le serveur
           echo "📤 Récupération des rapports de tests..."
+          mkdir -p cypress/reports cypress/screenshots cypress/videos
           scp -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/Jeroka-backoffice/cypress/cypress/reports/* ./cypress/reports/ || true
           scp -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/Jeroka-backoffice/cypress/cypress/screenshots/* ./cypress/screenshots/ || true
           scp -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/Jeroka-backoffice/cypress/cypress/videos/* ./cypress/videos/ || true

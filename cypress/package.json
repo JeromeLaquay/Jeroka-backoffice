@@ -2,26 +2,14 @@
   "name": "jeroka-backoffice-cypress-tests",
   "version": "1.0.0",
   "description": "Tests Cypress pour le backoffice Jeroka",
-  "main": "index.js",
   "scripts": {
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "cypress:run:chrome": "cypress run --browser chrome",
-    "cypress:run:firefox": "cypress run --browser firefox",
-    "cypress:run:edge": "cypress run --browser edge",
-    "test": "cypress run",
-    "test:headed": "cypress run --headed",
-    "test:chrome": "cypress run --browser chrome --headed",
-    "test:firefox": "cypress run --browser firefox --headed",
-    "test:edge": "cypress run --browser edge --headed",
     "test:setup": "node scripts/setup-test-env.js",
     "test:report": "node scripts/generate-report.js",
-    "test:ci": "npm run test:setup && npm run test && npm run test:report",
-    "test:ci:chrome": "npm run test:setup && npm run cypress:run:chrome && npm run test:report",
-    "test:ci:firefox": "npm run test:setup && npm run cypress:run:firefox && npm run test:report",
-    "test:ci:edge": "npm run test:setup && npm run cypress:run:edge && npm run test:report",
-    "test:simple": "node scripts/run-tests-simple.js",
-    "test:simple:chrome": "node scripts/run-tests-simple.js"
+    "test:ci": "npm run test:setup && npm run cypress:run && npm run test:report",
+    "test:ci:chrome": "npm run test:setup && npm run cypress:run:chrome && npm run test:report"
   },
   "keywords": [
     "cypress",
@@ -33,11 +21,9 @@
   "author": "Jeroka Team",
   "license": "MIT",
   "devDependencies": {
-    "cypress": "^13.6.0",
-    "cypress-mochawesome-reporter": "^3.4.0",
-    "mochawesome": "^7.1.3",
-    "mochawesome-merge": "^4.3.0",
-    "mochawesome-report-generator": "^6.2.0"
+    "cypress": "^13.17.0",
+    "typescript": "^5.0.0",
+    "cypress-mochawesome-reporter": "^3.0.0"
   },
   "dependencies": {
     "dotenv": "^16.3.1"
