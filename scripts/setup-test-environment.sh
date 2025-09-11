@@ -81,7 +81,7 @@ log "📦 Installation des dépendances Cypress..."
 cd "$CYPRESS_DIR"
 
 if [ -f "package-lock.json" ]; then
-    npm ci --production=false
+    npm install --production=false
 else
     npm install
 fi

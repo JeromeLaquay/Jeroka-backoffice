@@ -125,7 +125,7 @@ jobs:
           
           # Installation des dépendances Cypress
           cd cypress
-          npm ci
+          npm install
           
           # Attendre que les services soient complètement prêts
           echo "⏳ Attente de la disponibilité des services..."

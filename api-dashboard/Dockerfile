@@ -19,7 +19,7 @@ COPY tsconfig*.json ./
 FROM base AS build
 
 # Installer toutes les dépendances (dev + prod)
-RUN npm ci
+RUN npm install
 
 # Copier le code source
 COPY src/ ./src/
@@ -35,7 +35,7 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
 # Installer uniquement les dépendances de production
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --only=production && npm cache clean --force
 
 # Copier les fichiers construits depuis l'étape build
 COPY --from=build /app/dist ./dist
