@@ -1,0 +1,116 @@
+name: 🚀 Déploiement Automatique Jeroka
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Permet de déclencher manuellement le déploiement
+
+env:
+  NODE_VERSION: '18'
+  DOCKER_COMPOSE_FILE: 'docker-compose.prod.yml'
+
+jobs:
+  deploy:
+    name: 🚀 Déploiement sur le serveur
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout du code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Récupère tout l'historique Git
+      
+      - name: 🔧 Configuration de Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+      
+      - name: 🔐 Configuration SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+      
+      - name: 📋 Ajout de la clé SSH au known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: 🚀 Déploiement sur le serveur
+        run: |
+          echo "🔄 Début du déploiement sur ${{ secrets.SERVER_HOST }}"
+          
+          # Connexion SSH et exécution du script de déploiement
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            set -e
+            
+            echo "📁 Navigation vers le répertoire du projet"
+            cd ${{ secrets.SERVER_PROJECT_PATH }}
+            
+            # Vérifier si le script de déploiement existe
+            if [ -f "./deploy.sh" ]; then
+              echo "🚀 Exécution du script de déploiement automatisé"
+              chmod +x ./deploy.sh
+              ./deploy.sh
+            else
+              echo "⚠️  Script de déploiement non trouvé, utilisation du déploiement manuel"
+              
+              echo "⏹️  Arrêt des services Docker"
+              docker compose -f docker-compose.prod.yml down || true
+              
+              echo "📥 Mise à jour du code depuis Git"
+              git fetch origin
+              git reset --hard origin/main
+              git clean -fd
+              
+              echo "🔧 Mise à jour des variables d'environnement"
+              if [ -f .env ]; then
+                echo "✅ Fichier .env trouvé"
+              else
+                echo "⚠️  Fichier .env manquant - veuillez le créer"
+              fi
+              
+              echo "🏗️  Construction et démarrage des services"
+              docker compose -f docker-compose.prod.yml up -d --build
+              
+              echo "⏳ Attente du démarrage des services"
+              sleep 30
+              
+              echo "🔍 Vérification du statut des conteneurs"
+              docker compose -f docker-compose.prod.yml ps
+              
+              echo "🏥 Vérification de la santé des services"
+              # Vérification de l'API
+              if curl -f http://localhost:3002/health > /dev/null 2>&1; then
+                echo "✅ API accessible"
+              else
+                echo "❌ API non accessible"
+                docker compose -f docker-compose.prod.yml logs api
+              fi
+              
+              # Vérification du backoffice
+              if curl -f http://localhost:3001 > /dev/null 2>&1; then
+                echo "✅ Backoffice accessible"
+              else
+                echo "❌ Backoffice non accessible"
+                docker compose -f docker-compose.prod.yml logs backoffice
+              fi
+              
+              echo "🧹 Nettoyage des images Docker inutilisées"
+              docker image prune -f
+              
+              echo "✅ Déploiement terminé avec succès !"
+            fi
+          EOF
+      
+      - name: 📊 Notification de succès
+        if: success()
+        run: |
+          echo "🎉 Déploiement réussi !"
+          echo "🌐 Backoffice: https://backoffice.jerokaxperience.fr"
+          echo "🔗 API: https://apibackoffice.jerokaxperience.fr"
+      
+      - name: ❌ Notification d'échec
+        if: failure()
+        run: |
+          echo "💥 Déploiement échoué !"
+          echo "Vérifiez les logs ci-dessus pour plus de détails."
