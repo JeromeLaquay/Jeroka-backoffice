@@ -51,6 +51,7 @@ services:
       
       # CORS
       BACKOFFICE_URL: https://backoffice.jerokaxperience.fr
+      FRONTEND_URL: https://apibackoffice.jerokaxperience.fr
       
       # Upload
       UPLOAD_DIR: /app/uploads

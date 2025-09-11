@@ -61,7 +61,9 @@ app.use(helmet({
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:3000',
-    process.env.BACKOFFICE_URL || 'http://localhost:3001'
+    process.env.BACKOFFICE_URL || 'http://localhost:3001',
+    'https://backoffice.jerokaxperience.fr',  // Ajouter explicitement
+    'https://apibackoffice.jerokaxperience.fr'  // Ajouter explicitement
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
