@@ -23,7 +23,7 @@ export default defineConfig({
     downloadsFolder: 'cypress/downloads',
     setupNodeEvents(on, config) {
       // Configuration pour les rapports
-      require('cypress-mochawesome-reporter/plugin')(on)
+      import('cypress-mochawesome-reporter/plugin').then(plugin => plugin.default(on))
       
       // Configuration pour ignorer les erreurs SSL
       on('before:browser:launch', (browser, launchOptions) => {
