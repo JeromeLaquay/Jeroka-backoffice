@@ -138,7 +138,7 @@ jobs:
           
           # Exécuter les tests Cypress
           echo "🚀 Exécution des tests Cypress..."
-          npm run test:ci:chrome
+          npm run test:simple:chrome
           
           # Générer le rapport consolidé
           echo "📊 Génération du rapport de tests..."

@@ -97,7 +97,7 @@ services:
       - "3001:80"
     restart: unless-stopped
     environment:
-      VITE_API_URL: https://apibackoffice.jerokaxperience.fr
+      VITE_API_URL: http://api:3002
       NODE_ENV: production
     networks:
       - jeroka-network

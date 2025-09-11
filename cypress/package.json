@@ -19,7 +19,9 @@
     "test:ci": "npm run test:setup && npm run test && npm run test:report",
     "test:ci:chrome": "npm run test:setup && npm run cypress:run:chrome && npm run test:report",
     "test:ci:firefox": "npm run test:setup && npm run cypress:run:firefox && npm run test:report",
-    "test:ci:edge": "npm run test:setup && npm run cypress:run:edge && npm run test:report"
+    "test:ci:edge": "npm run test:setup && npm run cypress:run:edge && npm run test:report",
+    "test:simple": "node scripts/run-tests-simple.js",
+    "test:simple:chrome": "node scripts/run-tests-simple.js"
   },
   "keywords": [
     "cypress",

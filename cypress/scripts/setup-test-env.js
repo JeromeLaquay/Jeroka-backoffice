@@ -8,16 +8,16 @@
 const http = require('http');
 const https = require('https');
 
-// Configuration
+// Configuration - Forcer les URLs locales pour les tests
 const SERVICES = [
   {
     name: 'Backoffice',
-    url: process.env.BACKOFFICE_URL || 'http://localhost:3001',
+    url: 'http://localhost:3001',
     timeout: 10000
   },
   {
     name: 'API Dashboard',
-    url: process.env.API_BASE_URL || 'http://localhost:3002',
+    url: 'http://localhost:3002',
     timeout: 10000
   }
 ];
