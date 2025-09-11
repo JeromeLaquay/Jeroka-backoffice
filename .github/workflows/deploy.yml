@@ -123,6 +123,15 @@ jobs:
           export ADMIN_EMAIL="${{ secrets.ADMIN_EMAIL }}"
           export ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD }}"
           
+          # Vérifier et démarrer les services Docker si nécessaire
+          echo "🔍 Vérification des services Docker..."
+          if ! docker ps | grep -q "jeroka-backoffice\|jeroka-api"; then
+            echo "🚀 Démarrage des services Docker..."
+            cd /var/www/jeroka-backoffice
+            docker compose -f docker-compose.prod.yml up -d
+            sleep 30
+          fi
+          
           # Installation des dépendances Cypress
           cd cypress
           npm install
@@ -131,10 +140,14 @@ jobs:
           echo "⏳ Attente de la disponibilité des services..."
           sleep 60
           
+          # Vérifier le statut des conteneurs Docker
+          echo "🔍 Vérification du statut des conteneurs Docker..."
+          docker ps
+          
           # Vérifier que les services sont accessibles
           echo "🔍 Vérification de l'accessibilité des services..."
-          curl -k -f "${{ env.BACKOFFICE_URL }}" || echo "⚠️ Backoffice non accessible"
-          curl -k -f "${{ env.API_BASE_URL }}/health" || echo "⚠️ API non accessible"
+          curl -f http://localhost:3001 || echo "⚠️ Backoffice non accessible"
+          curl -f http://localhost:3002/health || echo "⚠️ API non accessible"
           
           # Exécuter les tests Cypress
           echo "🚀 Exécution des tests Cypress..."
