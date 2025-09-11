@@ -112,54 +112,39 @@ jobs:
       - name: 🧪 Exécution des tests Cypress
         if: success() && (github.event.inputs.run_tests != 'false')
         run: |
-          echo "🧪 Début des tests Cypress sur le serveur déployé"
+          echo "🧪 Exécution des tests Cypress sur le serveur déployé"
           
-          # Configuration des variables d'environnement pour les tests
-          export CYPRESS_BASE_URL="${{ env.CYPRESS_BASE_URL }}"
-          export API_BASE_URL="${{ env.API_BASE_URL }}"
-          export BACKOFFICE_URL="${{ env.BACKOFFICE_URL }}"
-          export TEST_USER_EMAIL="${{ secrets.TEST_USER_EMAIL }}"
-          export TEST_USER_PASSWORD="${{ secrets.TEST_USER_PASSWORD }}"
-          export ADMIN_EMAIL="${{ secrets.ADMIN_EMAIL }}"
-          export ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD }}"
+          # Exécution des tests directement sur le serveur via SSH
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            set -e
+            
+            echo "📁 Navigation vers le répertoire Cypress"
+            cd ~/Jeroka-backoffice/cypress
+            
+            echo "📦 Installation des dépendances Cypress"
+            npm install
+            
+            echo "⏳ Attente de la disponibilité des services..."
+            sleep 30
+            
+            echo "🔍 Vérification de l'accessibilité des services..."
+            curl -f http://localhost:3001 || echo "⚠️ Backoffice non accessible"
+            curl -f http://localhost:3002/health || echo "⚠️ API non accessible"
+            
+            echo "🚀 Exécution des tests Cypress..."
+            CYPRESS_BASE_URL=http://localhost:3001 API_BASE_URL=http://localhost:3002 npm run cypress:run:chrome
+            
+            echo "📊 Génération du rapport de tests..."
+            npm run test:report
+            
+            echo "✅ Tests Cypress terminés !"
+          EOF
           
-          
-          # Installation des dépendances Cypress
-          cd cypress
-          npm install
-          
-          # Attendre que les services soient complètement prêts
-          echo "⏳ Attente de la disponibilité des services..."
-          sleep 60
-          
-          # Vérifier le statut des conteneurs Docker
-          echo "🔍 Vérification du statut des conteneurs Docker..."
-          docker ps
-          
-          # Vérifier que les services sont accessibles
-          echo "🔍 Vérification de l'accessibilité des services..."
-          curl -f http://localhost:3001 || echo "⚠️ Backoffice non accessible"
-          curl -f http://localhost:3002/health || echo "⚠️ API non accessible"
-          
-          
-          # Vérifier que les services sont démarrés
-          echo "🔍 Vérification des conteneurs..."
-          docker ps
-          
-          # Attendre que les services soient prêts
-          echo "⏳ Attente des services..."
-          sleep 30
-          
-          # Exécuter les tests Cypress directement
-          echo "🚀 Exécution des tests Cypress..."
-          cd cypress
-          CYPRESS_BASE_URL=http://localhost:3001 API_BASE_URL=http://localhost:3002 npm run cypress:run:chrome
-          
-          # Générer le rapport consolidé
-          echo "📊 Génération du rapport de tests..."
-          npm run test:report
-          
-          echo "✅ Tests Cypress terminés !"
+          # Récupération des rapports depuis le serveur
+          echo "📤 Récupération des rapports de tests..."
+          scp -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/Jeroka-backoffice/cypress/cypress/reports/* ./cypress/reports/ || true
+          scp -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/Jeroka-backoffice/cypress/cypress/screenshots/* ./cypress/screenshots/ || true
+          scp -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/Jeroka-backoffice/cypress/cypress/videos/* ./cypress/videos/ || true
       
       - name: 📤 Upload des rapports de tests
         if: always() && (github.event.inputs.run_tests != 'false')
