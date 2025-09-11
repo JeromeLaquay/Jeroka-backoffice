@@ -1,23 +1,6 @@
 # docker-compose.prod.yml
 
 services:
-  # Nginx Reverse Proxy
-  nginx:
-    image: nginx:alpine
-    container_name: jeroka-nginx
-    restart: unless-stopped
-    ports:
-      - "8000:80"
-      - "4430:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-    networks:
-      - jeroka-network
-    depends_on:
-      - api
-      - backoffice
-
   # Base de données PostgreSQL
   postgres:
     image: postgres:15-alpine
