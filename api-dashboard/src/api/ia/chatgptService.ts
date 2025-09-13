@@ -36,11 +36,11 @@ export class ChatgptService implements IAProvider {
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
+        const errorData = await response.json().catch(() => ({})) as any
         throw new Error(`OpenAI API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`)
       }
 
-      const data = await response.json()
+      const data = await response.json() as any
       
       if (!data.choices || !data.choices[0] || !data.choices[0].message) {
         throw new Error('Invalid response from OpenAI API')
