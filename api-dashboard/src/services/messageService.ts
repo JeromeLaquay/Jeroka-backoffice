@@ -41,4 +41,8 @@ export class MessageService {
   static async markAllRead(companyId: string): Promise<{ updatedCount: number; }> {
     return MessageRepository.markAllRead(companyId);
   }
+
+  static async remove(id: string, companyId: string): Promise<boolean> {
+    return MessageRepository.remove(id, companyId);
+  }
 }

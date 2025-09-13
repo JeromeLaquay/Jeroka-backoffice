@@ -166,7 +166,8 @@ export const optionalAuth = async (req: AuthRequest, res: Response, next: NextFu
               email: user.email,
               role: user.role,
               firstName: user.first_name,
-              lastName: user.last_name
+              lastName: user.last_name,
+              company_id: user.company_id
             };
           }
         } catch (error) {

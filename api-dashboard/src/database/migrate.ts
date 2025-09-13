@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { connectDatabase, query, closeDatabase } from './connection'
-import { logger } from './utils/logger'
+import { logger } from '../utils/logger'
 
 async function runMigrations() {
   try {

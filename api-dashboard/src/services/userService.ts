@@ -12,6 +12,7 @@ export interface User {
   created_at: Date;
   updated_at: Date;
   last_login?: Date;
+  password_hash?: string;
 }
 
 export class UserService {

@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { connectDatabase, query, closeDatabase } from './connection'
-import { logger } from './utils/logger'
+import { logger } from '../utils/logger'
 
 async function seedDatabase() {
   try {
