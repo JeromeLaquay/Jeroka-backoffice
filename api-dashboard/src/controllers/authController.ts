@@ -3,10 +3,10 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import type { SignOptions, Secret } from 'jsonwebtoken';
 import crypto from 'crypto';
-import { query, transaction } from '@/database/connection';
-import { createError, asyncHandler } from '@/middleware/errorHandler';
-import { AuthRequest } from '@/middleware/auth';
-import { logger } from '@/utils/logger';
+import { query, transaction } from '../database/connection';
+import { createError, asyncHandler } from '../middleware/errorHandler';
+import { AuthRequest } from '../middleware/auth';
+import { logger } from '../utils/logger';
 
 interface RegisterRequest extends Request {
   body: {
@@ -78,7 +78,8 @@ const setTokenCookies = (res: Response, accessToken: string, refreshToken: strin
 // Register new user
 export const register = asyncHandler(async (req: RegisterRequest, res: Response, next: NextFunction) => {
   const { email, password, firstName, lastName, phone } = req.body;
-
+  const companyId = "11111111-1111-1111-1111-111111111111"
+  console.log('🚀 NOUVEAU CODE CHARGÉ - Company ID:', companyId) // FORCER LE RECHARGEMENT
   // Check if user already exists
   const existingUser = await query(
     'SELECT id FROM users WHERE email = $1',
@@ -95,10 +96,10 @@ export const register = asyncHandler(async (req: RegisterRequest, res: Response,
 
   // Create user
   const userResult = await query(
-    `INSERT INTO users (email, password_hash, first_name, last_name, phone, role, email_verified) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7) 
+    `INSERT INTO users (email, company_id, password_hash, first_name, last_name, phone, role, email_verified) 
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING id, email, first_name, last_name, role, created_at`,
-    [email.toLowerCase(), passwordHash, firstName, lastName, phone, 'user', true] // Auto-verify for now
+    [email.toLowerCase(), companyId, passwordHash, firstName, lastName, phone, 'user', true]
   );
 
   const user = userResult.rows[0];

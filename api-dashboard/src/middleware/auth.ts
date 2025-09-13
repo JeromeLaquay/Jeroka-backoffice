@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { query } from '@/database/connection';
-import { createError } from '@/middleware/errorHandler';
-import { logger } from '@/utils/logger';
+import { query } from '../database/connection';
+import { createError } from './errorHandler';
+import { logger } from '../utils/logger';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -11,6 +11,7 @@ export interface AuthRequest extends Request {
     role: string;
     firstName: string;
     lastName: string;
+    company_id: string;
   };
 }
 
@@ -52,7 +53,7 @@ export const verifyToken = async (req: AuthRequest, res: Response, next: NextFun
 
     // Get user from database
     const userResult = await query(
-      `SELECT id, email, first_name, last_name, role, is_active, email_verified 
+      `SELECT id, email, first_name, last_name, role, company_id, is_active, email_verified 
        FROM users WHERE id = $1`,
       [decoded.id]
     );
@@ -79,7 +80,8 @@ export const verifyToken = async (req: AuthRequest, res: Response, next: NextFun
       email: user.email,
       role: user.role,
       firstName: user.first_name,
-      lastName: user.last_name
+      lastName: user.last_name,
+      company_id: user.company_id
     };
 
     // Update last login

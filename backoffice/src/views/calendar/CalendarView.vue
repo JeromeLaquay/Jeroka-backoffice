@@ -229,10 +229,10 @@ import {
   ArrowPathIcon,
   UserIcon 
 } from '@heroicons/vue/24/outline'
-import AddAvailabilityModal from '@/components/calendar/AddAvailabilityModal.vue'
-import EditAvailabilityModal from '@/components/calendar/EditAvailabilityModal.vue'
-import EditAppointmentModal from '@/components/calendar/EditAppointmentModal.vue'
-import { useCalendarStore } from '@/stores/calendar'
+import AddAvailabilityModal from './components/calendar/AddAvailabilityModal.vue'
+import EditAvailabilityModal from './components/calendar/EditAvailabilityModal.vue'
+import EditAppointmentModal from './components/calendar/EditAppointmentModal.vue'
+import { useCalendarStore } from './stores/calendar'
 
 // Store
 const calendarStore = useCalendarStore()

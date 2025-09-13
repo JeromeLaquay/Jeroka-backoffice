@@ -418,11 +418,11 @@ import {
   ListBulletIcon,
   ArrowUpTrayIcon
 } from '@heroicons/vue/24/outline'
-import ProductSummary from '@/components/products/ProductSummary.vue'
-import ProductStatusBadge from '@/components/products/ProductStatusBadge.vue'
-import ProductStockBadge from '@/components/products/ProductStockBadge.vue'
-import DeleteConfirmModal from '@/components/common/DeleteConfirmModal.vue'
-import { productService } from '@/services/products'
+import ProductSummary from './components/products/ProductSummary.vue'
+import ProductStatusBadge from './components/products/ProductStatusBadge.vue'
+import ProductStockBadge from './components/products/ProductStockBadge.vue'
+import DeleteConfirmModal from './components/common/DeleteConfirmModal.vue'
+import { productService } from './services/products'
 // Fonction debounce simple
 const debounce = (func: Function, wait: number) => {
   let timeout: NodeJS.Timeout

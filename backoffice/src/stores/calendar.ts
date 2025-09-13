@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { apiService as api } from '@/services/api'
+import { apiService as api } from './services/api'
 
 // Types
 interface AvailabilityRule {

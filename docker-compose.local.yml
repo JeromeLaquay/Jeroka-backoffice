@@ -30,8 +30,7 @@ services:
   api:
     build:
       context: ./api-dashboard
-      dockerfile: Dockerfile
-      target: production
+      dockerfile: Dockerfile.dev
     container_name: jeroka-api-local
     restart: unless-stopped
     environment:
@@ -87,7 +86,7 @@ services:
   backoffice:
     build:
       context: ./backoffice
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: jeroka-backoffice-local
     restart: unless-stopped
     environment:
@@ -95,40 +94,6 @@ services:
       NODE_ENV: development
     ports:
       - "3001:80"  # Exposer le backoffice
-    networks:
-      - jeroka-network-local
-    depends_on:
-      - api
-
-  # E-boutique Vue.js
-  eboutique:
-    build:
-      context: ./eboutique
-      dockerfile: Dockerfile
-    container_name: jeroka-eboutique-local
-    restart: unless-stopped
-    environment:
-      VITE_API_URL: http://localhost:3002
-      NODE_ENV: development
-    ports:
-      - "3000:80"  # Exposer l'e-boutique
-    networks:
-      - jeroka-network-local
-    depends_on:
-      - api
-
-  # Site Web Jeroka Vue.js
-  jeroka-site:
-    build:
-      context: ./Jeroka
-      dockerfile: Dockerfile
-    container_name: jeroka-site-local
-    restart: unless-stopped
-    environment:
-      VITE_API_URL: http://localhost:3002
-      NODE_ENV: development
-    ports:
-      - "3003:80"  # Exposer le site Jeroka
     networks:
       - jeroka-network-local
     depends_on:

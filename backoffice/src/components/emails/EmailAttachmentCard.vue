@@ -174,7 +174,7 @@
 </template>
 
 <script setup lang="ts">
-import emailsService, { type EmailAttachment } from '@/services/emails'
+import emailsService, { type EmailAttachment } from './services/emails'
 
 interface Props {
   attachment: EmailAttachment

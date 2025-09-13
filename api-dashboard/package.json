@@ -4,7 +4,7 @@
   "description": "API backend pour le dashboard Jeroka - Gestion complète PME/TPE",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx --tsconfig tsconfig.dev.json --watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "migrate": "tsx src/database/migrate.ts",

@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { verifyToken } from '@/middleware/auth';
-import { query } from '@/database/connection';
-import { asyncHandler } from '@/middleware/errorHandler';
+import { verifyToken } from '../middleware/auth';
+import { query } from '../database/connection';
+import { asyncHandler } from '../middleware/errorHandler';
 
 const router = Router();
 

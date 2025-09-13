@@ -24,7 +24,7 @@ Nouvelles méthodes disponibles :
 
 ### En développement
 ```typescript
-import { apiService } from '@/services/api'
+import { apiService } from './services/api'
 
 // Bascule vers l'environnement local
 apiService.switchToLocal()
@@ -32,7 +32,7 @@ apiService.switchToLocal()
 
 ### En production
 ```typescript
-import { apiService } from '@/services/api'
+import { apiService } from './services/api'
 
 // Bascule vers l'environnement de production
 apiService.switchToProduction()
@@ -45,7 +45,7 @@ apiService.switchToProduction()
 </template>
 
 <script setup>
-import EnvironmentSwitcher from '@/components/EnvironmentSwitcher.vue'
+import EnvironmentSwitcher from './components/EnvironmentSwitcher.vue'
 </script>
 ```
 

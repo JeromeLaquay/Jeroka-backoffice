@@ -1,173 +1,173 @@
-declare module '@/services/orders' {
+declare module './services/orders' {
   export * from '../services/orders'
 }
 
-declare module '@/components/orders/OrderStatusBadge.vue' {
+declare module './components/orders/OrderStatusBadge.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/common/DeleteConfirmModal.vue' {
+declare module './components/common/DeleteConfirmModal.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/orders/PaymentStatusBadge.vue' {
+declare module './components/orders/PaymentStatusBadge.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/orders/StatusChangeModal.vue' {
+declare module './components/orders/StatusChangeModal.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/orders/ClientSelector.vue' {
+declare module './components/orders/ClientSelector.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/orders/OrderItemRow.vue' {
+declare module './components/orders/OrderItemRow.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/orders/AddressForm.vue' {
+declare module './components/orders/AddressForm.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/orders/OrderSummary.vue' {
+declare module './components/orders/OrderSummary.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/services/invoices' {
+declare module './services/invoices' {
   export * from '../services/invoices'
 }
 
-declare module '@/services/quotes' {
+declare module './services/quotes' {
   export * from '../services/quotes'
 }
 
-declare module '@/components/invoices/InvoiceStatusBadge.vue' {
+declare module './components/invoices/InvoiceStatusBadge.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/invoices/InvoiceItemRow.vue' {
+declare module './components/invoices/InvoiceItemRow.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/invoices/InvoiceSummary.vue' {
+declare module './components/invoices/InvoiceSummary.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/quotes/QuoteStatusBadge.vue' {
+declare module './components/quotes/QuoteStatusBadge.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/quotes/QuoteItemRow.vue' {
+declare module './components/quotes/QuoteItemRow.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/quotes/QuoteSummary.vue' {
+declare module './components/quotes/QuoteSummary.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/services/accounting' {
+declare module './services/accounting' {
   export * from '../services/accounting'
 }
 
-declare module '@/services/settings' {
+declare module './services/settings' {
   export * from '../services/settings'
 }
 
-declare module '@/components/accounting/TransactionTypeBadge.vue' {
+declare module './components/accounting/TransactionTypeBadge.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/accounting/FinancialChart.vue' {
+declare module './components/accounting/FinancialChart.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/accounting/AddTransactionModal.vue' {
+declare module './components/accounting/AddTransactionModal.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/accounting/ImportModal.vue' {
+declare module './components/accounting/ImportModal.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/settings/UserProfileSettings.vue' {
+declare module './components/settings/UserProfileSettings.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/settings/CompanySettings.vue' {
+declare module './components/settings/CompanySettings.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/settings/SystemSettings.vue' {
+declare module './components/settings/SystemSettings.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/settings/SecuritySettings.vue' {
+declare module './components/settings/SecuritySettings.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/settings/BackupSettings.vue' {
+declare module './components/settings/BackupSettings.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/components/settings/IntegrationsSettings.vue' {
+declare module './components/settings/IntegrationsSettings.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/views/accounting/TransactionsView.vue' {
+declare module './views/accounting/TransactionsView.vue' {
   import { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
-declare module '@/services/messages' {
+declare module './services/messages' {
   export * from '../services/messages'
 }

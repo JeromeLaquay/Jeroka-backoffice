@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from 'pg';
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 
 class DatabaseConnection {
   private pool: Pool | null = null;

@@ -1,8 +1,8 @@
 import express from 'express';
 import { Request, Response } from 'express';
 import multer from 'multer';
-import { verifyToken } from '@/middleware/auth';
-import { logger } from '@/utils/logger';
+import { verifyToken } from '../middleware/auth';
+import { logger } from '../utils/logger';
 
 const router = express.Router();
 

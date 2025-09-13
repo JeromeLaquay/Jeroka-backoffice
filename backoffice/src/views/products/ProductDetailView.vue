@@ -370,9 +370,9 @@ import {
   PlusIcon,
   StarIcon
 } from '@heroicons/vue/24/outline'
-import ProductStatusBadge from '@/components/products/ProductStatusBadge.vue'
-import ProductStockBadge from '@/components/products/ProductStockBadge.vue'
-import { productService } from '@/services/products'
+import ProductStatusBadge from './components/products/ProductStatusBadge.vue'
+import ProductStockBadge from './components/products/ProductStockBadge.vue'
+import { productService } from './services/products'
 
 const route = useRoute()
 const router = useRouter()

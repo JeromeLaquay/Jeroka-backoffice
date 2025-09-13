@@ -199,7 +199,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
 import { PhotoIcon } from '@heroicons/vue/24/outline'
-import { settingsService, type UserProfile } from '@/services/settings'
+import { settingsService, type UserProfile } from './services/settings'
 
 interface Props {
   profile: UserProfile | null

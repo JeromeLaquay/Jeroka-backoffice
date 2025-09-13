@@ -1,5 +1,4 @@
-// Initialize module-alias for path resolution
-import 'module-alias/register';
+// module-alias désactivé en dev (tsx gère les paths via tsconfig)
 
 import express from 'express';
 import cors from 'cors';
@@ -10,24 +9,24 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 
-import { connectDatabase } from '@/database/connection';
-import { logger } from '@/utils/logger';
-import { errorHandler } from '@/middleware/errorHandler';
-import { requestLogger } from '@/middleware/requestLogger';
+import { connectDatabase } from './database/connection';
+import { logger } from './utils/logger';
+import { errorHandler } from './middleware/errorHandler';
+import { requestLogger } from './middleware/requestLogger';
 
 // Routes
-import authRoutes from '@/routes/auth';
-import usersRoutes from '@/routes/users';
-import messagesRoutes from '@/routes/messages';
-import clientsRoutes from '@/routes/clients';
-import publicationsRoutes from '@/routes/publications';
-import productsRoutes from '@/routes/products';
-import invoicesRoutes from '@/routes/invoices';
-import quotesRoutes from '@/routes/quotes';
-import dashboardRoutes from '@/routes/dashboard';
-import emailsRoutes from '@/routes/emails';
-import announcementsRoutes from '@/routes/announcements';
-import calendarRoutes from '@/routes/calendar';
+import authRoutes from './routes/auth';
+import usersRoutes from './routes/users';
+import messagesRoutes from './routes/messages';
+import clientsRoutes from './routes/clients';
+import publicationsRoutes from './routes/publications';
+import productsRoutes from './routes/products';
+import invoicesRoutes from './routes/invoices';
+import quotesRoutes from './routes/quotes';
+import dashboardRoutes from './routes/dashboard';
+import emailsRoutes from './routes/emails';
+import announcementsRoutes from './routes/announcements';
+import calendarRoutes from './routes/calendar';
 
 // Load environment variables
 dotenv.config();

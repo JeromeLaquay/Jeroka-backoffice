@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from './stores/auth'
 
 const authStore = useAuthStore()
 const authLoading = ref(true)

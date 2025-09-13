@@ -368,7 +368,7 @@ import {
   ArrowPathIcon,
   XMarkIcon
 } from '@heroicons/vue/24/outline'
-import { productService } from '@/services/products'
+import { productService } from './services/products'
 
 const route = useRoute()
 const router = useRouter()

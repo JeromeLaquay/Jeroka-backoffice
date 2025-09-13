@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { createHttpLogger } from '@/utils/logger';
+import { createHttpLogger } from '../utils/logger';
 
 const httpLogger = createHttpLogger();
 

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { apiService, type LoginRequest, type RegisterRequest, type User as ApiUser } from '@/services/api'
+import { apiService, type LoginRequest, type RegisterRequest, type User as ApiUser } from '../services/api'
 
 export interface User {
   id: string

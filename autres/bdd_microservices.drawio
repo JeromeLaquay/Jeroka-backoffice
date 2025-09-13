@@ -1,0 +1,190 @@
+<mxfile host="65bd71144e">
+    <diagram name="Architecture Microservices Jeroka" id="microservices-architecture-jeroka">
+        <mxGraphModel dx="4369" dy="5464" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" background="none" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="&lt;h1&gt;🏗️ ARCHITECTURE MICROSERVICES JEROKA&lt;/h1&gt;&lt;br&gt;&lt;i&gt;Séparation des domaines métier avec bases de données dédiées&lt;/i&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#FF6B35;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="20" width="800" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend" value="&lt;b&gt;LÉGENDE MICROSERVICES&lt;/b&gt;&lt;hr&gt;&lt;font color='#FF6B35'&gt;🔴 Service d'Authentification&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🔵 Service CRM&lt;/font&gt;&lt;br&gt;&lt;font color='#4CAF50'&gt;🟢 Service E-commerce&lt;/font&gt;&lt;br&gt;&lt;font color='#9C27B0'&gt;🟣 Service Facturation&lt;/font&gt;&lt;br&gt;&lt;font color='#FF9800'&gt;🟠 Service Publications&lt;/font&gt;&lt;br&gt;&lt;font color='#607D8B'&gt;🟤 Service Messagerie&lt;/font&gt;&lt;br&gt;&lt;font color='#795548'&gt;🟫 Service Rendez-vous&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;PRINCIPES&lt;/b&gt;&lt;br&gt;• Base de données par service&lt;br&gt;• Communication via API REST&lt;br&gt;• Event-driven architecture&lt;br&gt;• Saga pattern pour transactions&lt;br&gt;• Circuit breakers&lt;br&gt;• Service discovery" style="text;html=1;strokeColor=#FF6B35;fillColor=#FFF5F5;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#FF6B35;" parent="1" vertex="1">
+                    <mxGeometry x="1000" y="-170" width="300" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="auth-service" value="&lt;b&gt;🔐 AUTH SERVICE&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Responsabilités:&lt;/b&gt;&lt;br&gt;• Authentification JWT&lt;br&gt;• Gestion des utilisateurs&lt;br&gt;• RBAC (Rôles &amp; Permissions)&lt;br&gt;• Multi-tenant isolation&lt;br&gt;• OAuth2/SSO&lt;br&gt;&lt;br&gt;&lt;b&gt;Port:&lt;/b&gt; 3001&lt;br&gt;&lt;b&gt;Database:&lt;/b&gt; auth_db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#FF6B35;fontStyle=1;fontSize=11;fontColor=#FF6B35;" parent="1" vertex="1">
+                    <mxGeometry x="-70" y="360" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="auth-db" value="&lt;b&gt;auth_db&lt;/b&gt;&lt;hr&gt;&lt;b&gt;companies&lt;/b&gt;&lt;br&gt;id, name, legal_name, siret&lt;br&gt;subscription_plan, status&lt;br&gt;created_at, updated_at&lt;br&gt;&lt;br&gt;&lt;b&gt;users&lt;/b&gt;&lt;br&gt;id, company_id, email&lt;br&gt;password_hash, role&lt;br&gt;is_active, permissions&lt;br&gt;&lt;br&gt;&lt;b&gt;refresh_tokens&lt;/b&gt;&lt;br&gt;id, user_id, token_hash&lt;br&gt;expires_at, is_revoked&lt;br&gt;&lt;br&gt;&lt;b&gt;user_sessions&lt;/b&gt;&lt;br&gt;id, user_id, session_token&lt;br&gt;ip_address, user_agent&lt;br&gt;expires_at, created_at" style="verticalAlign=top;align=left;overflow=fill;fontSize=10;fontFamily=Helvetica;html=1;strokeColor=#FF6B35;fillColor=#FFEBEE;fontColor=#FF6B35;" parent="1" vertex="1">
+                    <mxGeometry x="-260" y="-180" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="crm-service" value="&lt;b&gt;👥 CRM SERVICE&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Responsabilités:&lt;/b&gt;&lt;br&gt;• Gestion des clients&lt;br&gt;• Historique des interactions&lt;br&gt;• Segmentation client&lt;br&gt;• Pipeline de vente&lt;br&gt;• Analytics CRM&lt;br&gt;&lt;br&gt;&lt;b&gt;Port:&lt;/b&gt; 3002&lt;br&gt;&lt;b&gt;Database:&lt;/b&gt; crm_db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#003366;fontStyle=1;fontSize=11;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="190" y="140" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="crm-db" value="&lt;b&gt;crm_db&lt;/b&gt;&lt;hr&gt;&lt;b&gt;clients&lt;/b&gt;&lt;br&gt;id, company_id, type&lt;br&gt;first_name, last_name, email&lt;br&gt;phone, address, status&lt;br&gt;tags, custom_fields&lt;br&gt;&lt;br&gt;&lt;b&gt;client_interactions&lt;/b&gt;&lt;br&gt;id, client_id, type&lt;br&gt;description, outcome&lt;br&gt;user_id, created_at&lt;br&gt;&lt;br&gt;&lt;b&gt;client_segments&lt;/b&gt;&lt;br&gt;id, company_id, name&lt;br&gt;criteria, client_count&lt;br&gt;created_at, updated_at&lt;br&gt;&lt;br&gt;&lt;b&gt;contact_messages&lt;/b&gt;&lt;br&gt;id, company_id, name&lt;br&gt;email, subject, message&lt;br&gt;status, priority, assigned_to" style="verticalAlign=top;align=left;overflow=fill;fontSize=10;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E3F2FD;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="170" y="-300" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="ecommerce-db" value="&lt;b&gt;ecommerce_db&lt;/b&gt;&lt;hr&gt;&lt;b&gt;products&lt;/b&gt;&lt;br&gt;id, company_id, name&lt;br&gt;sku, category, price_ht&lt;br&gt;stock_quantity, is_active&lt;br&gt;images, tags&lt;br&gt;&lt;br&gt;&lt;b&gt;product_categories&lt;/b&gt;&lt;br&gt;id, company_id, name&lt;br&gt;parent_id, description&lt;br&gt;sort_order, is_active&lt;br&gt;&lt;br&gt;&lt;b&gt;inventory_movements&lt;/b&gt;&lt;br&gt;id, product_id, type&lt;br&gt;quantity, reason&lt;br&gt;user_id, created_at&lt;br&gt;&lt;br&gt;&lt;b&gt;product_analytics&lt;/b&gt;&lt;br&gt;id, product_id, date&lt;br&gt;views, sales, revenue&lt;br&gt;stock_level" style="verticalAlign=top;align=left;overflow=fill;fontSize=10;fontFamily=Helvetica;html=1;strokeColor=#4CAF50;fillColor=#E8F5E8;fontColor=#4CAF50;" parent="1" vertex="1">
+                    <mxGeometry x="590" y="-330" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="billing-service" value="&lt;b&gt;💰 BILLING SERVICE&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Responsabilités:&lt;/b&gt;&lt;br&gt;• Création de devis&lt;br&gt;• Gestion des factures&lt;/b&gt;&lt;br&gt;• Paiements &amp; relances&lt;br&gt;• Comptabilité&lt;br&gt;• Rapports financiers&lt;br&gt;&lt;br&gt;&lt;b&gt;Port:&lt;/b&gt; 3004&lt;br&gt;&lt;b&gt;Database:&lt;/b&gt; billing_db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9C27B0;fontStyle=1;fontSize=11;fontColor=#9C27B0;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="1020" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="billing-db" value="&lt;b&gt;billing_db&lt;/b&gt;&lt;hr&gt;&lt;b&gt;quotes&lt;/b&gt;&lt;br&gt;id, company_id, quote_number&lt;br&gt;client_id, status, total_ht&lt;br&gt;valid_until, created_by&lt;br&gt;&lt;br&gt;&lt;b&gt;quote_items&lt;/b&gt;&lt;br&gt;id, quote_id, product_id&lt;br&gt;quantity, unit_price_ht&lt;br&gt;discount_percent, total_ht&lt;br&gt;&lt;br&gt;&lt;b&gt;invoices&lt;/b&gt;&lt;br&gt;id, company_id, invoice_number&lt;br&gt;quote_id, client_id, status&lt;br&gt;total_ht, amount_paid&lt;br&gt;&lt;br&gt;&lt;b&gt;invoice_items&lt;/b&gt;&lt;br&gt;id, invoice_id, product_id&lt;br&gt;quantity, unit_price_ht&lt;br&gt;total_ht, vat_rate&lt;br&gt;&lt;br&gt;&lt;b&gt;payments&lt;/b&gt;&lt;br&gt;id, invoice_id, amount&lt;br&gt;payment_method, status&lt;br&gt;processed_at, reference" style="verticalAlign=top;align=left;overflow=fill;fontSize=10;fontFamily=Helvetica;html=1;strokeColor=#9C27B0;fillColor=#F3E5F5;fontColor=#9C27B0;" parent="1" vertex="1">
+                    <mxGeometry x="-370" y="990" width="300" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="content-service" value="&lt;b&gt;📝 CONTENT SERVICE&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Responsabilités:&lt;/b&gt;&lt;br&gt;• Gestion des publications&lt;br&gt;• CMS intégré&lt;br&gt;• SEO &amp; Analytics&lt;br&gt;• Multi-plateforme&lt;br&gt;• Planification&lt;br&gt;&lt;br&gt;&lt;b&gt;Port:&lt;/b&gt; 3005&lt;br&gt;&lt;b&gt;Database:&lt;/b&gt; content_db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;fontStyle=1;fontSize=11;fontColor=#FF9800;" parent="1" vertex="1">
+                    <mxGeometry x="-200" y="640" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="content-db" value="&lt;b&gt;content_db&lt;/b&gt;&lt;hr&gt;&lt;b&gt;publications&lt;/b&gt;&lt;br&gt;id, company_id, title&lt;br&gt;content, excerpt, type&lt;br&gt;status, category, tags&lt;br&gt;&lt;br&gt;&lt;b&gt;publication_platforms&lt;/b&gt;&lt;br&gt;id, publication_id, platform&lt;br&gt;platform_post_id, status&lt;br&gt;published_at, metrics&lt;br&gt;&lt;br&gt;&lt;b&gt;content_analytics&lt;/b&gt;&lt;br&gt;id, publication_id, date&lt;br&gt;views, likes, shares&lt;br&gt;engagement_rate&lt;br&gt;&lt;br&gt;&lt;b&gt;content_templates&lt;/b&gt;&lt;br&gt;id, company_id, name&lt;br&gt;template_content, type&lt;br&gt;is_active, created_by" style="verticalAlign=top;align=left;overflow=fill;fontSize=10;fontFamily=Helvetica;html=1;strokeColor=#FF9800;fillColor=#FFF3E0;fontColor=#FF9800;" parent="1" vertex="1">
+                    <mxGeometry x="-550" y="640" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="messaging-service" value="&lt;b&gt;💬 MESSAGING SERVICE&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Responsabilités:&lt;/b&gt;&lt;br&gt;• Messages clients&lt;br&gt;• Chat en temps réel&lt;br&gt;• Notifications&lt;br&gt;• IA pour réponses&lt;br&gt;• Historique complet&lt;br&gt;&lt;br&gt;&lt;b&gt;Port:&lt;/b&gt; 3006&lt;br&gt;&lt;b&gt;Database:&lt;/b&gt; messaging_db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECEFF1;strokeColor=#607D8B;fontStyle=1;fontSize=11;fontColor=#607D8B;" parent="1" vertex="1">
+                    <mxGeometry x="350" y="1220" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="messaging-db" value="&lt;b&gt;messaging_db&lt;/b&gt;&lt;hr&gt;&lt;b&gt;messages&lt;/b&gt;&lt;br&gt;id, company_id, first_name&lt;br&gt;last_name, email, subject&lt;br&gt;message, reponseIA, status&lt;br&gt;&lt;br&gt;&lt;b&gt;message_replies&lt;/b&gt;&lt;br&gt;id, message_id, content&lt;br&gt;is_from_customer, author_id&lt;br&gt;attachments, created_at&lt;br&gt;&lt;br&gt;&lt;b&gt;chat_sessions&lt;/b&gt;&lt;br&gt;id, company_id, client_id&lt;br&gt;status, last_activity&lt;br&gt;assigned_to, created_at&lt;br&gt;&lt;br&gt;&lt;b&gt;notifications&lt;/b&gt;&lt;br&gt;id, user_id, type&lt;br&gt;title, message, is_read&lt;br&gt;created_at, expires_at" style="verticalAlign=top;align=left;overflow=fill;fontSize=10;fontFamily=Helvetica;html=1;strokeColor=#607D8B;fillColor=#ECEFF1;fontColor=#607D8B;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="1480" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="appointment-service" value="&lt;b&gt;📅 APPOINTMENT SERVICE&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Responsabilités:&lt;/b&gt;&lt;br&gt;• Gestion des RDV&lt;br&gt;• Calendrier intégré&lt;br&gt;• Disponibilités&lt;br&gt;• Rappels automatiques&lt;br&gt;• Synchronisation Google&lt;br&gt;&lt;br&gt;&lt;b&gt;Port:&lt;/b&gt; 3007&lt;br&gt;&lt;b&gt;Database:&lt;/b&gt; appointment_db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFEBE9;strokeColor=#795548;fontStyle=1;fontSize=11;fontColor=#795548;" parent="1" vertex="1">
+                    <mxGeometry x="790" y="1210" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="appointment-db" value="&lt;b&gt;appointment_db&lt;/b&gt;&lt;hr&gt;&lt;b&gt;appointments&lt;/b&gt;&lt;br&gt;id, company_id, date&lt;br&gt;start_time, end_time&lt;br&gt;client_name, client_email&lt;br&gt;status, notes&lt;br&gt;&lt;br&gt;&lt;b&gt;availability_rules&lt;/b&gt;&lt;br&gt;id, company_id, day_of_week&lt;br&gt;start_time, end_time&lt;br&gt;is_active, created_by&lt;br&gt;&lt;br&gt;&lt;b&gt;appointment_reminders&lt;/b&gt;&lt;br&gt;id, appointment_id, type&lt;br&gt;sent_at, status&lt;br&gt;reminder_time&lt;br&gt;&lt;br&gt;&lt;b&gt;calendar_integrations&lt;/b&gt;&lt;br&gt;id, company_id, provider&lt;br&gt;access_token, refresh_token&lt;br&gt;is_active, last_sync" style="verticalAlign=top;align=left;overflow=fill;fontSize=10;fontFamily=Helvetica;html=1;strokeColor=#795548;fillColor=#EFEBE9;fontColor=#795548;" parent="1" vertex="1">
+                    <mxGeometry x="740" y="1450" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="api-gateway" value="&lt;b&gt;🚪 API GATEWAY&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Responsabilités:&lt;/b&gt;&lt;br&gt;• Routage des requêtes&lt;br&gt;• Authentification centralisée&lt;br&gt;• Rate limiting&lt;br&gt;• Load balancing&lt;br&gt;• Monitoring &amp; Logs&lt;br&gt;• Circuit breakers&lt;br&gt;&lt;br&gt;&lt;b&gt;Port:&lt;/b&gt; 3000&lt;br&gt;&lt;b&gt;Technologie:&lt;/b&gt; Kong/Nginx" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;fontStyle=1;fontSize=11;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="1520" y="190" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="service-discovery" value="&lt;b&gt;🔍 SERVICE DISCOVERY&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Responsabilités:&lt;/b&gt;&lt;br&gt;• Enregistrement des services&lt;br&gt;• Découverte automatique&lt;br&gt;• Health checks&lt;br&gt;• Configuration centralisée&lt;br&gt;• Load balancing&lt;br&gt;&lt;br&gt;&lt;b&gt;Technologie:&lt;/b&gt;&lt;br&gt;Consul/etcd" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#4CAF50;fontStyle=1;fontSize=11;fontColor=#4CAF50;" parent="1" vertex="1">
+                    <mxGeometry x="1530" y="470" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="message-broker" value="&lt;b&gt;📨 MESSAGE BROKER&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Responsabilités:&lt;/b&gt;&lt;br&gt;• Communication asynchrone&lt;br&gt;• Event sourcing&lt;br&gt;• Saga pattern&lt;br&gt;• Pub/Sub&lt;br&gt;• Dead letter queues&lt;br&gt;&lt;br&gt;&lt;b&gt;Technologie:&lt;/b&gt;&lt;br&gt;RabbitMQ/Kafka" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#003366;fontStyle=1;fontSize=11;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="1590" y="770" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="monitoring" value="&lt;b&gt;📊 MONITORING&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Stack:&lt;/b&gt;&lt;br&gt;• Prometheus (Métriques)&lt;br&gt;• Grafana (Dashboards)&lt;br&gt;• ELK Stack (Logs)&lt;br&gt;• Jaeger (Tracing)&lt;br&gt;• AlertManager&lt;br&gt;&lt;br&gt;&lt;b&gt;Ports:&lt;/b&gt;&lt;br&gt;Prometheus: 9090&lt;br&gt;Grafana: 3000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;fontStyle=1;fontSize=11;fontColor=#FF9800;" parent="1" vertex="1">
+                    <mxGeometry x="1600" y="1080" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="gateway-to-auth" style="strokeColor=#666666;strokeWidth=2;dashed=1;" parent="1" source="api-gateway" target="auth-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="gateway-to-crm" style="strokeColor=#666666;strokeWidth=2;dashed=1;startArrow=none;" parent="1" source="ecommerce-service" target="crm-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="gateway-to-ecommerce" style="strokeColor=#666666;strokeWidth=2;dashed=1;" parent="1" source="api-gateway" target="ecommerce-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="gateway-to-billing" style="strokeColor=#666666;strokeWidth=2;dashed=1;" parent="1" source="api-gateway" target="billing-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="gateway-to-content" style="strokeColor=#666666;strokeWidth=2;dashed=1;" parent="1" source="api-gateway" target="content-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="gateway-to-messaging" style="strokeColor=#666666;strokeWidth=2;dashed=1;" parent="1" source="api-gateway" target="messaging-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="gateway-to-appointment" style="strokeColor=#666666;strokeWidth=2;dashed=1;" parent="1" source="api-gateway" target="appointment-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="auth-to-db" style="strokeColor=#FF6B35;strokeWidth=2;" parent="1" source="auth-service" target="auth-db" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="crm-to-db" style="strokeColor=#003366;strokeWidth=2;" parent="1" source="crm-service" target="crm-db" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ecommerce-to-db" style="strokeColor=#4CAF50;strokeWidth=2;" parent="1" source="ecommerce-service" target="ecommerce-db" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="billing-to-db" style="strokeColor=#9C27B0;strokeWidth=2;" parent="1" source="billing-service" target="billing-db" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="content-to-db" style="strokeColor=#FF9800;strokeWidth=2;" parent="1" source="content-service" target="content-db" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="messaging-to-db" style="strokeColor=#607D8B;strokeWidth=2;" parent="1" source="messaging-service" target="messaging-db" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="appointment-to-db" style="strokeColor=#795548;strokeWidth=2;" parent="1" source="appointment-service" target="appointment-db" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="discovery-to-auth" style="strokeColor=#4CAF50;strokeWidth=1;dashed=1;" parent="1" source="service-discovery" target="auth-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="discovery-to-crm" style="strokeColor=#4CAF50;strokeWidth=1;dashed=1;" parent="1" source="service-discovery" target="crm-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="discovery-to-ecommerce" style="strokeColor=#4CAF50;strokeWidth=1;dashed=1;" parent="1" source="service-discovery" target="ecommerce-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="discovery-to-billing" style="strokeColor=#4CAF50;strokeWidth=1;dashed=1;" parent="1" source="service-discovery" target="billing-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="discovery-to-content" style="strokeColor=#4CAF50;strokeWidth=1;dashed=1;" parent="1" source="service-discovery" target="content-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="discovery-to-messaging" style="strokeColor=#4CAF50;strokeWidth=1;dashed=1;" parent="1" source="service-discovery" target="messaging-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="discovery-to-appointment" style="strokeColor=#4CAF50;strokeWidth=1;dashed=1;" parent="1" source="service-discovery" target="appointment-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="broker-to-auth" style="strokeColor=#003366;strokeWidth=1;dashed=1;" parent="1" source="message-broker" target="auth-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="broker-to-crm" style="strokeColor=#003366;strokeWidth=1;dashed=1;" parent="1" source="message-broker" target="crm-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="broker-to-ecommerce" style="strokeColor=#003366;strokeWidth=1;dashed=1;" parent="1" source="message-broker" target="ecommerce-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="broker-to-billing" style="strokeColor=#003366;strokeWidth=1;dashed=1;" parent="1" source="message-broker" target="billing-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="broker-to-content" style="strokeColor=#003366;strokeWidth=1;dashed=1;" parent="1" source="message-broker" target="content-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="broker-to-messaging" style="strokeColor=#003366;strokeWidth=1;dashed=1;" parent="1" source="message-broker" target="messaging-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="broker-to-appointment" style="strokeColor=#003366;strokeWidth=1;dashed=1;" parent="1" source="message-broker" target="appointment-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="monitoring-to-auth" style="strokeColor=#FF9800;strokeWidth=1;dashed=1;" parent="1" source="monitoring" target="auth-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="monitoring-to-crm" style="strokeColor=#FF9800;strokeWidth=1;dashed=1;" parent="1" source="monitoring" target="crm-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="monitoring-to-ecommerce" style="strokeColor=#FF9800;strokeWidth=1;dashed=1;" parent="1" source="monitoring" target="ecommerce-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="monitoring-to-billing" style="strokeColor=#FF9800;strokeWidth=1;dashed=1;" parent="1" source="monitoring" target="billing-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="monitoring-to-content" style="strokeColor=#FF9800;strokeWidth=1;dashed=1;" parent="1" source="monitoring" target="content-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="monitoring-to-messaging" style="strokeColor=#FF9800;strokeWidth=1;dashed=1;" parent="1" source="monitoring" target="messaging-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="monitoring-to-appointment" style="strokeColor=#FF9800;strokeWidth=1;dashed=1;" parent="1" source="monitoring" target="appointment-service" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="architecture-notes" value="&lt;b&gt;AVANTAGES DE CETTE ARCHITECTURE&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Scalabilité:&lt;/b&gt;&lt;br&gt;• Chaque service peut être scalé indépendamment&lt;br&gt;• Bases de données dédiées par domaine&lt;br&gt;• Load balancing par service&lt;br&gt;&lt;br&gt;&lt;b&gt;Maintenabilité:&lt;/b&gt;&lt;br&gt;• Séparation claire des responsabilités&lt;br&gt;• Déploiements indépendants&lt;br&gt;• Technologies adaptées par service&lt;br&gt;&lt;br&gt;&lt;b&gt;Résilience:&lt;/b&gt;&lt;br&gt;• Isolation des pannes&lt;br&gt;• Circuit breakers&lt;br&gt;• Retry policies&lt;br&gt;• Graceful degradation&lt;br&gt;&lt;br&gt;&lt;b&gt;Sécurité:&lt;/b&gt;&lt;br&gt;• Authentification centralisée&lt;br&gt;• Isolation des données&lt;br&gt;• Audit trail par service&lt;br&gt;• Encryption en transit et au repos" style="text;html=1;strokeColor=#4CAF50;fillColor=#E8F5E8;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#4CAF50;" parent="1" vertex="1">
+                    <mxGeometry x="2210" y="-160" width="400" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="migration-notes" value="&lt;b&gt;STRATÉGIE DE MIGRATION&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Phase 1 - Préparation:&lt;/b&gt;&lt;br&gt;• Identifier les domaines métier&lt;br&gt;• Créer les APIs de service&lt;br&gt;• Mettre en place l'API Gateway&lt;br&gt;&lt;br&gt;&lt;b&gt;Phase 2 - Extraction:&lt;/b&gt;&lt;br&gt;• Extraire Auth Service (priorité 1)&lt;br&gt;• Extraire CRM Service&lt;br&gt;• Extraire E-commerce Service&lt;br&gt;&lt;br&gt;&lt;b&gt;Phase 3 - Optimisation:&lt;/b&gt;&lt;br&gt;• Extraire Billing Service&lt;br&gt;• Extraire Content Service&lt;br&gt;• Extraire Messaging Service&lt;br&gt;&lt;br&gt;&lt;b&gt;Phase 4 - Finalisation:&lt;/b&gt;&lt;br&gt;• Extraire Appointment Service&lt;br&gt;• Mettre en place le monitoring&lt;br&gt;• Optimiser les performances" style="text;html=1;strokeColor=#FF9800;fillColor=#FFF3E0;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#FF9800;" parent="1" vertex="1">
+                    <mxGeometry x="1750" y="-160" width="400" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="tech-stack" value="&lt;b&gt;STACK TECHNOLOGIQUE&lt;/b&gt;&lt;hr&gt;&lt;b&gt;Services:&lt;/b&gt;&lt;br&gt;• Node.js/Express (Backend)&lt;br&gt;• PostgreSQL (Base de données)&lt;br&gt;• Redis (Cache/Sessions)&lt;br&gt;&lt;br&gt;&lt;b&gt;Infrastructure:&lt;/b&gt;&lt;br&gt;• Docker &amp; Docker Compose&lt;br&gt;• Kubernetes (Production)&lt;br&gt;• Nginx/Kong (API Gateway)&lt;br&gt;&lt;br&gt;&lt;b&gt;Monitoring:&lt;/b&gt;&lt;br&gt;• Prometheus + Grafana&lt;br&gt;• ELK Stack (Logs)&lt;br&gt;• Jaeger (Tracing)&lt;br&gt;&lt;br&gt;&lt;b&gt;Communication:&lt;/b&gt;&lt;br&gt;• REST APIs&lt;br&gt;• RabbitMQ/Kafka&lt;br&gt;• WebSockets (temps réel)&lt;br&gt;&lt;br&gt;&lt;b&gt;Sécurité:&lt;/b&gt;&lt;br&gt;• JWT Authentication&lt;br&gt;• OAuth2/OpenID Connect&lt;br&gt;• Rate Limiting&lt;br&gt;• HTTPS/TLS" style="text;html=1;strokeColor=#9C27B0;fillColor=#F3E5F5;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#9C27B0;" parent="1" vertex="1">
+                    <mxGeometry x="1360" y="-170" width="300" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="" style="strokeColor=#666666;strokeWidth=2;dashed=1;endArrow=none;" edge="1" parent="1" source="api-gateway" target="ecommerce-service">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1520" y="274.6564885496182" as="sourcePoint"/>
+                        <mxPoint x="410" y="215.3435114503818" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ecommerce-service" value="&lt;b&gt;🛒 E-COMMERCE SERVICE&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Responsabilités:&lt;/b&gt;&lt;br&gt;• Catalogue produits&lt;br&gt;• Gestion des stocks&lt;br&gt;• Commandes &amp; Panier&lt;br&gt;• Inventaire temps réel&lt;br&gt;• Analytics produits&lt;br&gt;&lt;br&gt;&lt;b&gt;Port:&lt;/b&gt; 3003&lt;br&gt;&lt;b&gt;Database:&lt;/b&gt; ecommerce_db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#4CAF50;fontStyle=1;fontSize=11;fontColor=#4CAF50;" parent="1" vertex="1">
+                    <mxGeometry x="580" y="140" width="200" height="180" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

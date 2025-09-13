@@ -101,9 +101,17 @@ class ApiService {
       },
       async (error) => {
         if (error.response?.status === 401) {
-          // Token expiré ou invalide
+          // Éviter la boucle infinie
+          if (error.config?.url?.includes('/auth/refresh')) {
+            // Si c'est déjà une requête de refresh qui échoue, déconnecter
+            localStorage.removeItem('auth_token')
+            localStorage.removeItem('user')
+            window.location.href = '/login'
+            return Promise.reject(error)
+          }
+          
+          // Tenter de rafraîchir le token seulement si ce n'est pas déjà une requête de refresh
           try {
-            // Tenter de rafraîchir le token
             await this.refreshToken()
             // Retry la requête originale
             return this.api.request(error.config)

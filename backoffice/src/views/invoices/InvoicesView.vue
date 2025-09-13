@@ -347,9 +347,9 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/vue/24/outline'
-import InvoiceStatusBadge from '@/components/invoices/InvoiceStatusBadge.vue'
-import DeleteConfirmModal from '@/components/common/DeleteConfirmModal.vue'
-import { invoiceService } from '@/services/invoices'
+import InvoiceStatusBadge from './components/invoices/InvoiceStatusBadge.vue'
+import DeleteConfirmModal from './components/common/DeleteConfirmModal.vue'
+import { invoiceService } from './services/invoices'
 import { debounce } from 'lodash-es'
 
 // Types

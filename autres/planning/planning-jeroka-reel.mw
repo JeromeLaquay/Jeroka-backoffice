@@ -5,8 +5,9 @@
 2025-09-15 / 2025-10-01: Configuration Docker
 - Docker containers 
 - Docker Compose 
-- Environnement dev 
-- cypress sur environnement dev 
+- Environnement test 
+- cypress sur environnement test 
+- gérer environnement dev suite aux changements
 - backup bdd
 *Estimation : 6h/semaine × 3 semaines = 18h*
 
@@ -16,10 +17,11 @@
 - modification de compte et de rôles
 - suppression de compte
 - toggle en haut à droite USER/ADMIN pour changer de rôle 
+- tests cypress sur environnement test
 *Estimation : 6h/semaine × 3 semaines = 18h*
 
 
-## Gestion clients et messages (Novembre-Décembre 2025)
+## Phase 3 - Gestion clients et messages (Novembre-Décembre 2025)
 2025-11-15 / 2025-12-31: gestion clients et messages
 - clients : exporter ou importer en csv
 - lors de l'import, vérifier si client existe déjà, si oui, mettre à jour, sinon créer
@@ -32,6 +34,47 @@
     - récupérer la réponse
     - afficher la réponse
 - marquer comme lu lors du clic sur le message
+- tests cypress sur environnement test
+
+## Phase 4 - Gestion publications (Novembre-Décembre 2025)
+2025-11-15 / 2025-12-31: gestion publications
+- publications : créer, modifier, supprimer dans l'application 
+- générer le contenu de la publication avec l'IA:
+    - connexion à l'api de chatGpt -> aiservice.ts
+    - alimenter les données de l'entreprise pour la génération du prompt ->
+    - générer un prompt avec les données du formulaire et de l'entreprise
+    - appeler l'api de chatGpt
+    - récupérer la réponse
+    - afficher la réponse
+- publier sur les réseaux sociaux:
+    - Facebook
+    - Instagram
+    - LinkedIn
+    - Site web
+    - générer une ligne publication_platform pour chaque réseaux sociaux
+- tests cypress sur environnement test
+
+## Phase 5 - Gestion calendrier (Novembre-Décembre 2025)
+2025-11-15 / 2025-12-31: gestion publications
+- publications : créer, modifier, supprimer dans l'application 
+- générer le contenu de la publication avec l'IA:
+    - connexion à l'api de chatGpt -> aiservice.ts
+    - alimenter les données de l'entreprise pour la génération du prompt ->
+    - générer un prompt avec les données du formulaire et de l'entreprise
+    - appeler l'api de chatGpt
+    - récupérer la réponse
+    - afficher la réponse
+- publier sur les réseaux sociaux:
+    - Facebook
+    - Instagram
+    - LinkedIn
+    - Site web
+    - générer une ligne publication_platform pour chaque réseaux sociaux
+- tests cypress sur environnement test
+
+## Phase 12 - Déploiement production (janvier-février 2026)
+2026-01-15 / 2026-02-28: déploiement production
+- 
 
 ## Réalisation business plan (Novembre-Décembre 2025)
 2025-11-15 / 2025-12-31: partie

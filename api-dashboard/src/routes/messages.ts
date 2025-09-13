@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express'
-import { verifyToken } from '../middleware/auth'
+import { verifyToken, AuthRequest } from '../middleware/auth'
+import { MessageService } from '../services/messageService'
 
 const router = Router()
 
@@ -94,7 +95,11 @@ router.post('/', async (req: Request, res: Response) => {
       repliedAt: null
     }
 
-    // In production, save to database
+    // En dev: garder le mock. En prod: on persiste
+    if (process.env.NODE_ENV !== 'development') {
+      // Si on a un companyId (via optionalAuth plus tard), on persiste
+      return res.status(501).json({ success: false, message: 'Not implemented in dev' })
+    }
     mockMessages.unshift(newMessage)
 
     return res.status(201).json({
@@ -116,53 +121,18 @@ router.post('/', async (req: Request, res: Response) => {
  * @desc Get all messages with filters and pagination
  * @access Private
  */
-router.get('/', verifyToken, async (req: Request, res: Response) => {
+router.get('/', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
-    const {
-      page = 1, limit = 20, search = '', status, priority
-    } = req.query
-
-    let filteredMessages = [...mockMessages]
-
-    // Apply filters
-    if (search) {
-      const searchLower = String(search).toLowerCase()
-      filteredMessages = filteredMessages.filter(m => 
-        m.firstName.toLowerCase().includes(searchLower) ||
-        m.lastName.toLowerCase().includes(searchLower) ||
-        m.email.toLowerCase().includes(searchLower) ||
-        m.subject.toLowerCase().includes(searchLower) ||
-        m.message.toLowerCase().includes(searchLower)
-      )
-    }
-
-    if (status) {
-      filteredMessages = filteredMessages.filter(m => m.status === status)
-    }
-
-    if (priority) {
-      filteredMessages = filteredMessages.filter(m => m.priority === priority)
-    }
-
-    // Apply pagination
-    const totalCount = filteredMessages.length
-    const totalPages = Math.ceil(totalCount / Number(limit))
-    const offset = (Number(page) - 1) * Number(limit)
-    const paginatedMessages = filteredMessages.slice(offset, offset + Number(limit))
-
-    return res.json({
-      success: true,
-      data: {
-        messages: paginatedMessages,
-        pagination: {
-          currentPage: Number(page),
-          totalPages,
-          totalCount,
-          hasNextPage: Number(page) < totalPages,
-          hasPrevPage: Number(page) > 1
-        }
-      }
-    })
+    const companyId = req.user!.id ? req.user!.id /* to replace by company_id from user */ : ''
+    // NOTE: ici, utilisez req.user.company_id quand disponible dans middleware
+    const result = await MessageService.getMessages(companyId, req.query as any)
+    return res.json({ success: true, data: { messages: result.data, pagination: {
+      currentPage: result.currentPage,
+      totalPages: result.totalPages,
+      totalCount: result.total,
+      hasNextPage: result.currentPage < result.totalPages,
+      hasPrevPage: result.currentPage > 1
+    } } })
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -176,39 +146,11 @@ router.get('/', verifyToken, async (req: Request, res: Response) => {
  * @desc Get messages statistics
  * @access Private
  */
-router.get('/stats', verifyToken, async (req: Request, res: Response) => {
+router.get('/stats', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
-    const total = mockMessages.length
-    const newCount = mockMessages.filter(m => m.status === 'new').length
-    const readCount = mockMessages.filter(m => m.status === 'read').length
-    const repliedCount = mockMessages.filter(m => m.status === 'replied').length
-    const archivedCount = mockMessages.filter(m => m.status === 'archived').length
-    
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const todayCount = mockMessages.filter(m => new Date(m.createdAt) >= today).length
-    
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-    const weekCount = mockMessages.filter(m => new Date(m.createdAt) >= weekAgo).length
-    
-    const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-    const monthCount = mockMessages.filter(m => new Date(m.createdAt) >= monthAgo).length
-
-    return res.json({
-      success: true,
-      data: {
-        total,
-        new: newCount,
-        read: readCount,
-        replied: repliedCount,
-        archived: archivedCount,
-        todayCount,
-        weekCount,
-        monthCount,
-        averageResponseTime: 2.5,
-        responseRate: 85
-      }
-    })
+    const companyId = req.user!.id // remplacez par req.user.company_id
+    const stats = await MessageService.getStats(companyId)
+    return res.json({ success: true, data: stats })
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -222,18 +164,12 @@ router.get('/stats', verifyToken, async (req: Request, res: Response) => {
  * @desc Get a specific message
  * @access Private
  */
-router.get('/:id', verifyToken, async (req: Request, res: Response) => {
+router.get('/:id', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
-    const message = mockMessages.find(m => m.id === id)
-
-    if (!message) {
-      return res.status(404).json({
-        success: false,
-        message: 'Message non trouvé'
-      })
-    }
-
+    const companyId = req.user!.id // remplacez par req.user.company_id
+    const message = await MessageService.getById(id, companyId)
+    if (!message) return res.status(404).json({ success: false, message: 'Message non trouvé' })
     return res.json({ success: true, data: message })
   } catch (error) {
     return res.status(500).json({
@@ -248,42 +184,13 @@ router.get('/:id', verifyToken, async (req: Request, res: Response) => {
  * @desc Update a message
  * @access Private
  */
-router.put('/:id', verifyToken, async (req: Request, res: Response) => {
+router.put('/:id', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
-    const { status, priority, tags, assignedTo } = req.body
-
-    const messageIndex = mockMessages.findIndex(m => m.id === id)
-    if (messageIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Message non trouvé'
-      })
-    }
-
-    const message = mockMessages[messageIndex]
-    
-    if (status !== undefined) {
-      message.status = status
-      if (status === 'read' || status === 'replied') {
-        message.readAt = new Date().toISOString()
-      }
-      if (status === 'replied') {
-        message.repliedAt = new Date().toISOString()
-      }
-    }
-
-    if (priority !== undefined) message.priority = priority
-    if (tags !== undefined) message.tags = tags
-    if (assignedTo !== undefined) message.assignedTo = assignedTo
-
-    message.updatedAt = new Date().toISOString()
-
-    return res.json({
-      success: true,
-      message: 'Message mis à jour avec succès',
-      data: message
-    })
+    const companyId = req.user!.id // remplacez par req.user.company_id
+    const updated = await MessageService.update(id, companyId, req.body)
+    if (!updated) return res.status(404).json({ success: false, message: 'Message non trouvé' })
+    return res.json({ success: true, message: 'Message mis à jour avec succès', data: updated })
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -297,29 +204,13 @@ router.put('/:id', verifyToken, async (req: Request, res: Response) => {
  * @desc Mark a message as read
  * @access Private
  */
-router.post('/:id/mark-read', verifyToken, async (req: Request, res: Response) => {
+router.post('/:id/mark-read', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
-    const message = mockMessages.find(m => m.id === id)
-
-    if (!message) {
-      return res.status(404).json({
-        success: false,
-        message: 'Message non trouvé'
-      })
-    }
-
-    if (message.status === 'new') {
-      message.status = 'read'
-      message.readAt = new Date().toISOString()
-      message.updatedAt = new Date().toISOString()
-    }
-
-    return res.json({
-      success: true,
-      message: 'Message marqué comme lu',
-      data: message
-    })
+    const companyId = req.user!.id // remplacez par req.user.company_id
+    const updated = await MessageService.markRead(id, companyId)
+    if (!updated) return res.status(404).json({ success: false, message: 'Message non trouvé' })
+    return res.json({ success: true, message: 'Message marqué comme lu', data: updated })
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -333,23 +224,11 @@ router.post('/:id/mark-read', verifyToken, async (req: Request, res: Response) =
  * @desc Mark all messages as read
  * @access Private
  */
-router.post('/mark-all-read', verifyToken, async (req: Request, res: Response) => {
+router.post('/mark-all-read', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
-    let updatedCount = 0
-    mockMessages.forEach(message => {
-      if (message.status === 'new') {
-        message.status = 'read'
-        message.readAt = new Date().toISOString()
-        message.updatedAt = new Date().toISOString()
-        updatedCount++
-      }
-    })
-
-    return res.json({
-      success: true,
-      message: `${updatedCount} message(s) marqué(s) comme lu(s)`,
-      data: { updatedCount }
-    })
+    const companyId = req.user!.id // remplacez par req.user.company_id
+    const result = await MessageService.markAllRead(companyId)
+    return res.json({ success: true, message: `${result.updatedCount} message(s) marqué(s) comme lu(s)`, data: result })
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -363,24 +242,13 @@ router.post('/mark-all-read', verifyToken, async (req: Request, res: Response) =
  * @desc Delete a message
  * @access Private
  */
-router.delete('/:id', verifyToken, async (req: Request, res: Response) => {
+router.delete('/:id', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
-    const messageIndex = mockMessages.findIndex(m => m.id === id)
-
-    if (messageIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Message non trouvé'
-      })
-    }
-
-    mockMessages.splice(messageIndex, 1)
-
-    return res.json({
-      success: true,
-      message: 'Message supprimé avec succès'
-    })
+    const companyId = req.user!.id // remplacez par req.user.company_id
+    const ok = await MessageService.remove(id, companyId as any)
+    if (!ok) return res.status(404).json({ success: false, message: 'Message non trouvé' })
+    return res.json({ success: true, message: 'Message supprimé avec succès' })
   } catch (error) {
     return res.status(500).json({
       success: false,

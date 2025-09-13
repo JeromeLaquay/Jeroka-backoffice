@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { verifyToken } from '@/middleware/auth';
+import { verifyToken } from '../middleware/auth';
 import { query, body, param, validationResult } from 'express-validator';
 
 const router = Router();

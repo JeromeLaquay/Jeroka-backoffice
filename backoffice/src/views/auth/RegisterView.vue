@@ -228,7 +228,7 @@
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '../../stores/auth'
 import { 
   ExclamationCircleIcon, 
   CheckCircleIcon,

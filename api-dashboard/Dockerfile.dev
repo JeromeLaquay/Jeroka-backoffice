@@ -19,8 +19,14 @@ COPY tsconfig*.json ./
 # Installer toutes les dépendances (dev + prod)
 RUN npm install
 
+# Installer tsx globalement pour éviter les problèmes d'alias
+RUN npm install -g tsx
+
+# Copier le code source
+COPY src/ ./src/
+
 # Créer les répertoires nécessaires
-RUN mkdir -p uploads logs src
+RUN mkdir -p uploads logs
 
 # Exposer le port
 EXPOSE 3002

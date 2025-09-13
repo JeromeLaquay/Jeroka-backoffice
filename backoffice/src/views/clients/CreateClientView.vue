@@ -223,7 +223,7 @@
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { clientsService, type CreateClientRequest } from '@/services/clients'
+import { clientsService, type CreateClientRequest } from '../../services/clients'
 
 const router = useRouter()
 const route = useRoute()

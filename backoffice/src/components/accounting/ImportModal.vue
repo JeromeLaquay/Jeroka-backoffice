@@ -165,7 +165,7 @@
 import { ref } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ArrowUpTrayIcon, DocumentIcon, XMarkIcon } from '@heroicons/vue/24/outline'
-import { accountingService } from '@/services/accounting'
+import { accountingService } from './services/accounting'
 
 interface Props {
   show: boolean

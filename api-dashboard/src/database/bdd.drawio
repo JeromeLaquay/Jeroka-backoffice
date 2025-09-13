@@ -1,265 +1,130 @@
-<mxfile host="app.diagrams.net" modified="2024-01-20T12:00:00.000Z" agent="5.0" etag="drawio" version="22.1.16" type="device">
-  <diagram name="Jeroka Database Schema" id="e7e014a7-5840-1c2e-5031-d8a4daf1dd37">
-    <mxGraphModel dx="2066" dy="1161" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" background="none" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        
-        <!-- Table users -->
-        <mxCell id="users" value="&lt;b&gt;users&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;email: VARCHAR(255) UNIQUE&lt;br&gt;password_hash: VARCHAR(255)&lt;br&gt;first_name: VARCHAR(100)&lt;br&gt;last_name: VARCHAR(100)&lt;br&gt;phone: VARCHAR(20)&lt;br&gt;avatar_url: TEXT&lt;br&gt;role: VARCHAR(50) ['admin', 'user', 'manager']&lt;br&gt;is_active: BOOLEAN&lt;br&gt;last_login: TIMESTAMP&lt;br&gt;email_verified: BOOLEAN&lt;br&gt;email_verification_token: VARCHAR(255)&lt;br&gt;password_reset_token: VARCHAR(255)&lt;br&gt;password_reset_expires: TIMESTAMP&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#D4E1F5;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="40" y="40" width="280" height="300" as="geometry" />
-        </mxCell>
-        
-        <!-- Table refresh_tokens -->
-        <mxCell id="refresh_tokens" value="&lt;b&gt;refresh_tokens&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;user_id: UUID (FK → users.id)&lt;br&gt;token_hash: VARCHAR(255)&lt;br&gt;expires_at: TIMESTAMP&lt;br&gt;is_revoked: BOOLEAN&lt;br&gt;created_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#D4E1F5;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="360" y="40" width="280" height="120" as="geometry" />
-        </mxCell>
-        
-        <!-- Table clients -->
-        <mxCell id="clients" value="&lt;b&gt;clients&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;type: VARCHAR(20) ['individual', 'company']&lt;br&gt;first_name: VARCHAR(100)&lt;br&gt;last_name: VARCHAR(100)&lt;br&gt;company_name: VARCHAR(200)&lt;br&gt;email: VARCHAR(255)&lt;br&gt;phone: VARCHAR(20)&lt;br&gt;mobile: VARCHAR(20)&lt;br&gt;address_line1: VARCHAR(255)&lt;br&gt;address_line2: VARCHAR(255)&lt;br&gt;city: VARCHAR(100)&lt;br&gt;postal_code: VARCHAR(20)&lt;br&gt;country: VARCHAR(100)&lt;br&gt;siret: VARCHAR(14)&lt;br&gt;vat_number: VARCHAR(50)&lt;br&gt;website: VARCHAR(255)&lt;br&gt;notes: TEXT&lt;br&gt;avatar_url: TEXT&lt;br&gt;status: VARCHAR(20) ['active', 'inactive', 'prospect']&lt;br&gt;source: VARCHAR(50)&lt;br&gt;tags: TEXT[]&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E1F5FE;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="40" y="380" width="280" height="400" as="geometry" />
-        </mxCell>
-        
-        <!-- Table contact_messages -->
-        <mxCell id="contact_messages" value="&lt;b&gt;contact_messages&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;name: VARCHAR(200)&lt;br&gt;email: VARCHAR(255)&lt;br&gt;phone: VARCHAR(20)&lt;br&gt;company: VARCHAR(200)&lt;br&gt;subject: VARCHAR(500)&lt;br&gt;message: TEXT&lt;br&gt;type: VARCHAR(50) ['devis', 'information', 'partnership', 'support', 'other']&lt;br&gt;status: VARCHAR(20) ['unread', 'read', 'replied', 'archived']&lt;br&gt;priority: VARCHAR(20) ['low', 'normal', 'high', 'urgent']&lt;br&gt;assigned_to: UUID (FK → users.id)&lt;br&gt;client_id: UUID (FK → clients.id)&lt;br&gt;ip_address: INET&lt;br&gt;user_agent: TEXT&lt;br&gt;source: VARCHAR(100)&lt;br&gt;tags: TEXT[]&lt;br&gt;replied_at: TIMESTAMP&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E1F5FE;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="360" y="200" width="320" height="350" as="geometry" />
-        </mxCell>
-        
-        <!-- Table products -->
-        <mxCell id="products" value="&lt;b&gt;products&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;name: VARCHAR(255)&lt;br&gt;description: TEXT&lt;br&gt;short_description: VARCHAR(500)&lt;br&gt;sku: VARCHAR(100) UNIQUE&lt;br&gt;category: VARCHAR(100)&lt;br&gt;subcategory: VARCHAR(100)&lt;br&gt;price_ht: DECIMAL(10,2)&lt;br&gt;vat_rate: DECIMAL(5,2)&lt;br&gt;price_ttc: DECIMAL(10,2) COMPUTED&lt;br&gt;cost_price: DECIMAL(10,2)&lt;br&gt;stock_quantity: INTEGER&lt;br&gt;min_stock_level: INTEGER&lt;br&gt;max_stock_level: INTEGER&lt;br&gt;unit: VARCHAR(20)&lt;br&gt;weight: DECIMAL(8,3)&lt;br&gt;dimensions: JSONB&lt;br&gt;images: TEXT[]&lt;br&gt;is_active: BOOLEAN&lt;br&gt;is_digital: BOOLEAN&lt;br&gt;meta_title: VARCHAR(255)&lt;br&gt;meta_description: TEXT&lt;br&gt;tags: TEXT[]&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#FFF9C4;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="720" y="40" width="300" height="440" as="geometry" />
-        </mxCell>
-        
-        <!-- Table quotes -->
-        <mxCell id="quotes" value="&lt;b&gt;quotes&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;quote_number: VARCHAR(50) UNIQUE&lt;br&gt;client_id: UUID (FK → clients.id)&lt;br&gt;status: VARCHAR(20) ['draft', 'sent', 'accepted', 'rejected', 'expired']&lt;br&gt;title: VARCHAR(255)&lt;br&gt;description: TEXT&lt;br&gt;subtotal_ht: DECIMAL(10,2)&lt;br&gt;discount_percent: DECIMAL(5,2)&lt;br&gt;discount_amount: DECIMAL(10,2)&lt;br&gt;total_ht: DECIMAL(10,2)&lt;br&gt;total_vat: DECIMAL(10,2)&lt;br&gt;total_ttc: DECIMAL(10,2)&lt;br&gt;valid_until: DATE&lt;br&gt;notes: TEXT&lt;br&gt;terms_conditions: TEXT&lt;br&gt;payment_terms: VARCHAR(255)&lt;br&gt;delivery_delay: VARCHAR(255)&lt;br&gt;sent_at: TIMESTAMP&lt;br&gt;accepted_at: TIMESTAMP&lt;br&gt;rejected_at: TIMESTAMP&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#F3E5F5;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="40" y="820" width="300" height="420" as="geometry" />
-        </mxCell>
-        
-        <!-- Table quote_items -->
-        <mxCell id="quote_items" value="&lt;b&gt;quote_items&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;quote_id: UUID (FK → quotes.id)&lt;br&gt;product_id: UUID (FK → products.id)&lt;br&gt;description: VARCHAR(500)&lt;br&gt;quantity: DECIMAL(10,3)&lt;br&gt;unit: VARCHAR(20)&lt;br&gt;unit_price_ht: DECIMAL(10,2)&lt;br&gt;discount_percent: DECIMAL(5,2)&lt;br&gt;vat_rate: DECIMAL(5,2)&lt;br&gt;total_ht: DECIMAL(10,2) COMPUTED&lt;br&gt;total_vat: DECIMAL(10,2) COMPUTED&lt;br&gt;total_ttc: DECIMAL(10,2) COMPUTED&lt;br&gt;sort_order: INTEGER&lt;br&gt;created_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#F3E5F5;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="380" y="820" width="300" height="240" as="geometry" />
-        </mxCell>
-        
-        <!-- Table invoices -->
-        <mxCell id="invoices" value="&lt;b&gt;invoices&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;invoice_number: VARCHAR(50) UNIQUE&lt;br&gt;quote_id: UUID (FK → quotes.id)&lt;br&gt;client_id: UUID (FK → clients.id)&lt;br&gt;status: VARCHAR(20) ['draft', 'sent', 'paid', 'overdue', 'cancelled']&lt;br&gt;type: VARCHAR(20) ['invoice', 'credit_note', 'proforma']&lt;br&gt;title: VARCHAR(255)&lt;br&gt;description: TEXT&lt;br&gt;subtotal_ht: DECIMAL(10,2)&lt;br&gt;discount_percent: DECIMAL(5,2)&lt;br&gt;discount_amount: DECIMAL(10,2)&lt;br&gt;total_ht: DECIMAL(10,2)&lt;br&gt;total_vat: DECIMAL(10,2)&lt;br&gt;total_ttc: DECIMAL(10,2)&lt;br&gt;amount_paid: DECIMAL(10,2)&lt;br&gt;amount_due: DECIMAL(10,2) COMPUTED&lt;br&gt;issue_date: DATE&lt;br&gt;due_date: DATE&lt;br&gt;payment_terms: VARCHAR(255)&lt;br&gt;payment_method: VARCHAR(50)&lt;br&gt;bank_details: TEXT&lt;br&gt;notes: TEXT&lt;br&gt;sent_at: TIMESTAMP&lt;br&gt;paid_at: TIMESTAMP&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E8F5E8;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="40" y="1280" width="300" height="480" as="geometry" />
-        </mxCell>
-        
-        <!-- Table invoice_items -->
-        <mxCell id="invoice_items" value="&lt;b&gt;invoice_items&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;invoice_id: UUID (FK → invoices.id)&lt;br&gt;product_id: UUID (FK → products.id)&lt;br&gt;description: VARCHAR(500)&lt;br&gt;quantity: DECIMAL(10,3)&lt;br&gt;unit: VARCHAR(20)&lt;br&gt;unit_price_ht: DECIMAL(10,2)&lt;br&gt;discount_percent: DECIMAL(5,2)&lt;br&gt;vat_rate: DECIMAL(5,2)&lt;br&gt;total_ht: DECIMAL(10,2) COMPUTED&lt;br&gt;total_vat: DECIMAL(10,2) COMPUTED&lt;br&gt;total_ttc: DECIMAL(10,2) COMPUTED&lt;br&gt;sort_order: INTEGER&lt;br&gt;created_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E8F5E8;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="380" y="1280" width="300" height="240" as="geometry" />
-        </mxCell>
-        
-        <!-- Table publications -->
-        <mxCell id="publications" value="&lt;b&gt;publications&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;title: VARCHAR(255)&lt;br&gt;content: TEXT&lt;br&gt;excerpt: VARCHAR(500)&lt;br&gt;featured_image: TEXT&lt;br&gt;images: TEXT[]&lt;br&gt;hashtags: TEXT[]&lt;br&gt;type: VARCHAR(50) ['standard', 'promotion', 'event', 'announcement', 'tutorial']&lt;br&gt;status: VARCHAR(20) ['draft', 'scheduled', 'published', 'archived']&lt;br&gt;category: VARCHAR(100)&lt;br&gt;tags: TEXT[]&lt;br&gt;seo_title: VARCHAR(255)&lt;br&gt;seo_description: TEXT&lt;br&gt;seo_keywords: TEXT[]&lt;br&gt;slug: VARCHAR(255) UNIQUE&lt;br&gt;view_count: INTEGER&lt;br&gt;like_count: INTEGER&lt;br&gt;share_count: INTEGER&lt;br&gt;scheduled_at: TIMESTAMP&lt;br&gt;published_at: TIMESTAMP&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#FFE0B2;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="720" y="520" width="300" height="400" as="geometry" />
-        </mxCell>
-        
-        <!-- Table publication_platforms -->
-        <mxCell id="publication_platforms" value="&lt;b&gt;publication_platforms&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;publication_id: UUID (FK → publications.id)&lt;br&gt;platform: VARCHAR(50) ['facebook', 'instagram', 'linkedin', 'website']&lt;br&gt;platform_post_id: VARCHAR(255)&lt;br&gt;status: VARCHAR(20) ['pending', 'published', 'failed']&lt;br&gt;error_message: TEXT&lt;br&gt;published_at: TIMESTAMP&lt;br&gt;metrics: JSONB&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;&lt;br&gt;UNIQUE(publication_id, platform)" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#FFE0B2;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="1060" y="520" width="300" height="220" as="geometry" />
-        </mxCell>
-        
-        <!-- Table messages -->
-        <mxCell id="messages" value="&lt;b&gt;messages&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;first_name: VARCHAR(100)&lt;br&gt;last_name: VARCHAR(100)&lt;br&gt;email: VARCHAR(255)&lt;br&gt;phone: VARCHAR(20)&lt;br&gt;company: VARCHAR(255)&lt;br&gt;subject: VARCHAR(500)&lt;br&gt;message: TEXT&lt;br&gt;status: VARCHAR(20) ['new', 'read', 'replied', 'archived']&lt;br&gt;priority: VARCHAR(10) ['low', 'medium', 'high']&lt;br&gt;source: VARCHAR(20) ['website', 'email', 'phone', 'other']&lt;br&gt;tags: JSONB&lt;br&gt;ip_address: INET&lt;br&gt;user_agent: TEXT&lt;br&gt;referrer: TEXT&lt;br&gt;assigned_to: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;read_at: TIMESTAMP&lt;br&gt;replied_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#FFEBEE;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="720" y="960" width="300" height="360" as="geometry" />
-        </mxCell>
-        
-        <!-- Table message_replies -->
-        <mxCell id="message_replies" value="&lt;b&gt;message_replies&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;message_id: UUID (FK → messages.id)&lt;br&gt;content: TEXT&lt;br&gt;is_from_customer: BOOLEAN&lt;br&gt;author_id: UUID (FK → users.id)&lt;br&gt;author_name: VARCHAR(255)&lt;br&gt;attachments: JSONB&lt;br&gt;created_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#FFEBEE;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="1060" y="960" width="300" height="160" as="geometry" />
-        </mxCell>
-        
-        <!-- Tables supplémentaires suggérées -->
-        
-        <!-- Table announcements -->
-        <mxCell id="announcements" value="&lt;b&gt;announcements&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;title: VARCHAR(255)&lt;br&gt;summary: VARCHAR(500)&lt;br&gt;content: TEXT&lt;br&gt;type: VARCHAR(50) ['feature', 'update', 'maintenance', 'security', 'announcement']&lt;br&gt;priority: VARCHAR(20) ['low', 'medium', 'high', 'critical']&lt;br&gt;status: VARCHAR(20) ['draft', 'scheduled', 'published', 'archived']&lt;br&gt;version: VARCHAR(50)&lt;br&gt;target_audience: TEXT[]&lt;br&gt;is_pinned: BOOLEAN&lt;br&gt;send_notification: BOOLEAN&lt;br&gt;views: INTEGER&lt;br&gt;scheduled_at: TIMESTAMP&lt;br&gt;published_at: TIMESTAMP&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#FFF3E0;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="1400" y="40" width="320" height="300" as="geometry" />
-        </mxCell>
-        
-        <!-- Table emails -->
-        <mxCell id="emails" value="&lt;b&gt;emails&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;subject: VARCHAR(500)&lt;br&gt;from_email: VARCHAR(255)&lt;br&gt;to_email: VARCHAR(255)&lt;br&gt;date: TIMESTAMP&lt;br&gt;message_id: VARCHAR(255)&lt;br&gt;has_attachments: BOOLEAN&lt;br&gt;category_id: UUID (FK → email_categories.id)&lt;br&gt;user_id: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E3F2FD;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="1400" y="380" width="280" height="200" as="geometry" />
-        </mxCell>
-        
-        <!-- Table email_categories -->
-        <mxCell id="email_categories" value="&lt;b&gt;email_categories&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;name: VARCHAR(200)&lt;br&gt;download_attachments: BOOLEAN&lt;br&gt;user_id: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E3F2FD;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="1720" y="380" width="260" height="120" as="geometry" />
-        </mxCell>
-        
-        <!-- Table email_attachments -->
-        <mxCell id="email_attachments" value="&lt;b&gt;email_attachments&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;email_id: UUID (FK → emails.id)&lt;br&gt;filename: VARCHAR(255)&lt;br&gt;original_name: VARCHAR(255)&lt;br&gt;mime_type: VARCHAR(100)&lt;br&gt;size: BIGINT&lt;br&gt;path: TEXT&lt;br&gt;analyzed: BOOLEAN&lt;br&gt;created_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E3F2FD;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="1400" y="620" width="280" height="180" as="geometry" />
-        </mxCell>
-        
-        <!-- Table orders -->
-        <mxCell id="orders" value="&lt;b&gt;orders&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;order_number: VARCHAR(50) UNIQUE&lt;br&gt;client_id: UUID (FK → clients.id)&lt;br&gt;quote_id: UUID (FK → quotes.id)&lt;br&gt;status: VARCHAR(20) ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']&lt;br&gt;payment_status: VARCHAR(20) ['pending', 'paid', 'partial', 'refunded']&lt;br&gt;total_ht: DECIMAL(10,2)&lt;br&gt;total_vat: DECIMAL(10,2)&lt;br&gt;total_ttc: DECIMAL(10,2)&lt;br&gt;shipping_address: JSONB&lt;br&gt;billing_address: JSONB&lt;br&gt;notes: TEXT&lt;br&gt;shipped_at: TIMESTAMP&lt;br&gt;delivered_at: TIMESTAMP&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#F1F8E9;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="720" y="1360" width="300" height="300" as="geometry" />
-        </mxCell>
-        
-        <!-- Table order_items -->
-        <mxCell id="order_items" value="&lt;b&gt;order_items&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;order_id: UUID (FK → orders.id)&lt;br&gt;product_id: UUID (FK → products.id)&lt;br&gt;description: VARCHAR(500)&lt;br&gt;quantity: DECIMAL(10,3)&lt;br&gt;unit_price_ht: DECIMAL(10,2)&lt;br&gt;vat_rate: DECIMAL(5,2)&lt;br&gt;total_ht: DECIMAL(10,2) COMPUTED&lt;br&gt;total_vat: DECIMAL(10,2) COMPUTED&lt;br&gt;total_ttc: DECIMAL(10,2) COMPUTED&lt;br&gt;created_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#F1F8E9;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="1060" y="1360" width="300" height="200" as="geometry" />
-        </mxCell>
-        
-        <!-- Relations (Edges) -->
-        
-        <!-- users → refresh_tokens -->
-        <mxCell id="rel_users_refresh_tokens" edge="1" parent="1" source="users" target="refresh_tokens">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → clients (created_by) -->
-        <mxCell id="rel_users_clients" edge="1" parent="1" source="users" target="clients">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → contact_messages (assigned_to) -->
-        <mxCell id="rel_users_contact_messages" edge="1" parent="1" source="users" target="contact_messages">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- clients → contact_messages -->
-        <mxCell id="rel_clients_contact_messages" edge="1" parent="1" source="clients" target="contact_messages">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → products (created_by) -->
-        <mxCell id="rel_users_products" edge="1" parent="1" source="users" target="products">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- clients → quotes -->
-        <mxCell id="rel_clients_quotes" edge="1" parent="1" source="clients" target="quotes">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → quotes (created_by) -->
-        <mxCell id="rel_users_quotes" edge="1" parent="1" source="users" target="quotes">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- quotes → quote_items -->
-        <mxCell id="rel_quotes_quote_items" edge="1" parent="1" source="quotes" target="quote_items">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- products → quote_items -->
-        <mxCell id="rel_products_quote_items" edge="1" parent="1" source="products" target="quote_items">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- quotes → invoices -->
-        <mxCell id="rel_quotes_invoices" edge="1" parent="1" source="quotes" target="invoices">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- clients → invoices -->
-        <mxCell id="rel_clients_invoices" edge="1" parent="1" source="clients" target="invoices">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → invoices (created_by) -->
-        <mxCell id="rel_users_invoices" edge="1" parent="1" source="users" target="invoices">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- invoices → invoice_items -->
-        <mxCell id="rel_invoices_invoice_items" edge="1" parent="1" source="invoices" target="invoice_items">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- products → invoice_items -->
-        <mxCell id="rel_products_invoice_items" edge="1" parent="1" source="products" target="invoice_items">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → publications (created_by) -->
-        <mxCell id="rel_users_publications" edge="1" parent="1" source="users" target="publications">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- publications → publication_platforms -->
-        <mxCell id="rel_publications_platforms" edge="1" parent="1" source="publications" target="publication_platforms">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → messages (assigned_to) -->
-        <mxCell id="rel_users_messages" edge="1" parent="1" source="users" target="messages">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- messages → message_replies -->
-        <mxCell id="rel_messages_replies" edge="1" parent="1" source="messages" target="message_replies">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → message_replies (author_id) -->
-        <mxCell id="rel_users_message_replies" edge="1" parent="1" source="users" target="message_replies">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → announcements (created_by) -->
-        <mxCell id="rel_users_announcements" edge="1" parent="1" source="users" target="announcements">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → emails -->
-        <mxCell id="rel_users_emails" edge="1" parent="1" source="users" target="emails">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- email_categories → emails -->
-        <mxCell id="rel_categories_emails" edge="1" parent="1" source="email_categories" target="emails">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → email_categories -->
-        <mxCell id="rel_users_email_categories" edge="1" parent="1" source="users" target="email_categories">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- emails → email_attachments -->
-        <mxCell id="rel_emails_attachments" edge="1" parent="1" source="emails" target="email_attachments">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- clients → orders -->
-        <mxCell id="rel_clients_orders" edge="1" parent="1" source="clients" target="orders">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- quotes → orders -->
-        <mxCell id="rel_quotes_orders" edge="1" parent="1" source="quotes" target="orders">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- users → orders (created_by) -->
-        <mxCell id="rel_users_orders" edge="1" parent="1" source="users" target="orders">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- orders → order_items -->
-        <mxCell id="rel_orders_order_items" edge="1" parent="1" source="orders" target="order_items">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- products → order_items -->
-        <mxCell id="rel_products_order_items" edge="1" parent="1" source="products" target="order_items">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        
-        <!-- Titre du diagramme -->
-        <mxCell id="title" value="&lt;h1&gt;JEROKA DASHBOARD - SCHÉMA DE BASE DE DONNÉES&lt;/h1&gt;&lt;br&gt;&lt;i&gt;Architecture complète avec toutes les entités métier&lt;/i&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="40" y="0" width="600" height="30" as="geometry" />
-        </mxCell>
-        
-        <!-- Légende des couleurs -->
-        <mxCell id="legend" value="&lt;b&gt;LÉGENDE&lt;/b&gt;&lt;hr&gt;&lt;font color='#003366'&gt;🔵 Authentification&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🟦 CRM (Clients)&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🟨 Catalogue Produits&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🟪 Devis&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🟩 Facturation&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🟧 Publications&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🟥 Messagerie&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🟤 Annonces&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;⚪ Emails&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🍃 Commandes&lt;/font&gt;" style="text;html=1;strokeColor=#003366;fillColor=#F5F5F5;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#003366;" vertex="1" parent="1">
-          <mxGeometry x="1400" y="840" width="200" height="200" as="geometry" />
-        </mxCell>
-        
-      </root>
-    </mxGraphModel>
-  </diagram>
+<mxfile host="65bd71144e">
+    <diagram name="Jeroka Database Schema" id="e7e014a7-5840-1c2e-5031-d8a4daf1dd37">
+        <mxGraphModel dx="6189" dy="6761" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" background="none" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="&lt;b&gt;companies&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;name: VARCHAR(255)&lt;br&gt;legal_name: VARCHAR(255)&lt;br&gt;siret: VARCHAR(14) UNIQUE&lt;br&gt;vat_number: VARCHAR(50)&lt;br&gt;address_line1: VARCHAR(255)&lt;br&gt;address_line2: VARCHAR(255)&lt;br&gt;city: VARCHAR(100)&lt;br&gt;postal_code: VARCHAR(20)&lt;br&gt;country: VARCHAR(100)&lt;br&gt;phone: VARCHAR(20)&lt;br&gt;email: VARCHAR(255)&lt;br&gt;website: VARCHAR(255)&lt;br&gt;logo_url: TEXT&lt;br&gt;description: TEXT&lt;br&gt;industry: VARCHAR(100)&lt;br&gt;size: VARCHAR(50)&lt;br&gt;status: VARCHAR(20) ['active', 'inactive', 'suspended']&lt;br&gt;subscription_plan: VARCHAR(50) ['free', 'basic', 'premium', 'enterprise']&lt;br&gt;subscription_expires_at: TIMESTAMP&lt;br&gt;max_users: INTEGER&lt;br&gt;max_clients: INTEGER&lt;br&gt;max_storage_mb: INTEGER&lt;br&gt;settings: JSONB&lt;br&gt;billing_info: JSONB&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#FF6B35;fillColor=#FFE5E5;fontColor=#FF6B35;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="-40" width="320" height="500" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="&lt;b&gt;users&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;company_id: UUID (FK → companies.id)&lt;br&gt;email: VARCHAR(255)&lt;br&gt;password_hash: VARCHAR(255)&lt;br&gt;first_name: VARCHAR(100)&lt;br&gt;last_name: VARCHAR(100)&lt;br&gt;phone: VARCHAR(20)&lt;br&gt;avatar_url: TEXT&lt;br&gt;role: VARCHAR(50) ['admin', 'manager', 'user', 'viewer']&lt;br&gt;is_active: BOOLEAN&lt;br&gt;is_company_admin: BOOLEAN&lt;br&gt;last_login: TIMESTAMP&lt;br&gt;email_verified: BOOLEAN&lt;br&gt;email_verification_token: VARCHAR(255)&lt;br&gt;password_reset_token: VARCHAR(255)&lt;br&gt;password_reset_expires: TIMESTAMP&lt;br&gt;permissions: JSONB&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;&lt;br&gt;UNIQUE(company_id, email)" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#D4E1F5;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="-490" width="300" height="350" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="&lt;b&gt;refresh_tokens&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;user_id: UUID (FK → users.id)&lt;br&gt;token_hash: VARCHAR(255)&lt;br&gt;expires_at: TIMESTAMP&lt;br&gt;is_revoked: BOOLEAN&lt;br&gt;created_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#D4E1F5;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="440" y="-360" width="280" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="&lt;b&gt;clients&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;company_id: UUID (FK → companies.id)&lt;br&gt;type: VARCHAR(20) ['individual', 'company']&lt;br&gt;first_name: VARCHAR(100)&lt;br&gt;last_name: VARCHAR(100)&lt;br&gt;company_name: VARCHAR(200)&lt;br&gt;email: VARCHAR(255)&lt;br&gt;phone: VARCHAR(20)&lt;br&gt;mobile: VARCHAR(20)&lt;br&gt;address_line1: VARCHAR(255)&lt;br&gt;address_line2: VARCHAR(255)&lt;br&gt;city: VARCHAR(100)&lt;br&gt;postal_code: VARCHAR(20)&lt;br&gt;country: VARCHAR(100)&lt;br&gt;siret: VARCHAR(14)&lt;br&gt;vat_number: VARCHAR(50)&lt;br&gt;website: VARCHAR(255)&lt;br&gt;notes: TEXT&lt;br&gt;avatar_url: TEXT&lt;br&gt;status: VARCHAR(20) ['active', 'inactive', 'prospect']&lt;br&gt;source: VARCHAR(50)&lt;br&gt;tags: TEXT[]&lt;br&gt;custom_fields: JSONB&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;&lt;br&gt;UNIQUE(company_id, email)" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E1F5FE;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="-590" y="570" width="320" height="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="&lt;b&gt;contact_messages&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;company_id: UUID (FK → companies.id)&lt;br&gt;name: VARCHAR(200)&lt;br&gt;email: VARCHAR(255)&lt;br&gt;phone: VARCHAR(20)&lt;br&gt;company: VARCHAR(200)&lt;br&gt;subject: VARCHAR(500)&lt;br&gt;message: TEXT&lt;br&gt;type: VARCHAR(50) ['devis', 'information', 'partnership', 'support', 'other']&lt;br&gt;status: VARCHAR(20) ['unread', 'read', 'replied', 'archived']&lt;br&gt;priority: VARCHAR(20) ['low', 'normal', 'high', 'urgent']&lt;br&gt;assigned_to: UUID (FK → users.id)&lt;br&gt;client_id: UUID (FK → clients.id)&lt;br&gt;ip_address: INET&lt;br&gt;user_agent: TEXT&lt;br&gt;source: VARCHAR(100)&lt;br&gt;tags: TEXT[]&lt;br&gt;replied_at: TIMESTAMP&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E1F5FE;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="-870" y="180" width="320" height="350" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="&lt;b&gt;products&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;company_id: UUID (FK → companies.id)&lt;br&gt;name: VARCHAR(255)&lt;br&gt;description: TEXT&lt;br&gt;short_description: VARCHAR(500)&lt;br&gt;sku: VARCHAR(100)&lt;br&gt;category: VARCHAR(100)&lt;br&gt;subcategory: VARCHAR(100)&lt;br&gt;price_ht: DECIMAL(10,2)&lt;br&gt;vat_rate: DECIMAL(5,2)&lt;br&gt;price_ttc: DECIMAL(10,2) COMPUTED&lt;br&gt;cost_price: DECIMAL(10,2)&lt;br&gt;stock_quantity: INTEGER&lt;br&gt;min_stock_level: INTEGER&lt;br&gt;max_stock_level: INTEGER&lt;br&gt;unit: VARCHAR(20)&lt;br&gt;weight: DECIMAL(8,3)&lt;br&gt;dimensions: JSONB&lt;br&gt;images: TEXT[]&lt;br&gt;is_active: BOOLEAN&lt;br&gt;is_digital: BOOLEAN&lt;br&gt;meta_title: VARCHAR(255)&lt;br&gt;meta_description: TEXT&lt;br&gt;tags: TEXT[]&lt;br&gt;custom_fields: JSONB&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;&lt;br&gt;UNIQUE(company_id, sku)" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#FFF9C4;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="630" width="300" height="460" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="&lt;b&gt;quotes&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;company_id: UUID (FK → companies.id)&lt;br&gt;quote_number: VARCHAR(50)&lt;br&gt;client_id: UUID (FK → clients.id)&lt;br&gt;status: VARCHAR(20) ['draft', 'sent', 'accepted', 'rejected', 'expired']&lt;br&gt;title: VARCHAR(255)&lt;br&gt;description: TEXT&lt;br&gt;subtotal_ht: DECIMAL(10,2)&lt;br&gt;discount_percent: DECIMAL(5,2)&lt;br&gt;discount_amount: DECIMAL(10,2)&lt;br&gt;total_ht: DECIMAL(10,2)&lt;br&gt;total_vat: DECIMAL(10,2)&lt;br&gt;total_ttc: DECIMAL(10,2)&lt;br&gt;valid_until: DATE&lt;br&gt;notes: TEXT&lt;br&gt;terms_conditions: TEXT&lt;br&gt;payment_terms: VARCHAR(255)&lt;br&gt;delivery_delay: VARCHAR(255)&lt;br&gt;sent_at: TIMESTAMP&lt;br&gt;accepted_at: TIMESTAMP&lt;br&gt;rejected_at: TIMESTAMP&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;&lt;br&gt;UNIQUE(company_id, quote_number)" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#F3E5F5;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="-450" y="1040" width="320" height="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="&lt;b&gt;quote_items&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;quote_id: UUID (FK → quotes.id)&lt;br&gt;product_id: UUID (FK → products.id)&lt;br&gt;description: VARCHAR(500)&lt;br&gt;quantity: DECIMAL(10,3)&lt;br&gt;unit: VARCHAR(20)&lt;br&gt;unit_price_ht: DECIMAL(10,2)&lt;br&gt;discount_percent: DECIMAL(5,2)&lt;br&gt;vat_rate: DECIMAL(5,2)&lt;br&gt;total_ht: DECIMAL(10,2) COMPUTED&lt;br&gt;total_vat: DECIMAL(10,2) COMPUTED&lt;br&gt;total_ttc: DECIMAL(10,2) COMPUTED&lt;br&gt;sort_order: INTEGER&lt;br&gt;created_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#F3E5F5;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="1420" width="300" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="&lt;b&gt;invoices&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;company_id: UUID (FK → companies.id)&lt;br&gt;invoice_number: VARCHAR(50)&lt;br&gt;quote_id: UUID (FK → quotes.id)&lt;br&gt;client_id: UUID (FK → clients.id)&lt;br&gt;status: VARCHAR(20) ['draft', 'sent', 'paid', 'overdue', 'cancelled']&lt;br&gt;type: VARCHAR(20) ['invoice', 'credit_note', 'proforma']&lt;br&gt;title: VARCHAR(255)&lt;br&gt;description: TEXT&lt;br&gt;subtotal_ht: DECIMAL(10,2)&lt;br&gt;discount_percent: DECIMAL(5,2)&lt;br&gt;discount_amount: DECIMAL(10,2)&lt;br&gt;total_ht: DECIMAL(10,2)&lt;br&gt;total_vat: DECIMAL(10,2)&lt;br&gt;total_ttc: DECIMAL(10,2)&lt;br&gt;amount_paid: DECIMAL(10,2)&lt;br&gt;amount_due: DECIMAL(10,2) COMPUTED&lt;br&gt;issue_date: DATE&lt;br&gt;due_date: DATE&lt;br&gt;payment_terms: VARCHAR(255)&lt;br&gt;payment_method: VARCHAR(50)&lt;br&gt;bank_details: TEXT&lt;br&gt;notes: TEXT&lt;br&gt;sent_at: TIMESTAMP&lt;br&gt;paid_at: TIMESTAMP&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;&lt;br&gt;UNIQUE(company_id, invoice_number)" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E8F5E8;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="480" y="1230" width="320" height="480" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="&lt;b&gt;invoice_items&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;invoice_id: UUID (FK → invoices.id)&lt;br&gt;product_id: UUID (FK → products.id)&lt;br&gt;description: VARCHAR(500)&lt;br&gt;quantity: DECIMAL(10,3)&lt;br&gt;unit: VARCHAR(20)&lt;br&gt;unit_price_ht: DECIMAL(10,2)&lt;br&gt;discount_percent: DECIMAL(5,2)&lt;br&gt;vat_rate: DECIMAL(5,2)&lt;br&gt;total_ht: DECIMAL(10,2) COMPUTED&lt;br&gt;total_vat: DECIMAL(10,2) COMPUTED&lt;br&gt;total_ttc: DECIMAL(10,2) COMPUTED&lt;br&gt;sort_order: INTEGER&lt;br&gt;created_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E8F5E8;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="520" y="730" width="300" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="&lt;b&gt;publications&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;company_id: UUID (FK → companies.id)&lt;br&gt;title: VARCHAR(255)&lt;br&gt;content: TEXT&lt;br&gt;excerpt: VARCHAR(500)&lt;br&gt;featured_image: TEXT&lt;br&gt;images: TEXT[]&lt;br&gt;hashtags: TEXT[]&lt;br&gt;type: VARCHAR(50) ['standard', 'promotion', 'event', 'announcement', 'tutorial']&lt;br&gt;status: VARCHAR(20) ['draft', 'scheduled', 'published', 'archived']&lt;br&gt;category: VARCHAR(100)&lt;br&gt;tags: TEXT[]&lt;br&gt;seo_title: VARCHAR(255)&lt;br&gt;seo_description: TEXT&lt;br&gt;seo_keywords: TEXT[]&lt;br&gt;slug: VARCHAR(255)&lt;br&gt;view_count: INTEGER&lt;br&gt;like_count: INTEGER&lt;br&gt;share_count: INTEGER&lt;br&gt;scheduled_at: TIMESTAMP&lt;br&gt;published_at: TIMESTAMP&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;&lt;br&gt;UNIQUE(company_id, slug)" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#FFE0B2;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="-530" y="-140" width="300" height="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="&lt;b&gt;publication_platforms&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;publication_id: UUID (FK → publications.id)&lt;br&gt;platform: VARCHAR(50) ['facebook', 'instagram', 'linkedin', 'website']&lt;br&gt;platform_post_id: VARCHAR(255)&lt;br&gt;status: VARCHAR(20) ['pending', 'published', 'failed']&lt;br&gt;error_message: TEXT&lt;br&gt;published_at: TIMESTAMP&lt;br&gt;metrics: JSONB&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;&lt;br&gt;UNIQUE(publication_id, platform)" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#FFE0B2;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="-900" y="-100" width="300" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="&lt;b&gt;messages&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;company_id: UUID (FK → companies.id)&lt;br&gt;first_name: VARCHAR(100)&lt;br&gt;last_name: VARCHAR(100)&lt;br&gt;email: VARCHAR(255)&lt;br&gt;phone: VARCHAR(20)&lt;br&gt;company: VARCHAR(255)&lt;br&gt;subject: VARCHAR(500)&lt;br&gt;message: TEXT&lt;br&gt;reponseIA: TEXT&lt;br&gt;status: VARCHAR(20) ['new', 'read', 'replied', 'archived']&lt;br&gt;priority: VARCHAR(10) ['low', 'medium', 'high']&lt;br&gt;source: VARCHAR(20) ['website', 'email', 'phone', 'other']&lt;br&gt;tags: JSONB&lt;br&gt;ip_address: INET&lt;br&gt;user_agent: TEXT&lt;br&gt;referrer: TEXT&lt;br&gt;assigned_to: UUID (FK → users.id)&lt;br&gt;client_id: UUID (FK → clients.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;read_at: TIMESTAMP&lt;br&gt;replied_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#FFEBEE;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="530" y="210" width="300" height="360" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="&lt;b&gt;message_replies&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;message_id: UUID (FK → messages.id)&lt;br&gt;content: TEXT&lt;br&gt;is_from_customer: BOOLEAN&lt;br&gt;author_id: UUID (FK → users.id)&lt;br&gt;author_name: VARCHAR(255)&lt;br&gt;attachments: JSONB&lt;br&gt;created_at: TIMESTAMP" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#FFEBEE;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="900" y="310" width="300" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="&lt;b&gt;availability_rules&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;company_id: UUID (FK → companies.id)&lt;br&gt;day_of_week: INTEGER [0-6]&lt;br&gt;start_time: TIME&lt;br&gt;end_time: TIME&lt;br&gt;is_active: BOOLEAN&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;&lt;br&gt;UNIQUE(company_id, day_of_week)" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E8F5E8;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="-240" y="-440" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="&lt;b&gt;appointments&lt;/b&gt;&lt;hr&gt;id: UUID (PK)&lt;br&gt;company_id: UUID (FK → companies.id)&lt;br&gt;date: DATE&lt;br&gt;start_time: TIME&lt;br&gt;end_time: TIME&lt;br&gt;client_name: VARCHAR(200)&lt;br&gt;client_email: VARCHAR(255)&lt;br&gt;client_phone: VARCHAR(20)&lt;br&gt;notes: TEXT&lt;br&gt;status: VARCHAR(20) ['pending', 'confirmed', 'cancelled', 'completed', 'no_show']&lt;br&gt;google_event_id: VARCHAR(255)&lt;br&gt;reminder_sent: BOOLEAN&lt;br&gt;reminder_sent_at: TIMESTAMP&lt;br&gt;created_by: UUID (FK → users.id)&lt;br&gt;created_at: TIMESTAMP&lt;br&gt;updated_at: TIMESTAMP&lt;br&gt;&lt;br&gt;UNIQUE(company_id, date, start_time)" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;strokeColor=#003366;fillColor=#E8F5E8;fontColor=#003366;" parent="1" vertex="1">
+                    <mxGeometry x="-580" y="-490" width="300" height="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" parent="1" source="2" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" parent="1" source="2" target="5" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" parent="1" source="2" target="6" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" parent="1" source="2" target="7" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" parent="1" source="2" target="8" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" parent="1" source="2" target="10" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" parent="1" source="2" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" parent="1" source="2" target="14" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" parent="1" source="2" target="16" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" parent="1" source="2" target="17" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" parent="1" source="3" target="4" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" parent="1" source="5" target="6" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" parent="1" source="5" target="8" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" parent="1" source="8" target="9" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" parent="1" source="7" target="9" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" parent="1" source="8" target="10" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" parent="1" source="5" target="10" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" parent="1" source="10" target="11" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" parent="1" source="7" target="11" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" parent="1" source="12" target="13" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="45" parent="1" source="5" target="14" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" parent="1" source="14" target="15" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="50" value="&lt;h1&gt;JEROKA DASHBOARD - SCHÉMA MULTI-TENANT&lt;/h1&gt;&lt;br&gt;&lt;i&gt;Architecture avec entreprises et isolation des données&lt;/i&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#FF6B35;" parent="1" vertex="1">
+                    <mxGeometry x="910" y="-360" width="600" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" value="&lt;b&gt;LÉGENDE MULTI-TENANT&lt;/b&gt;&lt;hr&gt;&lt;font color='#FF6B35'&gt;�� Entreprises (Central)&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🔵 Authentification&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;�� CRM (Clients)&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🟨 Catalogue Produits&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🟪 Devis&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🟩 Facturation&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;�� Publications&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;�� Messagerie&lt;/font&gt;&lt;br&gt;&lt;font color='#003366'&gt;🟤 Rendez-vous&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;ISOLATION DES DONNÉES&lt;/b&gt;&lt;br&gt;• Toutes les tables liées à company_id&lt;br&gt;• Contraintes uniques par entreprise&lt;br&gt;• Permissions par entreprise&lt;br&gt;• Multi-tenant sécurisé" style="text;html=1;strokeColor=#FF6B35;fillColor=#FFF5F5;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#FF6B35;" parent="1" vertex="1">
+                    <mxGeometry x="720" y="-180" width="300" height="300" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
 </mxfile>

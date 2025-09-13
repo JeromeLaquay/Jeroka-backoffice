@@ -28,8 +28,8 @@ Ce dossier contient tous les services pour interagir avec l'API backend. Chaque 
 
 ```typescript
 // Import d'un service spécifique
-import { userService } from '@/services/users'
-import { productService } from '@/services/products'
+import { userService } from './services/users'
+import { productService } from './services/products'
 
 // Import de tous les services
 import { 
@@ -37,7 +37,7 @@ import {
   productService, 
   invoiceService, 
   quoteService 
-} from '@/services'
+} from './services'
 ```
 
 ### Exemples d'utilisation
@@ -45,7 +45,7 @@ import {
 #### Gestion des utilisateurs
 
 ```typescript
-import { userService } from '@/services/users'
+import { userService } from './services/users'
 
 // Récupérer la liste des utilisateurs
 const response = await userService.getUsers({ page: 1, limit: 10 })
@@ -75,7 +75,7 @@ await userService.updateUserStatus('1', false)
 #### Gestion des produits
 
 ```typescript
-import { productService } from '@/services/products'
+import { productService } from './services/products'
 
 // Récupérer les produits
 const products = await productService.getProducts({ 
@@ -101,7 +101,7 @@ await productService.setStock('1', 15) // Définir le stock à 15
 #### Gestion des factures
 
 ```typescript
-import { invoiceService } from '@/services/invoices'
+import { invoiceService } from './services/invoices'
 
 // Récupérer les factures
 const invoices = await invoiceService.getInvoices({ 
@@ -131,7 +131,7 @@ await invoiceService.markAsPaid('1')
 #### Gestion des devis
 
 ```typescript
-import { quoteService } from '@/services/quotes'
+import { quoteService } from './services/quotes'
 
 // Récupérer les devis
 const quotes = await quoteService.getQuotes({ 
@@ -228,7 +228,7 @@ import type {
   Quote,
   CreateUserRequest,
   UpdateProductRequest 
-} from '@/services'
+} from './services'
 ```
 
 ## Exemple complet

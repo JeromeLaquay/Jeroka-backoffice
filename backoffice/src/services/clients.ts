@@ -3,31 +3,31 @@ import { apiService } from './api'
 export interface Client {
   id: string
   type: 'individual' | 'company'
-  firstName: string
-  lastName: string
-  companyName?: string
+  first_name: string
+  last_name: string
+  company_name?: string
   name: string // Nom complet formaté
   company?: string
   email: string
   phone?: string
   mobile?: string
   website?: string
-  address: {
-    line1?: string
-    line2?: string
-    city?: string
-    postalCode?: string
-    country?: string
-  }
+  address_line1?: string
+  address_line2?: string
+  city?: string
+  postal_code?: string
+  country?: string
   siret?: string
-  vatNumber?: string
+  vat_number?: string
   notes?: string
-  avatarUrl?: string
+  avatar_url?: string
   status: 'active' | 'inactive' | 'prospect'
   source?: string
   tags?: string[]
-  createdAt: string
-  updatedAt: string
+  created_at: string
+  updated_at: string
+  company_id: string
+  custom_fields?: Record<string, any>
 }
 
 export interface CreateClientRequest {

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { createError } from '@/middleware/errorHandler';
+import { createError } from './errorHandler';
 
 // Validation middleware factory
 export const validate = (schema: {
@@ -104,7 +104,8 @@ export const userSchemas = {
       .messages({ 'any.only': 'Les mots de passe ne correspondent pas' }),
     firstName: Joi.string().min(2).max(100).required(),
     lastName: Joi.string().min(2).max(100).required(),
-    phone: commonSchemas.phone.optional()
+    phone: commonSchemas.phone.optional(),
+    companyId: "11111111-1111-1111-1111-111111111111"
   }),
 
   login: Joi.object({

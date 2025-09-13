@@ -189,7 +189,7 @@
 import { ref, reactive } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { PlusIcon } from '@heroicons/vue/24/outline'
-import { accountingService, type CreateTransactionRequest } from '@/services/accounting'
+import { accountingService, type CreateTransactionRequest } from './services/accounting'
 
 interface Props {
   show: boolean

@@ -63,7 +63,7 @@ services:
       LOG_LEVEL: debug
       
     volumes:
-      - .:/app
+      # - .:/app  # ← Commenter cette ligne
       - /app/node_modules
       - uploads_dev_data:/app/uploads
       - logs_dev_data:/app/logs
@@ -74,7 +74,7 @@ services:
     depends_on:
       postgres-dev:
         condition: service_healthy
-    command: npm run dev
+    # command: npm run start
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/health"]
       interval: 30s

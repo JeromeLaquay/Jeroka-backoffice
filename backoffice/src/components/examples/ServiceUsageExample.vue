@@ -87,7 +87,7 @@ import {
   type Product,
   type Invoice,
   type Quote
-} from '@/services'
+} from './services'
 
 // État réactif
 const users = ref<User[]>([])

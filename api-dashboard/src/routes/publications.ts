@@ -1,10 +1,11 @@
 import { Router, Request, Response } from 'express';
-import { verifyToken } from '@/middleware/auth';
+import { verifyToken, AuthRequest } from '../middleware/auth';
 import { query, body, param, validationResult } from 'express-validator';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 // import OpenAI from 'openai';
+import { PublicationService } from '../services/publicationService';
 
 const router = Router();
 
@@ -119,7 +120,7 @@ router.get('/', [
   query('type').optional().isIn(['standard', 'promotion', 'event', 'announcement', 'tutorial']),
   query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
   query('offset').optional().isInt({ min: 0 }).toInt()
-], async (req: Request, res: Response) => {
+], async (req: AuthRequest, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -130,49 +131,9 @@ router.get('/', [
       });
     }
 
-    const { search, status, platform, category, type, limit = 20, offset = 0 } = req.query;
-    let filteredPublications = [...publications];
-
-    // Filtrage
-    if (search) {
-      const searchTerm = (search as string).toLowerCase();
-      filteredPublications = filteredPublications.filter(pub => 
-        pub.title.toLowerCase().includes(searchTerm) ||
-        pub.content.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    if (status) {
-      filteredPublications = filteredPublications.filter(pub => pub.status === status);
-    }
-
-    if (platform) {
-      filteredPublications = filteredPublications.filter(pub => 
-        pub.platforms.includes(platform as string)
-      );
-    }
-
-    if (category) {
-      filteredPublications = filteredPublications.filter(pub => pub.category === category);
-    }
-
-    if (type) {
-      filteredPublications = filteredPublications.filter(pub => pub.type === type);
-    }
-
-    const total = filteredPublications.length;
-    const paginatedPublications = filteredPublications.slice(offset as number, (offset as number) + (limit as number));
-
-    return res.json({
-      success: true,
-      data: {
-        publications: paginatedPublications,
-        total,
-        page: Math.floor((offset as number) / (limit as number)) + 1,
-        limit,
-        hasMore: (offset as number) + (limit as number) < total
-      }
-    });
+    const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
+    const result = await PublicationService.list(companyId, req.query as any);
+    return res.json({ success: true, data: result });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -197,7 +158,7 @@ router.post('/', [
   body('platforms').isArray({ min: 1 }).withMessage('Au moins une plateforme est requise'),
   body('type').isIn(['standard', 'promotion', 'event', 'announcement', 'tutorial']),
   body('status').isIn(['draft', 'scheduled', 'published'])
-], async (req: Request, res: Response) => {
+], async (req: AuthRequest, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -208,35 +169,9 @@ router.post('/', [
       });
     }
 
-    const { title, content, hashtags, imageUrl, platforms, type, status, category, keywords, scheduledAt } = req.body;
-
-    const newPublication: Publication = {
-      id: `pub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      title,
-      content,
-      hashtags: hashtags || '',
-      imageUrl,
-      platforms,
-      type,
-      status,
-      category: category || '',
-      keywords: keywords || '',
-      createdAt: new Date().toISOString(),
-      scheduledAt: status === 'scheduled' ? scheduledAt : undefined,
-      publishedAt: status === 'published' ? new Date().toISOString() : undefined,
-      authorId: (req as any).user?.id || 'anonymous',
-      views: 0,
-      likes: 0,
-      shares: 0
-    };
-
-    publications.unshift(newPublication);
-
-    return res.status(201).json({
-      success: true,
-      message: 'Publication créée avec succès',
-      data: newPublication
-    });
+    const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
+    const created = await PublicationService.create(companyId, req.body);
+    return res.status(201).json({ success: true, message: 'Publication créée avec succès', data: created });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -255,22 +190,13 @@ router.post('/', [
  * @desc Get a specific publication
  * @access Private
  */
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const publication = publications.find(pub => pub.id === id);
-
-    if (!publication) {
-      return res.status(404).json({
-        success: false,
-        message: 'Publication non trouvée'
-      });
-    }
-
-    return res.json({
-      success: true,
-      data: publication
-    });
+    const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
+    const publication = await PublicationService.getById(companyId, id);
+    if (!publication) return res.status(404).json({ success: false, message: 'Publication non trouvée' });
+    return res.json({ success: true, data: publication });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -289,32 +215,13 @@ router.get('/:id', async (req: Request, res: Response) => {
  * @desc Update a publication
  * @access Private
  */
-router.put('/:id', async (req: Request, res: Response) => {
+router.put('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const publicationIndex = publications.findIndex(pub => pub.id === id);
-
-    if (publicationIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Publication non trouvée'
-      });
-    }
-
-    const currentPublication = publications[publicationIndex];
-    const updatedPublication: Publication = {
-      ...currentPublication,
-      ...req.body,
-      updatedAt: new Date().toISOString()
-    };
-
-    publications[publicationIndex] = updatedPublication;
-
-    return res.json({
-      success: true,
-      message: 'Publication mise à jour avec succès',
-      data: updatedPublication
-    });
+    const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
+    const updated = await PublicationService.update(companyId, id, req.body);
+    if (!updated) return res.status(404).json({ success: false, message: 'Publication non trouvée' });
+    return res.json({ success: true, message: 'Publication mise à jour avec succès', data: updated });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -333,24 +240,13 @@ router.put('/:id', async (req: Request, res: Response) => {
  * @desc Delete a publication
  * @access Private
  */
-router.delete('/:id', async (req: Request, res: Response) => {
+router.delete('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const publicationIndex = publications.findIndex(pub => pub.id === id);
-
-    if (publicationIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Publication non trouvée'
-      });
-    }
-
-    publications.splice(publicationIndex, 1);
-
-    return res.json({
-      success: true,
-      message: 'Publication supprimée avec succès'
-    });
+    const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
+    const ok = await PublicationService.remove(companyId, id);
+    if (!ok) return res.status(404).json({ success: false, message: 'Publication non trouvée' });
+    return res.json({ success: true, message: 'Publication supprimée avec succès' });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -369,28 +265,13 @@ router.delete('/:id', async (req: Request, res: Response) => {
  * @desc Publish a publication immediately
  * @access Private
  */
-router.post('/:id/publish', async (req: Request, res: Response) => {
+router.post('/:id/publish', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const publicationIndex = publications.findIndex(pub => pub.id === id);
-
-    if (publicationIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Publication non trouvée'
-      });
-    }
-
-    const publication = publications[publicationIndex];
-    publication.status = 'published';
-    publication.publishedAt = new Date().toISOString();
-    publication.updatedAt = new Date().toISOString();
-
-    return res.json({
-      success: true,
-      message: 'Publication publiée avec succès',
-      data: publication
-    });
+    const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
+    const published = await PublicationService.publish(companyId, id);
+    if (!published) return res.status(404).json({ success: false, message: 'Publication non trouvée' });
+    return res.json({ success: true, message: 'Publication publiée avec succès', data: published });
   } catch (error) {
     return res.status(500).json({
       success: false,

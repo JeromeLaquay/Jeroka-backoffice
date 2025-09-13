@@ -27,7 +27,7 @@
             {{ client.name }}
           </h1>
           <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ client.companyName || 'Client particulier' }}
+            {{ client.company_name || 'Client particulier' }}
           </p>
         </div>
       </div>
@@ -160,7 +160,7 @@
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600 dark:text-gray-400">Client depuis</span>
               <span class="text-sm text-gray-900 dark:text-gray-100">
-                {{ client.createdAt }}
+                {{ client.created_at }}
               </span>
             </div>
           </div>
@@ -179,7 +179,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ArrowLeftIcon } from '@heroicons/vue/24/outline'
-import { clientsService, type Client } from '@/services/clients'
+import { clientsService, type Client } from '../../services/clients'
 
 const route = useRoute()
 
@@ -206,14 +206,12 @@ const stats = ref({
 })
 
 const fullAddress = computed(() => {
-  if (!client.value?.address) return 'Non renseignée'
-  
-  const addr = client.value.address
+
   const parts = [
-    addr.line1,
-    addr.line2,
-    addr.postalCode && addr.city ? `${addr.postalCode} ${addr.city}` : addr.city,
-    addr.country
+    client.value?.address_line1,
+    client.value?.address_line2,
+    client.value?.postal_code && client.value?.city ? `${client.value?.postal_code} ${client.value?.city}` : client.value?.city,
+    client.value?.country
   ].filter(Boolean)
   
   return parts.join(', ') || 'Non renseignée'
@@ -230,6 +228,7 @@ const loadClientData = async () => {
     
     if (response.success) {
       client.value = response.data
+      console.log('client', client.value)
       
       // TODO: Charger les commandes récentes et stats depuis l'API
       // Pour l'instant on garde des données de simulation

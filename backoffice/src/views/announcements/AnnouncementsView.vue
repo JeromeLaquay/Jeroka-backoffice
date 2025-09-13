@@ -574,9 +574,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import announcementsService from '@/services/announcements'
-import type { Announcement } from '@/services/announcements'
+import { useAuthStore } from './stores/auth'
+import announcementsService from './services/announcements'
+import type { Announcement } from './services/announcements'
 
 const authStore = useAuthStore()
 

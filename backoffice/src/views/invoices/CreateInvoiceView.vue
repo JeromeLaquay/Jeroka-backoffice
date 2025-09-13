@@ -264,10 +264,10 @@ import {
   PlusIcon,
   DocumentTextIcon
 } from '@heroicons/vue/24/outline'
-import ClientSelector from '@/components/orders/ClientSelector.vue'
-import InvoiceItemRow from '@/components/invoices/InvoiceItemRow.vue'
-import InvoiceSummary from '@/components/invoices/InvoiceSummary.vue'
-import { invoiceService, type CreateInvoiceRequest, type Invoice } from '@/services/invoices'
+import ClientSelector from './components/orders/ClientSelector.vue'
+import InvoiceItemRow from './components/invoices/InvoiceItemRow.vue'
+import InvoiceSummary from './components/invoices/InvoiceSummary.vue'
+import { invoiceService, type CreateInvoiceRequest, type Invoice } from './services/invoices'
 
 const route = useRoute()
 const router = useRouter()
