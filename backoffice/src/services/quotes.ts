@@ -223,6 +223,23 @@ class QuoteService {
   }
 
   /**
+   * Télécharge le PDF d'un devis
+   */
+  async downloadQuotePdf(id: string): Promise<Blob> {
+    const response = await apiService.axiosInstance.get(`/quotes/${id}/pdf`, {
+      responseType: 'blob'
+    })
+    return response.data
+  }
+
+  /**
+   * Convertit un devis en facture
+   */
+  async convertToInvoice(id: string): Promise<ApiResponse> {
+    return await apiService.axiosInstance.post(`/quotes/${id}/convert-to-invoice`)
+  }
+
+  /**
    * Génère un numéro de devis unique
    */
   generateQuoteNumber(): string {

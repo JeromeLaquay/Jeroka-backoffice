@@ -374,7 +374,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import QuoteStatusBadge from '../../components/quotes/QuoteStatusBadge.vue'
 import DeleteConfirmModal from '../../components/common/DeleteConfirmModal.vue'
-import { quoteService } from './services/quotes'
+import { quoteService } from '../../services/quotes'
 import { debounce } from 'lodash-es'
 
 // Types
