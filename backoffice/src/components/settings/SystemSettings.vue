@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { CogIcon } from '@heroicons/vue/24/outline'
-import type { SystemSettings } from './services/settings'
+import type { SystemSettings } from '../../services/settings.ts'
 
 interface Props {
   settings: SystemSettings | null

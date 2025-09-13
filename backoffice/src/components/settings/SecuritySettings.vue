@@ -93,7 +93,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { settingsService, type UserProfile } from './services/settings'
+import { settingsService, type UserProfile } from '../../services/settings.ts'
 
 interface Props {
   profile: UserProfile | null
