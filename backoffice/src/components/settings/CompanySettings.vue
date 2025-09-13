@@ -287,7 +287,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
 import { BuildingOfficeIcon, PhotoIcon } from '@heroicons/vue/24/outline'
-import { settingsService, type CompanySettings } from './services/settings'
+import { settingsService, type CompanySettings } from '../../services/settings.ts'
 
 interface Props {
   settings: CompanySettings | null

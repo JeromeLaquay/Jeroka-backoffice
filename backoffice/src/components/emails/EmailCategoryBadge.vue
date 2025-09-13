@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { EmailCategory } from './services/emails'
+import type { EmailCategory } from '../../services/emails.ts'
 
 interface Props {
   category?: EmailCategory
