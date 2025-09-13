@@ -253,7 +253,7 @@ import {
   DocumentTextIcon
 } from '@heroicons/vue/24/outline'
 import QuoteStatusBadge from '../../components/quotes/QuoteStatusBadge.vue'
-import { quoteService, type Quote } from '../../services/quotes'
+import { quoteService, type Quote } from '../../services/quotes.ts'
 
 const route = useRoute()
 const router = useRouter()
