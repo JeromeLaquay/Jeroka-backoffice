@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8" data-cy="register-page">
     <div class="max-w-md w-full space-y-8">
       <div>
         <div class="mx-auto h-16 w-16 bg-primary-600 rounded-full flex items-center justify-center">
@@ -30,6 +30,7 @@
                 type="text"
                 autocomplete="given-name"
                 required
+                data-cy="first-name-input"
                 class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700"
                 placeholder="Jean"
               />
@@ -45,6 +46,7 @@
                 type="text"
                 autocomplete="family-name"
                 required
+                data-cy="last-name-input"
                 class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700"
                 placeholder="Dupont"
               />
@@ -63,6 +65,7 @@
               type="email"
               autocomplete="email"
               required
+              data-cy="register-email-input"
               class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700"
               placeholder="jean.dupont@entreprise.fr"
             />
@@ -97,6 +100,7 @@
                 :type="showPassword ? 'text' : 'password'"
                 autocomplete="new-password"
                 required
+                data-cy="register-password-input"
                 class="appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700"
                 placeholder="Minimum 8 caractères"
                 @input="validatePassword"
@@ -138,6 +142,7 @@
               type="password"
               autocomplete="new-password"
               required
+              data-cy="confirm-password-input"
               class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700"
               placeholder="Répétez votre mot de passe"
               :class="{'border-red-500': form.confirmPassword && !passwordsMatch}"
@@ -175,7 +180,7 @@
         </div>
 
         <!-- Messages d'erreur/succès -->
-        <div v-if="error" class="bg-danger-50 dark:bg-danger-900 border border-danger-200 dark:border-danger-700 rounded-md p-4">
+        <div v-if="error" data-cy="register-error-message" class="bg-danger-50 dark:bg-danger-900 border border-danger-200 dark:border-danger-700 rounded-md p-4">
           <div class="flex">
             <div class="flex-shrink-0">
               <ExclamationCircleIcon class="h-5 w-5 text-danger-400" />
@@ -202,6 +207,7 @@
           <button
             type="submit"
             :disabled="loading || !isFormValid"
+            data-cy="register-button"
             class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">

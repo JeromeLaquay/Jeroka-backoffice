@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="publications-page">
     <!-- Header -->
     <div class="sm:flex sm:items-center sm:justify-between">
       <div>
@@ -11,6 +11,7 @@
       <div class="mt-4 sm:mt-0 flex space-x-3">
         <button
           @click="openAIGenerationModal"
+          data-cy="ai-generation-button"
           class="btn-secondary inline-flex items-center"
         >
           <svg class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -20,6 +21,7 @@
         </button>
         <button
           @click="openCreateModal"
+          data-cy="create-publication-button"
           class="btn-primary inline-flex items-center"
         >
           <PlusIcon class="h-4 w-4 mr-2" />
@@ -121,11 +123,12 @@
             type="text"
             class="form-input"
             placeholder="Titre, contenu..."
+            data-cy="publication-search-input"
           />
         </div>
         <div>
           <label class="form-label">Statut</label>
-          <select v-model="statusFilter" class="form-input">
+          <select v-model="statusFilter" class="form-input" data-cy="status-filter">
             <option value="">Tous les statuts</option>
             <option value="draft">Brouillon</option>
             <option value="scheduled">Programmée</option>
@@ -134,12 +137,23 @@
         </div>
         <div>
           <label class="form-label">Plateforme</label>
-          <select v-model="platformFilter" class="form-input">
+          <select v-model="platformFilter" class="form-input" data-cy="platform-filter">
             <option value="">Toutes les plateformes</option>
             <option value="facebook">Facebook</option>
             <option value="instagram">Instagram</option>
             <option value="linkedin">LinkedIn</option>
             <option value="website">Site web</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Catégorie</label>
+          <select v-model="categoryFilter" class="form-input" data-cy="category-filter">
+            <option value="">Toutes les catégories</option>
+            <option value="technology">Technologie</option>
+            <option value="business">Business</option>
+            <option value="innovation">Innovation</option>
+            <option value="tips">Conseils</option>
+            <option value="news">Actualités</option>
           </select>
         </div>
         <div>
@@ -155,17 +169,18 @@
     </div>
 
     <!-- Liste des publications -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-cy="publications-grid">
       <div 
         v-for="publication in filteredPublications" 
         :key="publication.id"
+        :data-cy="`publication-card-${publication.id}`"
         class="card hover:shadow-lg transition-shadow cursor-pointer"
         @click="editPublication(publication)"
       >
         <!-- Image de la publication -->
-        <div v-if="publication.image" class="mb-4">
+        <div v-if="publication.featured_image" class="mb-4">
           <img 
-            :src="publication.image" 
+            :src="publication.featured_image" 
             :alt="publication.title"
             class="w-full h-48 object-cover rounded-lg"
           />
@@ -238,12 +253,14 @@
               <button
                 v-if="publication.status === 'draft'"
                 @click.stop="publishNow(publication)"
+                :data-cy="`publish-button-${publication.id}`"
                 class="btn-sm btn-primary"
               >
                 Publier
               </button>
               <button
                 @click.stop="editPublication(publication)"
+                :data-cy="`edit-button-${publication.id}`"
                 class="btn-sm btn-secondary"
               >
                 Modifier
@@ -260,11 +277,12 @@
         Aucune publication trouvée
       </h3>
       <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        {{ searchQuery || statusFilter || platformFilter ? 'Essayez de modifier vos filtres' : 'Commencez par créer votre première publication' }}
+        {{ searchQuery || statusFilter || platformFilter || categoryFilter ? 'Essayez de modifier vos filtres' : 'Commencez par créer votre première publication' }}
       </p>
       <div class="mt-6">
         <button
           @click="openCreateModal"
+          data-cy="create-publication-empty-button"
           class="btn-primary inline-flex items-center"
         >
           <PlusIcon class="h-4 w-4 mr-2" />
@@ -278,6 +296,7 @@
   <div 
     v-if="showAIModal" 
     class="fixed inset-0 z-50 overflow-y-auto"
+    data-cy="ai-generation-modal"
     @click="closeAIModal"
   >
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
@@ -315,6 +334,7 @@
                   type="text"
                   class="form-input"
                   placeholder="Ex: Lancement nouveau produit, conseils marketing digital..."
+                  data-cy="ai-topic-input"
                   required
                 />
               </div>
@@ -457,6 +477,7 @@
             <button
               type="submit"
               :disabled="aiLoading"
+              data-cy="ai-generate-button"
               class="btn-primary mb-3 sm:mb-0 sm:ml-3 min-w-[120px]"
             >
               <span v-if="!aiLoading">Générer</span>
@@ -483,6 +504,7 @@
   <div 
     v-if="showModal" 
     class="fixed inset-0 z-50 overflow-y-auto"
+    data-cy="publication-modal"
     @click="closeModal"
   >
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
@@ -525,6 +547,7 @@
                     type="text"
                     class="form-input"
                     placeholder="Titre de la publication"
+                    data-cy="publication-title-input"
                     required
                   />
                 </div>
@@ -536,6 +559,7 @@
                     rows="6"
                     class="form-input"
                     placeholder="Contenu de la publication..."
+                    data-cy="publication-content-input"
                     required
                   ></textarea>
                   <p class="text-xs text-gray-500 mt-1">
@@ -544,15 +568,15 @@
                 </div>
 
                 <div>
-                  <label class="form-label">Hashtags</label>
-                  <input
-                    v-model="form.hashtags"
-                    type="text"
+                  <label class="form-label">Extrait</label>
+                  <textarea
+                    v-model="form.excerpt"
+                    rows="3"
                     class="form-input"
-                    placeholder="#jeroka #innovation #digital"
-                  />
+                    placeholder="Résumé court de la publication..."
+                  ></textarea>
                   <p class="text-xs text-gray-500 mt-1">
-                    Séparez les hashtags par des espaces
+                    {{ form.excerpt.length }}/500 caractères
                   </p>
                 </div>
 
@@ -576,9 +600,9 @@
                       <p class="text-xs text-gray-500">PNG, JPG, GIF jusqu'à 10MB</p>
                     </div>
                   </div>
-                  <div v-if="form.image" class="mt-2">
+                  <div v-if="form.featured_image" class="mt-2">
                     <div class="relative">
-                      <img :src="form.image" alt="Preview" class="h-32 w-auto rounded-lg" />
+                      <img :src="form.featured_image" alt="Preview" class="h-32 w-auto rounded-lg" />
                       <div v-if="isAIGenerated && aiGeneratedData?.metadata?.imageGenerated" 
                            class="absolute top-1 left-1 inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-600 text-white">
                         <svg class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -693,15 +717,28 @@
                 </div>
 
                 <div>
-                  <label class="form-label">Mots-clés SEO</label>
+                  <label class="form-label">Titre SEO</label>
                   <input
-                    v-model="form.keywords"
+                    v-model="form.seo_title"
                     type="text"
                     class="form-input"
-                    placeholder="mots-clés, séparés, par, des, virgules"
+                    placeholder="Titre optimisé pour le SEO"
                   />
                   <p class="text-xs text-gray-500 mt-1">
-                    Pour le référencement du site web
+                    Titre spécifique pour le référencement
+                  </p>
+                </div>
+
+                <div>
+                  <label class="form-label">Description SEO</label>
+                  <textarea
+                    v-model="form.seo_description"
+                    rows="2"
+                    class="form-input"
+                    placeholder="Description optimisée pour le SEO"
+                  ></textarea>
+                  <p class="text-xs text-gray-500 mt-1">
+                    Description pour les moteurs de recherche
                   </p>
                 </div>
               </div>
@@ -711,6 +748,7 @@
           <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 sm:px-6 sm:flex sm:flex-row-reverse">
             <button
               type="submit"
+              data-cy="save-publication-button"
               class="btn-primary mb-3 sm:mb-0 sm:ml-3"
             >
               {{ form.status === 'published' ? 'Publier' : 'Enregistrer' }}
@@ -746,13 +784,22 @@ interface Publication {
   id: string
   title: string
   content: string
-  hashtags: string
-  image?: string
+  excerpt?: string
+  featured_image?: string
+  images?: string[]
+  hashtags?: string[]
+  tags?: string[]
   platforms: string[]
   type: 'standard' | 'promotion' | 'event' | 'announcement' | 'tutorial'
   status: 'draft' | 'scheduled' | 'published'
-  category: string
-  keywords: string
+  category?: string
+  seo_title?: string
+  seo_description?: string
+  seo_keywords?: string[]
+  slug: string
+  view_count?: number
+  like_count?: number
+  share_count?: number
   createdAt: string
   scheduledAt?: string
   publishedAt?: string
@@ -761,6 +808,7 @@ interface Publication {
 const searchQuery = ref('')
 const statusFilter = ref('')
 const platformFilter = ref('')
+const categoryFilter = ref('')
 const dateFilter = ref('')
 const showModal = ref(false)
 const showAIModal = ref(false)
@@ -772,13 +820,18 @@ const aiGeneratedData = ref<any>(null)
 const form = ref({
   title: '',
   content: '',
-  hashtags: '',
-  image: '',
+  excerpt: '',
+  featured_image: '',
+  images: [] as string[],
+  hashtags: [] as string[],
+  tags: [] as string[],
   platforms: [] as string[],
   type: 'standard' as Publication['type'],
   status: 'draft' as Publication['status'],
   category: '',
-  keywords: '',
+  seo_title: '',
+  seo_description: '',
+  seo_keywords: [] as string[],
   scheduledAt: ''
 })
 
@@ -807,8 +860,9 @@ const filteredPublications = computed(() => {
     
     const matchesStatus = !statusFilter.value || publication.status === statusFilter.value
     const matchesPlatform = !platformFilter.value || publication.platforms.includes(platformFilter.value)
+    const matchesCategory = !categoryFilter.value || publication.category === categoryFilter.value
     
-    return matchesSearch && matchesStatus && matchesPlatform
+    return matchesSearch && matchesStatus && matchesPlatform && matchesCategory
   })
 })
 
@@ -850,6 +904,28 @@ const getPlatformIcon = () => {
   return DocumentTextIcon
 }
 
+const getCategoryLabel = (category: string) => {
+  const labels = {
+    'technology': 'Technologie',
+    'business': 'Business',
+    'innovation': 'Innovation',
+    'tips': 'Conseils',
+    'news': 'Actualités'
+  }
+  return labels[category as keyof typeof labels] || category
+}
+
+const getCategoryClass = (category: string) => {
+  const classes = {
+    'technology': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    'business': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    'innovation': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+    'tips': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+    'news': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+  }
+  return classes[category as keyof typeof classes] || 'bg-gray-100 text-gray-800'
+}
+
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('fr-FR', {
     year: 'numeric',
@@ -881,13 +957,18 @@ const editPublication = (publication: Publication) => {
   form.value = {
     title: publication.title,
     content: publication.content,
-    hashtags: publication.hashtags,
-    image: publication.image || '',
+    excerpt: publication.excerpt || '',
+    featured_image: publication.featured_image || '',
+    images: [...(publication.images || [])],
+    hashtags: [...(publication.hashtags || [])],
+    tags: [...(publication.tags || [])],
     platforms: [...publication.platforms],
     type: publication.type,
     status: publication.status,
-    category: publication.category,
-    keywords: publication.keywords,
+    category: publication.category || '',
+    seo_title: publication.seo_title || '',
+    seo_description: publication.seo_description || '',
+    seo_keywords: [...(publication.seo_keywords || [])],
     scheduledAt: publication.scheduledAt || ''
   }
   showModal.value = true
@@ -905,13 +986,18 @@ const resetForm = () => {
   form.value = {
     title: '',
     content: '',
-    hashtags: '',
-    image: '',
+    excerpt: '',
+    featured_image: '',
+    images: [],
+    hashtags: [],
+    tags: [],
     platforms: [],
     type: 'standard',
     status: 'draft',
     category: '',
-    keywords: '',
+    seo_title: '',
+    seo_description: '',
+    seo_keywords: [],
     scheduledAt: ''
   }
 }
@@ -936,12 +1022,12 @@ const handleImageUpload = async (event: Event) => {
     try {
       // Upload vers le serveur
       const imageUrl = await publicationsService.uploadImage(file)
-      form.value.image = imageUrl
+      form.value.featured_image = imageUrl
       
       // Preview local pour l'interface
       const reader = new FileReader()
       reader.onload = (e) => {
-        form.value.image = e.target?.result as string
+        form.value.featured_image = e.target?.result as string
       }
       reader.readAsDataURL(file)
     } catch (error) {
@@ -949,7 +1035,7 @@ const handleImageUpload = async (event: Event) => {
       // Fallback vers preview local
       const reader = new FileReader()
       reader.onload = (e) => {
-        form.value.image = e.target?.result as string
+        form.value.featured_image = e.target?.result as string
       }
       reader.readAsDataURL(file)
     }
@@ -984,14 +1070,19 @@ const generateAIContent = async () => {
       form.value = {
         title: title,
         content: content,
-        hashtags: hashtags,
-        image: image || '',
-        platforms: [...aiForm.value.platforms],
+        excerpt: '',
+        featured_image: image || '',
+        images: image ? [image] : [],
+        hashtags: hashtags ? hashtags.split(' ').filter(h => h.startsWith('#')) : [],
+        tags: [],
         type: aiForm.value.contentType === 'promotional' ? 'promotion' : 
               aiForm.value.contentType === 'educational' ? 'tutorial' : 'standard',
         status: 'draft',
         category: '',
-        keywords: suggestedKeywords || aiForm.value.keywords,
+        platforms: [...aiForm.value.platforms],
+        seo_title: '',
+        seo_description: '',
+        seo_keywords: suggestedKeywords ? suggestedKeywords.split(',').map(k => k.trim()) : [],
         scheduledAt: ''
       }
       
@@ -1092,7 +1183,8 @@ const loadPublications = async () => {
     const filters = {
       search: searchQuery.value || undefined,
       status: statusFilter.value || undefined,
-      platform: platformFilter.value || undefined
+      platform: platformFilter.value || undefined,
+      category: categoryFilter.value || undefined
     }
     
     const response = await publicationsService.getPublications(filters)

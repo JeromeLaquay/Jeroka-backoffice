@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="dashboard-page">
     <!-- Welcome Section -->
     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
       <div class="p-6">
@@ -24,10 +24,11 @@
     </div>
 
     <!-- Statistiques -->
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4" data-cy="dashboard-stats">
       <div 
         v-for="stat in stats" 
         :key="stat.name"
+        :data-cy="`stat-${stat.name.toLowerCase().replace(/\s+/g, '-')}`"
         class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg"
       >
         <div class="p-5">

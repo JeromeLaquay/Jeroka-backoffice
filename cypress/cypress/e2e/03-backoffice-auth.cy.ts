@@ -36,7 +36,7 @@ describe('Tests d\'authentification - Backoffice Jeroka', () => {
         token: 'fake-jwt-token',
         user: {
           id: 1,
-          email: 'admin@jeroka.com',
+          email: 'laquay.jerome@gmail.com',
           name: 'Administrateur',
           role: 'admin'
         }
@@ -48,8 +48,8 @@ describe('Tests d\'authentification - Backoffice Jeroka', () => {
     cy.get('body').then(($body) => {
       if ($body.find('[data-cy="email-input"]').length > 0) {
         // Remplir le formulaire de connexion
-        cy.get('[data-cy="email-input"]').type('admin@jeroka.com')
-        cy.get('[data-cy="password-input"]').type('adminpassword123')
+        cy.get('[data-cy="email-input"]').type('laquay.jerome@gmail.com')
+        cy.get('[data-cy="password-input"]').type('Je123456!')
         
         // Soumettre le formulaire
         cy.get('[data-cy="login-button"]').click()
@@ -116,7 +116,7 @@ describe('Tests d\'authentification - Backoffice Jeroka', () => {
       win.localStorage.setItem('token', 'fake-jwt-token')
       win.localStorage.setItem('user', JSON.stringify({
         id: 1,
-        email: 'admin@jeroka.com',
+        email: 'laquay.jerome@gmail.com',
         name: 'Administrateur',
         role: 'admin'
       }))

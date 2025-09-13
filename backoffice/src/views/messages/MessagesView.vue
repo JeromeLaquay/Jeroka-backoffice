@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="messages-page">
     <!-- Header -->
     <div class="sm:flex sm:items-center sm:justify-between">
       <div>
@@ -11,6 +11,7 @@
       <div class="mt-4 sm:mt-0 flex space-x-3">
         <button
           @click="markAllAsRead"
+          data-cy="mark-all-read-button"
           class="btn-secondary inline-flex items-center"
         >
           <CheckIcon class="h-4 w-4 mr-2" />

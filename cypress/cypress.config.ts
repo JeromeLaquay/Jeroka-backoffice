@@ -6,7 +6,7 @@ config()
 
 export default defineConfig({
   e2e: {
-    baseUrl: 'https://backoffice.jerokaxperience.fr',
+    baseUrl: process.env.CYPRESS_BASE_URL || 'http://localhost:3002',
     viewportWidth: 1280,
     viewportHeight: 720,
     video: true,
@@ -65,8 +65,8 @@ export default defineConfig({
   },
   env: {
     // Variables d'environnement pour les tests
-    API_BASE_URL: 'https://apibackoffice.jerokaxperience.fr',
-    BACKOFFICE_URL: process.env.BACKOFFICE_URL || 'http://localhost:3001',
+    API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:3001',
+    BACKOFFICE_URL: process.env.BACKOFFICE_URL || 'http://localhost:3002',
     TEST_USER_EMAIL: process.env.TEST_USER_EMAIL || 'test@jeroka.com',
     TEST_USER_PASSWORD: process.env.TEST_USER_PASSWORD || 'testpassword123',
     ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@jeroka.com',

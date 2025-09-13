@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="clients-page">
     <!-- En-tête -->
     <div class="flex justify-between items-center">
       <div>
@@ -20,6 +20,7 @@
         
         <button
           @click="createClient"
+          data-cy="create-client-button"
           class="btn-primary inline-flex items-center"
         >
           <PlusIcon class="h-4 w-4 mr-2" />
@@ -125,6 +126,7 @@
               v-model="filters.search"
               type="text"
               placeholder="Nom, email, entreprise..."
+              data-cy="client-search-input"
               class="pl-10 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               @input="debouncedSearch"
             />

@@ -14,8 +14,8 @@
  * Commande personnalisée pour se connecter en tant qu'administrateur
  */
 Cypress.Commands.add('loginAsAdmin', () => {
-  const adminEmail = Cypress.env('ADMIN_EMAIL') || 'admin@jeroka.com'
-  const adminPassword = Cypress.env('ADMIN_PASSWORD') || 'adminpassword123'
+  const adminEmail = Cypress.env('ADMIN_EMAIL') || 'laquay.jerome@gmail.com'
+  const adminPassword = Cypress.env('ADMIN_PASSWORD') || 'Je123456!'
   
   cy.session('admin-session', () => {
     cy.visit('/login')
@@ -32,8 +32,8 @@ Cypress.Commands.add('loginAsAdmin', () => {
  * Commande personnalisée pour se connecter en tant qu'utilisateur standard
  */
 Cypress.Commands.add('loginAsUser', () => {
-  const userEmail = Cypress.env('TEST_USER_EMAIL') || 'test@jeroka.com'
-  const userPassword = Cypress.env('TEST_USER_PASSWORD') || 'testpassword123'
+  const userEmail = Cypress.env('TEST_USER_EMAIL') || 'laquay.jerome@gmail.com'
+  const userPassword = Cypress.env('TEST_USER_PASSWORD') || 'Je123456!'
   
   cy.session('user-session', () => {
     cy.visit('/login')

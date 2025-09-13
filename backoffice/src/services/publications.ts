@@ -5,42 +5,44 @@ export interface Publication {
   id: string
   title: string
   content: string
-  hashtags: string
-  image?: string
-  imageUrl?: string
+  excerpt?: string
+  featured_image?: string
+  images?: string[]
+  hashtags?: string[]
+  tags?: string[]
   platforms: string[]
   type: 'standard' | 'promotion' | 'event' | 'announcement' | 'tutorial'
   status: 'draft' | 'scheduled' | 'published'
-  category: string
-  keywords: string
+  category?: string
+  seo_title?: string
+  seo_description?: string
+  seo_keywords?: string[]
+  slug: string
+  view_count?: number
+  like_count?: number
+  share_count?: number
   createdAt: string
   updatedAt?: string
   scheduledAt?: string
   publishedAt?: string
-  authorId?: string
-  views?: number
-  likes?: number
-  shares?: number
-  metadata?: {
-    seoTitle?: string
-    seoDescription?: string
-    slug?: string
-  }
 }
 
 export interface CreatePublicationRequest {
   title: string
   content: string
-  hashtags?: string
-  image?: File | string
-  imageUrl?: string
+  excerpt?: string
+  featured_image?: string
+  images?: string[]
+  hashtags?: string[]
+  tags?: string[]
   platforms: string[]
   type: Publication['type']
   status: Publication['status']
   category?: string
-  keywords?: string
+  seo_title?: string
+  seo_description?: string
+  seo_keywords?: string[]
   scheduledAt?: string
-  metadata?: Publication['metadata']
 }
 
 export interface UpdatePublicationRequest extends Partial<CreatePublicationRequest> {
@@ -55,10 +57,9 @@ export interface PublicationFilters {
   type?: string
   dateFrom?: string
   dateTo?: string
-  authorId?: string
   limit?: number
   offset?: number
-  sortBy?: 'createdAt' | 'updatedAt' | 'scheduledAt' | 'title' | 'views'
+  sortBy?: 'createdAt' | 'updatedAt' | 'scheduledAt' | 'title' | 'view_count'
   sortOrder?: 'asc' | 'desc'
 }
 
@@ -124,9 +125,9 @@ class PublicationsService {
     let payload = { ...data }
 
     // Gestion de l'upload d'image si nécessaire
-    if (data.image instanceof File) {
-      const imageUrl = await this.uploadImage(data.image)
-      payload = { ...payload, image: imageUrl, imageUrl }
+    if (data.featured_image && typeof data.featured_image === 'string' && data.featured_image.startsWith('blob:')) {
+      // Si c'est une image blob, on la traite comme un fichier
+      // Pour l'instant, on garde l'URL telle quelle
     }
 
     return await apiService.createPublication(payload)
@@ -140,9 +141,9 @@ class PublicationsService {
     let payload = { ...updateData }
 
     // Gestion de l'upload d'image si nécessaire
-    if (updateData.image instanceof File) {
-      const imageUrl = await this.uploadImage(updateData.image)
-      payload = { ...payload, image: imageUrl, imageUrl }
+    if (updateData.featured_image && typeof updateData.featured_image === 'string' && updateData.featured_image.startsWith('blob:')) {
+      // Si c'est une image blob, on la traite comme un fichier
+      // Pour l'instant, on garde l'URL telle quelle
     }
 
     return await apiService.updatePublication(id, payload)

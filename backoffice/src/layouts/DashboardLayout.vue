@@ -1,15 +1,16 @@
 <template>
-  <div class="flex h-screen bg-gray-100 dark:bg-gray-900">
+  <div class="flex h-screen bg-gray-100 dark:bg-gray-900" data-cy="dashboard-layout">
     <!-- Sidebar -->
     <div 
       :class="[
         'fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       ]"
+      data-cy="sidebar"
     >
-      <div class="flex items-center justify-center h-16 px-4">
+      <div class="flex items-center justify-center h-16 px-4 cursor-pointer bg-primary-100 dark:bg-primary-900" @click="router.push('/')">
         <img src="../assets/x-logo.png" alt="Jeroka" class="h-12 w-12" />
-        <h1 class="text-xl font-bold text-primary-600">Jeroka Xperience</h1>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-purple-400 via-violet-700 to-blue-400 bg-clip-text text-transparent" style="font-family: 'Poppins', 'Inter', system-ui, sans-serif; font-weight: 900; font-size: 26px;">Jeroka</h1>
       </div>
       
       <nav class="mt-8">
@@ -18,6 +19,7 @@
             v-for="item in navigation"
             :key="item.name"
             :to="item.href"
+            :data-cy="`nav-${item.name.toLowerCase()}`"
             :class="[
               'sidebar-link',
               $route.name === item.name ? 'sidebar-link-active' : 'sidebar-link-inactive'
@@ -46,6 +48,7 @@
           <div class="flex items-center">
             <button
               type="button"
+              data-cy="mobile-menu-button"
               class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
               @click="sidebarOpen = !sidebarOpen"
             >
@@ -110,6 +113,7 @@
                 </router-link>
                 <button
                   @click="logout"
+                  data-cy="logout-button"
                   class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   Déconnexion

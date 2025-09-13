@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 // import OpenAI from 'openai';
 import { PublicationService } from '../services/publicationService';
+import { PublicationValidation } from '../validations/publicationValidation';
 
 const router = Router();
 
@@ -50,60 +51,27 @@ interface Publication {
   id: string;
   title: string;
   content: string;
-  hashtags?: string;
-  image?: string;
-  imageUrl?: string;
+  excerpt?: string;
+  featured_image?: string;
+  images?: string[];
+  hashtags?: string[];
+  tags?: string[];
   platforms: string[];
   type: 'standard' | 'promotion' | 'event' | 'announcement' | 'tutorial';
   status: 'draft' | 'scheduled' | 'published';
   category?: string;
-  keywords?: string;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string[];
+  slug: string;
+  view_count?: number;
+  like_count?: number;
+  share_count?: number;
   createdAt: string;
   updatedAt?: string;
   scheduledAt?: string;
   publishedAt?: string;
-  authorId?: string;
-  views?: number;
-  likes?: number;
-  shares?: number;
 }
-
-// Données simulées
-let publications: Publication[] = [
-  {
-    id: '1',
-    title: 'Lancement de notre nouveau service d\'automatisation',
-    content: 'Nous sommes fiers d\'annoncer le lancement de notre nouveau service d\'automatisation pour les PME...',
-    hashtags: '#jeroka #automatisation #PME #innovation',
-    imageUrl: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=300&fit=crop',
-    platforms: ['facebook', 'linkedin', 'website'],
-    type: 'announcement',
-    status: 'published',
-    category: 'business',
-    keywords: 'automatisation, PME, innovation, transformation digitale',
-    createdAt: new Date('2024-01-20T10:00:00Z').toISOString(),
-    publishedAt: new Date('2024-01-20T14:00:00Z').toISOString(),
-    authorId: 'user1',
-    views: 1250,
-    likes: 89,
-    shares: 23
-  },
-  {
-    id: '2',
-    title: '5 conseils pour optimiser votre site web',
-    content: 'Découvrez nos 5 conseils essentiels pour améliorer les performances et le référencement de votre site web...',
-    hashtags: '#siteweb #SEO #conseils #optimisation',
-    imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop',
-    platforms: ['facebook', 'linkedin', 'website'],
-    type: 'tutorial',
-    status: 'scheduled',
-    category: 'tips',
-    keywords: 'site web, SEO, optimisation, performance',
-    createdAt: new Date('2024-01-19T15:30:00Z').toISOString(),
-    scheduledAt: new Date('2024-01-22T09:00:00Z').toISOString(),
-    authorId: 'user1'
-  }
-];
 
 router.use(verifyToken);
 
@@ -112,29 +80,20 @@ router.use(verifyToken);
  * @desc Get all publications with filters
  * @access Private
  */
-router.get('/', [
-  query('search').optional().isString().trim(),
-  query('status').optional().isIn(['draft', 'scheduled', 'published']),
-  query('platform').optional().isString().trim(),
-  query('category').optional().isString().trim(),
-  query('type').optional().isIn(['standard', 'promotion', 'event', 'announcement', 'tutorial']),
-  query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
-  query('offset').optional().isInt({ min: 0 }).toInt()
-], async (req: AuthRequest, res: Response) => {
+router.get('/', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
+    const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
+    if (!companyId) {
+      return res.status(401).json({
         success: false,
-        message: 'Paramètres invalides',
-        errors: errors.array()
+        message: 'Company ID manquant'
       });
     }
 
-    const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
     const result = await PublicationService.list(companyId, req.query as any);
     return res.json({ success: true, data: result });
   } catch (error) {
+    console.error('Erreur GET /publications:', error);
     return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des publications',
@@ -152,27 +111,38 @@ router.get('/', [
  * @desc Create a new publication
  * @access Private
  */
-router.post('/', [
-  body('title').notEmpty().trim().withMessage('Le titre est requis'),
-  body('content').notEmpty().trim().withMessage('Le contenu est requis'),
-  body('platforms').isArray({ min: 1 }).withMessage('Au moins une plateforme est requise'),
-  body('type').isIn(['standard', 'promotion', 'event', 'announcement', 'tutorial']),
-  body('status').isIn(['draft', 'scheduled', 'published'])
-], async (req: AuthRequest, res: Response) => {
+router.post('/', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
+    const companyId = req.user?.company_id;
+    const { title, content, excerpt, featured_image, images, hashtags, tags, platforms, type, status, category, seo_title, seo_description, seo_keywords, scheduled_at } = req.body;
+    const newPublication = {
+      title,
+      content,
+      excerpt,
+      featured_image,
+      images: images || [],
+      hashtags: hashtags || [],
+      tags: tags || [],
+      platforms: platforms || [],
+      type,
+      status,
+      category,
+      seo_title,
+      seo_description,
+      seo_keywords: seo_keywords || [],
+      scheduled_at,
+    };
+    if (!companyId) {
+      return res.status(401).json({
         success: false,
-        message: 'Données invalides',
-        errors: errors.array()
+        message: 'Company ID manquant'
       });
     }
 
-    const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
-    const created = await PublicationService.create(companyId, req.body);
+    const created = await PublicationService.create(companyId, newPublication);
     return res.status(201).json({ success: true, message: 'Publication créée avec succès', data: created });
   } catch (error) {
+    console.error('Erreur POST /publications:', error);
     return res.status(500).json({
       success: false,
       message: 'Erreur lors de la création de la publication',
@@ -190,14 +160,27 @@ router.post('/', [
  * @desc Get a specific publication
  * @access Private
  */
-router.get('/:id', async (req: AuthRequest, res: Response) => {
+router.get('/:id', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
+    if (!companyId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Company ID manquant'
+      });
+    }
+
     const publication = await PublicationService.getById(companyId, id);
-    if (!publication) return res.status(404).json({ success: false, message: 'Publication non trouvée' });
+    if (!publication) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Publication non trouvée' 
+      });
+    }
     return res.json({ success: true, data: publication });
   } catch (error) {
+    console.error('Erreur GET /publications/:id:', error);
     return res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération de la publication',
@@ -215,14 +198,27 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
  * @desc Update a publication
  * @access Private
  */
-router.put('/:id', async (req: AuthRequest, res: Response) => {
+router.put('/:id', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
+    if (!companyId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Company ID manquant'
+      });
+    }
+
     const updated = await PublicationService.update(companyId, id, req.body);
-    if (!updated) return res.status(404).json({ success: false, message: 'Publication non trouvée' });
+    if (!updated) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Publication non trouvée' 
+      });
+    }
     return res.json({ success: true, message: 'Publication mise à jour avec succès', data: updated });
   } catch (error) {
+    console.error('Erreur PUT /publications/:id:', error);
     return res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour',
@@ -240,14 +236,27 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
  * @desc Delete a publication
  * @access Private
  */
-router.delete('/:id', async (req: AuthRequest, res: Response) => {
+router.delete('/:id', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
+    if (!companyId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Company ID manquant'
+      });
+    }
+
     const ok = await PublicationService.remove(companyId, id);
-    if (!ok) return res.status(404).json({ success: false, message: 'Publication non trouvée' });
+    if (!ok) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Publication non trouvée' 
+      });
+    }
     return res.json({ success: true, message: 'Publication supprimée avec succès' });
   } catch (error) {
+    console.error('Erreur DELETE /publications/:id:', error);
     return res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression',
@@ -265,14 +274,27 @@ router.delete('/:id', async (req: AuthRequest, res: Response) => {
  * @desc Publish a publication immediately
  * @access Private
  */
-router.post('/:id/publish', async (req: AuthRequest, res: Response) => {
+router.post('/:id/publish', verifyToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const companyId = (req.user as any)?.companyId || (req.user as any)?.company_id;
+    if (!companyId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Company ID manquant'
+      });
+    }
+
     const published = await PublicationService.publish(companyId, id);
-    if (!published) return res.status(404).json({ success: false, message: 'Publication non trouvée' });
+    if (!published) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Publication non trouvée' 
+      });
+    }
     return res.json({ success: true, message: 'Publication publiée avec succès', data: published });
   } catch (error) {
+    console.error('Erreur POST /publications/:id/publish:', error);
     return res.status(500).json({
       success: false,
       message: 'Erreur lors de la publication',
@@ -290,7 +312,7 @@ router.post('/:id/publish', async (req: AuthRequest, res: Response) => {
  * @desc Upload an image for publications
  * @access Private
  */
-router.post('/uploads/image', upload.single('image'), async (req: Request, res: Response) => {
+router.post('/uploads/image', upload.single('image'), verifyToken, async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({
