@@ -266,7 +266,7 @@ export class PublicationRepository {
       const row = result.rows[0];
       
       // Mettre à jour les plateformes si elles sont fournies
-      if (data.platforms !== undefined) {
+      if (data.platforms !== undefined && data.platforms !== null) {
         await this.updatePlatforms(id, data.platforms);
       }
       
@@ -330,7 +330,7 @@ export class PublicationRepository {
 
   static async getPlatforms(publicationId: string): Promise<string[]> {
     const result = await query('SELECT platform FROM publication_platforms WHERE publication_id = $1', [publicationId]);
-    return result.rows.map(row => row.platform);
+    return result.rows.map((row: any) => row.platform);
   }
 }
 
