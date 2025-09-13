@@ -794,7 +794,7 @@ import emailsService, {
   type AnalysisResult,
   type CreateCategoryRequest,
   type UpdateCategoryRequest
-} from './services/emails'
+} from '../../services/emails.ts'
 
 const router = useRouter()
 
