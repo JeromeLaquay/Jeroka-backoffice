@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { apiService } from './services/api'
+import { apiService } from '../services/api.ts'
 
 const currentEnvironment = ref<'local' | 'production'>('local')
 const currentUrl = ref('')
