@@ -321,10 +321,10 @@ import {
   CubeIcon,
   EnvelopeIcon
 } from '@heroicons/vue/24/outline'
-import OrderStatusBadge from './components/orders/OrderStatusBadge.vue'
-import PaymentStatusBadge from './components/orders/PaymentStatusBadge.vue'
-import StatusChangeModal from './components/orders/StatusChangeModal.vue'
-import { ordersService, type Order } from './services/orders'
+import OrderStatusBadge from '../../components/orders/OrderStatusBadge.vue'
+import PaymentStatusBadge from '../../components/orders/PaymentStatusBadge.vue'
+import StatusChangeModal from '../../components/orders/StatusChangeModal.vue'
+import { ordersService, type Order } from '../../services/orders'
 
 const route = useRoute()
 const router = useRouter()

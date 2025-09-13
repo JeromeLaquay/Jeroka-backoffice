@@ -6,6 +6,8 @@ export interface QuoteItem {
   quantity: number
   unitPrice: number
   total: number
+  discountPercent?: number
+  vatRate?: number
 }
 
 export interface Quote {
@@ -72,7 +74,7 @@ class QuoteService {
     clientId?: number
     dateFrom?: string
     dateTo?: string
-  }): Promise<ApiResponse<QuotesListResponse>> {
+  }): Promise<ApiResponse<any>> {
     return await apiService.getQuotes(params)
   }
 
@@ -149,42 +151,42 @@ class QuoteService {
   /**
    * Récupère les devis par statut
    */
-  async getQuotesByStatus(status: string): Promise<ApiResponse<QuotesListResponse>> {
+  async getQuotesByStatus(status: string): Promise<ApiResponse<any>> {
     return await this.getQuotes({ status, limit: 100 })
   }
 
   /**
    * Récupère les devis d'un client
    */
-  async getQuotesByClient(clientId: number): Promise<ApiResponse<QuotesListResponse>> {
+  async getQuotesByClient(clientId: number): Promise<ApiResponse<any>> {
     return await this.getQuotes({ clientId, limit: 100 })
   }
 
   /**
    * Récupère les devis expirés
    */
-  async getExpiredQuotes(): Promise<ApiResponse<QuotesListResponse>> {
+  async getExpiredQuotes(): Promise<ApiResponse<any>> {
     return await this.getQuotesByStatus('expired')
   }
 
   /**
    * Récupère les devis en attente
    */
-  async getPendingQuotes(): Promise<ApiResponse<QuotesListResponse>> {
+  async getPendingQuotes(): Promise<ApiResponse<any>> {
     return await this.getQuotesByStatus('sent')
   }
 
   /**
    * Récupère les devis acceptés
    */
-  async getAcceptedQuotes(): Promise<ApiResponse<QuotesListResponse>> {
+  async getAcceptedQuotes(): Promise<ApiResponse<any>> {
     return await this.getQuotesByStatus('accepted')
   }
 
   /**
    * Récupère les devis par période
    */
-  async getQuotesByDateRange(dateFrom: string, dateTo: string): Promise<ApiResponse<QuotesListResponse>> {
+  async getQuotesByDateRange(dateFrom: string, dateTo: string): Promise<ApiResponse<any>> {
     return await this.getQuotes({ dateFrom, dateTo, limit: 100 })
   }
 

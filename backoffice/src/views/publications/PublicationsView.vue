@@ -740,7 +740,7 @@ import {
   PhotoIcon,
   XMarkIcon
 } from '@heroicons/vue/24/outline'
-import publicationsService from './services/publications'
+import publicationsService from '../../services/publications'
 
 interface Publication {
   id: string

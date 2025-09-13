@@ -229,7 +229,7 @@ import {
   CheckIcon,
   ExclamationTriangleIcon
 } from '@heroicons/vue/24/outline'
-import InvoiceStatusBadge from './components/invoices/InvoiceStatusBadge.vue'
+import InvoiceStatusBadge from '../../components/invoices/InvoiceStatusBadge.vue'
 import { invoiceService, type Invoice } from './services/invoices'
 
 const route = useRoute()

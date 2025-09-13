@@ -264,10 +264,10 @@ import {
   PlusIcon,
   DocumentTextIcon
 } from '@heroicons/vue/24/outline'
-import ClientSelector from './components/orders/ClientSelector.vue'
-import InvoiceItemRow from './components/invoices/InvoiceItemRow.vue'
-import InvoiceSummary from './components/invoices/InvoiceSummary.vue'
-import { invoiceService, type CreateInvoiceRequest, type Invoice } from './services/invoices'
+import ClientSelector from '../../components/orders/ClientSelector.vue'
+import InvoiceItemRow from '../../components/invoices/InvoiceItemRow.vue'
+import InvoiceSummary from '../../components/invoices/InvoiceSummary.vue'
+import { invoiceService, type CreateInvoiceRequest, type Invoice } from '../../services/invoices'
 
 const route = useRoute()
 const router = useRouter()
@@ -310,7 +310,12 @@ const loadInvoice = async () => {
   try {
     loading.value = true
     const response = await invoiceService.getInvoice(route.params.id as string)
-    invoice.value = response.data
+    invoice.value = response.data || null
+    
+    // Vérifier que la facture existe
+    if (!invoice.value) {
+      throw new Error('Facture non trouvée')
+    }
     
     // Pré-remplir le formulaire
     Object.assign(form, {
@@ -332,7 +337,7 @@ const loadInvoice = async () => {
       termsAndConditions: invoice.value.termsAndConditions || ''
     })
 
-    selectedClient.value = invoice.value.client
+    selectedClient.value = { id: invoice.value.clientId, name: invoice.value.clientName }
   } catch (error) {
     console.error('Erreur lors du chargement de la facture:', error)
   } finally {
@@ -343,7 +348,7 @@ const loadInvoice = async () => {
 const generateInvoiceNumber = async () => {
   try {
     const response = await invoiceService.getNextInvoiceNumber()
-    form.invoiceNumber = response.data.invoiceNumber
+    form.invoiceNumber = response.data?.invoiceNumber || `FAC-${Date.now()}`
   } catch (error) {
     console.error('Erreur lors de la génération du numéro:', error)
     // Fallback

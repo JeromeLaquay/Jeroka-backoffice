@@ -113,6 +113,20 @@ class ProductService {
   }
 
   /**
+   * Alias pour getProductCategories
+   */
+  async getCategories(): Promise<ApiResponse<ProductCategory[]>> {
+    return await this.getProductCategories()
+  }
+
+  /**
+   * Génère un SKU pour un produit
+   */
+  async generateSKU(categoryId?: string): Promise<ApiResponse<{ sku: string }>> {
+    return await apiService.get('/products/generate-sku', { params: { categoryId } })
+  }
+
+  /**
    * Récupère les statistiques des produits
    */
   async getProductStats(): Promise<ApiResponse<ProductStats>> {

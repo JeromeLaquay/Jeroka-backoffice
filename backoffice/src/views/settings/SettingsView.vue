@@ -106,13 +106,13 @@ import {
   PuzzlePieceIcon,
   CodeBracketIcon
 } from '@heroicons/vue/24/outline'
-import UserProfileSettings from './components/settings/UserProfileSettings.vue'
-import CompanySettings from './components/settings/CompanySettings.vue'
-import SystemSettings from './components/settings/SystemSettings.vue'
-import SecuritySettings from './components/settings/SecuritySettings.vue'
-import BackupSettings from './components/settings/BackupSettings.vue'
-import IntegrationsSettings from './components/settings/IntegrationsSettings.vue'
-import EnvironmentSwitcher from './components/EnvironmentSwitcher.vue'
+import UserProfileSettings from '../../components/settings/UserProfileSettings.vue'
+import CompanySettings from '../../components/settings/CompanySettings.vue'
+import SystemSettings from '../../components/settings/SystemSettings.vue'
+import SecuritySettings from '../../components/settings/SecuritySettings.vue'
+import BackupSettings from '../../components/settings/BackupSettings.vue'
+import IntegrationsSettings from '../../components/settings/IntegrationsSettings.vue'
+import EnvironmentSwitcher from '../../components/EnvironmentSwitcher.vue'
 // État
 const activeTab = ref('development') // Commencer par l'onglet développement
 const userProfile = ref<any>(null)

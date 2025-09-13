@@ -248,10 +248,10 @@ import {
   PlusIcon,
   ClipboardDocumentListIcon
 } from '@heroicons/vue/24/outline'
-import ClientSelector from './components/orders/ClientSelector.vue'
-import QuoteItemRow from './components/quotes/QuoteItemRow.vue'
-import QuoteSummary from './components/quotes/QuoteSummary.vue'
-import { quoteService, type CreateQuoteRequest, type Quote } from './services/quotes'
+import ClientSelector from '../../components/orders/ClientSelector.vue'
+import QuoteItemRow from '../../components/quotes/QuoteItemRow.vue'
+import QuoteSummary from '../../components/quotes/QuoteSummary.vue'
+import { quoteService, type CreateQuoteRequest, type Quote } from '../../services/quotes'
 
 const route = useRoute()
 const router = useRouter()

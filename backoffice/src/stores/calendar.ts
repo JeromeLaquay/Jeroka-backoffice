@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { apiService as api } from './services/api'
+import { apiService as api } from '../services/api'
 
 // Types
 interface AvailabilityRule {
@@ -71,9 +71,9 @@ export const useCalendarStore = defineStore('calendar', () => {
       error.value = null
       
       const response = await api.get('/calendar/availability')
-      availabilityRules.value = response.data.data
+      availabilityRules.value = response?.data
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de la récupération des règles de disponibilité'
+      error.value = err?.response?.data?.message || 'Erreur lors de la récupération des règles de disponibilité'
       console.error('Erreur fetchAvailabilityRules:', err)
     } finally {
       loading.value = false
@@ -86,12 +86,14 @@ export const useCalendarStore = defineStore('calendar', () => {
       error.value = null
       
       const response = await api.post('/calendar/availability', rule)
-      const newRule = response.data.data
+      const newRule = response?.data || {} as AvailabilityRule
       
-      availabilityRules.value.push(newRule)
+      if (newRule.id) {
+        availabilityRules.value.push(newRule)
+      }
       return newRule
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de l\'ajout de la règle de disponibilité'
+      error.value = err?.response?.data?.message || 'Erreur lors de l\'ajout de la règle de disponibilité'
       console.error('Erreur addAvailabilityRule:', err)
       throw err
     } finally {
@@ -105,7 +107,7 @@ export const useCalendarStore = defineStore('calendar', () => {
       error.value = null
       
       const response = await api.put(`/calendar/availability/${rule.id}`, rule)
-      const updatedRule = response.data.data
+      const updatedRule = response?.data || {} as AvailabilityRule
       
       const index = availabilityRules.value.findIndex(r => r.id === rule.id)
       if (index !== -1) {
@@ -114,7 +116,7 @@ export const useCalendarStore = defineStore('calendar', () => {
       
       return updatedRule
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de la mise à jour de la règle de disponibilité'
+      error.value = err?.response?.data?.message || 'Erreur lors de la mise à jour de la règle de disponibilité'
       console.error('Erreur updateAvailabilityRule:', err)
       throw err
     } finally {
@@ -131,7 +133,7 @@ export const useCalendarStore = defineStore('calendar', () => {
       
       availabilityRules.value = availabilityRules.value.filter(rule => rule.id !== id)
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de la suppression de la règle de disponibilité'
+      error.value = err?.response?.data?.message || 'Erreur lors de la suppression de la règle de disponibilité'
       console.error('Erreur deleteAvailabilityRule:', err)
       throw err
     } finally {
@@ -149,10 +151,10 @@ export const useCalendarStore = defineStore('calendar', () => {
         params: { startDate, endDate }
       })
       
-      timeSlots.value = response.data.data
-      return response.data.data
+      timeSlots.value = response?.data || []
+      return response?.data?.data || []
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de la récupération des créneaux'
+      error.value = err?.response?.data?.message || 'Erreur lors de la récupération des créneaux'
       console.error('Erreur fetchTimeSlots:', err)
       throw err
     } finally {
@@ -171,9 +173,9 @@ export const useCalendarStore = defineStore('calendar', () => {
       if (endDate) params.endDate = endDate
       
       const response = await api.get('/calendar/appointments', { params })
-      appointments.value = response.data.data
+      appointments.value = response?.data || []
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de la récupération des rendez-vous'
+      error.value = err?.response?.data?.message || 'Erreur lors de la récupération des rendez-vous'
       console.error('Erreur fetchAppointments:', err)
     } finally {
       loading.value = false
@@ -186,12 +188,14 @@ export const useCalendarStore = defineStore('calendar', () => {
       error.value = null
       
       const response = await api.post('/calendar/appointments', appointment)
-      const newAppointment = response.data.data
+      const newAppointment = response?.data || {} as Appointment
       
-      appointments.value.push(newAppointment)
+      if (newAppointment.id) {
+        appointments.value.push(newAppointment)
+      }
       return newAppointment
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de la création du rendez-vous'
+      error.value = err?.response?.data?.message || 'Erreur lors de la création du rendez-vous'
       console.error('Erreur createAppointment:', err)
       throw err
     } finally {
@@ -211,7 +215,7 @@ export const useCalendarStore = defineStore('calendar', () => {
         appointments.value[index] = { ...appointments.value[index], ...appointment }
       }
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de la mise à jour du rendez-vous'
+      error.value = err?.response?.data?.message || 'Erreur lors de la mise à jour du rendez-vous'
       console.error('Erreur updateAppointment:', err)
       throw err
     } finally {
@@ -228,7 +232,7 @@ export const useCalendarStore = defineStore('calendar', () => {
       
       appointments.value = appointments.value.filter(appointment => appointment.id !== id)
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de la suppression du rendez-vous'
+      error.value = err?.response?.data?.message || 'Erreur lors de la suppression du rendez-vous'
       console.error('Erreur deleteAppointment:', err)
       throw err
     } finally {
@@ -245,7 +249,7 @@ export const useCalendarStore = defineStore('calendar', () => {
       const response = await api.post('/calendar/google/sync')
       return response.data
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erreur lors de la synchronisation avec Google Calendar'
+      error.value = err?.response?.data?.message || 'Erreur lors de la synchronisation avec Google Calendar'
       console.error('Erreur syncWithGoogle:', err)
       throw err
     } finally {

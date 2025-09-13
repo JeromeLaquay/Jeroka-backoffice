@@ -229,10 +229,10 @@ import {
   ArrowPathIcon,
   UserIcon 
 } from '@heroicons/vue/24/outline'
-import AddAvailabilityModal from './components/calendar/AddAvailabilityModal.vue'
-import EditAvailabilityModal from './components/calendar/EditAvailabilityModal.vue'
-import EditAppointmentModal from './components/calendar/EditAppointmentModal.vue'
-import { useCalendarStore } from './stores/calendar'
+import AddAvailabilityModal from '../../components/calendar/AddAvailabilityModal.vue'
+import EditAvailabilityModal from '../../components/calendar/EditAvailabilityModal.vue'
+import EditAppointmentModal from '../../components/calendar/EditAppointmentModal.vue'
+import { useCalendarStore } from '../../stores/calendar'
 
 // Store
 const calendarStore = useCalendarStore()
@@ -246,7 +246,7 @@ const selectedAvailabilityRule = ref(null)
 const selectedAppointment = ref(null)
 const appointmentDateFilter = ref('')
 const isSyncing = ref(false)
-const lastSyncDate = ref(null)
+const lastSyncDate = ref<string | null>(null)
 
 // Tabs
 const tabs = [

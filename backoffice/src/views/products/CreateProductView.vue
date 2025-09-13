@@ -368,7 +368,7 @@ import {
   ArrowPathIcon,
   XMarkIcon
 } from '@heroicons/vue/24/outline'
-import { productService } from './services/products'
+import { productService } from '../../services/products'
 
 const route = useRoute()
 const router = useRouter()
@@ -426,27 +426,29 @@ const loadProduct = async () => {
     product.value = response.data
     
     // Remplir le formulaire
-    Object.assign(form, {
-      name: product.value.name,
-      description: product.value.description || '',
-      sku: product.value.sku,
-      barcode: product.value.barcode || '',
-      categoryId: product.value.category,
-      brand: product.value.brand || '',
-      unitPrice: product.value.unitPrice,
-      costPrice: product.value.costPrice || 0,
-      vatRate: product.value.vatRate || 20,
-      unit: product.value.unit,
-      stock: {
-        current: product.value.stock?.current || 0,
-        minimum: product.value.stock?.minimum || 0,
-        maximum: product.value.stock?.maximum || null
-      },
-      status: product.value.status,
-      featured: product.value.featured,
-      isService: product.value.isService,
-      tags: [...(product.value.tags || [])]
-    })
+    if (product.value) {
+      Object.assign(form, {
+        name: product.value?.name || '',
+        description: product.value?.description || '',
+        sku: product.value?.sku || '',
+        barcode: product.value?.barcode || '',
+        categoryId: product.value?.category || '',
+        brand: product.value?.brand || '',
+        unitPrice: product.value?.unitPrice || 0,
+        costPrice: product.value?.costPrice || 0,
+        vatRate: product.value?.vatRate || 20,
+        unit: product.value?.unit || 'pièce',
+        stock: {
+          current: product.value?.stock?.current || 0,
+          minimum: product.value?.stock?.minimum || 0,
+          maximum: product.value?.stock?.maximum || null
+        },
+        status: product.value?.status || 'active',
+        featured: product.value?.featured || false,
+        isService: product.value?.isService || false,
+        tags: [...(product.value?.tags || [])]
+      })
+    }
   } catch (error) {
     console.error('Erreur lors du chargement du produit:', error)
     router.push('/produits')

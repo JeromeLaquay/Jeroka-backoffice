@@ -135,6 +135,28 @@ class ApiService {
     )
   }
 
+  // ===== MÉTHODES GÉNÉRIQUES =====
+
+  async get<T>(url: string, config?: any): Promise<ApiResponse<T>> {
+    const response = await this.api.get<ApiResponse<T>>(url, config)
+    return response.data
+  }
+
+  async post<T>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> {
+    const response = await this.api.post<ApiResponse<T>>(url, data, config)
+    return response.data
+  }
+
+  async put<T>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> {
+    const response = await this.api.put<ApiResponse<T>>(url, data, config)
+    return response.data
+  }
+
+  async delete<T>(url: string, config?: any): Promise<ApiResponse<T>> {
+    const response = await this.api.delete<ApiResponse<T>>(url, config)
+    return response.data
+  }
+
   // ===== AUTHENTIFICATION =====
 
   async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
@@ -382,8 +404,8 @@ class ApiService {
 
   // ===== DEVIS =====
 
-  async getQuotes(params?: any): Promise<ApiResponse<any[]>> {
-    const response = await this.api.get<ApiResponse<any[]>>('/quotes', { params })
+  async getQuotes(params?: any): Promise<ApiResponse<any>> {
+    const response = await this.api.get<ApiResponse<any>>('/quotes', { params })
     return response.data
   }
 

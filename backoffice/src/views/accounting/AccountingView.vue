@@ -314,10 +314,10 @@ import {
   DocumentChartBarIcon,
   ArrowUpTrayIcon
 } from '@heroicons/vue/24/outline'
-import FinancialChart from './components/accounting/FinancialChart.vue'
-import TransactionTypeBadge from './components/accounting/TransactionTypeBadge.vue'
-import AddTransactionModal from './components/accounting/AddTransactionModal.vue'
-import ImportModal from './components/accounting/ImportModal.vue'
+import FinancialChart from '../../components/accounting/FinancialChart.vue'
+import TransactionTypeBadge from '../../components/accounting/TransactionTypeBadge.vue'
+import AddTransactionModal from '../../components/accounting/AddTransactionModal.vue'
+import ImportModal from '../../components/accounting/ImportModal.vue'
 import { accountingService, type FinancialStats, type Transaction } from '../../services/accounting'
 
 // État

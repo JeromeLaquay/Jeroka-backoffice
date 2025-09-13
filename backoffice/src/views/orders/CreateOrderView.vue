@@ -252,11 +252,11 @@ import {
   PlusIcon,
   ShoppingCartIcon
 } from '@heroicons/vue/24/outline'
-import ClientSelector from './components/orders/ClientSelector.vue'
-import OrderItemRow from './components/orders/OrderItemRow.vue'
-import AddressForm from './components/orders/AddressForm.vue'
-import OrderSummary from './components/orders/OrderSummary.vue'
-import { ordersService, type CreateOrderRequest, type Order } from './services/orders'
+import ClientSelector from '../../components/orders/ClientSelector.vue'
+import OrderItemRow from '../../components/orders/OrderItemRow.vue'
+import AddressForm from '../../components/orders/AddressForm.vue'
+import OrderSummary from '../../components/orders/OrderSummary.vue'
+import { ordersService, type CreateOrderRequest, type Order } from '../../services/orders'
 
 const route = useRoute()
 const router = useRouter()
@@ -322,6 +322,11 @@ const loadOrder = async () => {
     loading.value = true
     const response = await ordersService.getOrder(route.params.id as string)
     order.value = response.data
+    
+    // Vérifier que la commande existe
+    if (!order.value) {
+      throw new Error('Commande non trouvée')
+    }
     
     // Pré-remplir le formulaire
     Object.assign(form, {

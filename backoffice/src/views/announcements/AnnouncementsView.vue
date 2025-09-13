@@ -574,9 +574,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useAuthStore } from './stores/auth'
-import announcementsService from './services/announcements'
-import type { Announcement } from './services/announcements'
+import { useAuthStore } from '../../stores/auth'
+import announcementsService from '../../services/announcements'
+import type { Announcement } from '../../services/announcements'
 
 const authStore = useAuthStore()
 
@@ -601,9 +601,9 @@ const form = ref({
   title: '',
   summary: '',
   content: '',
-  type: '',
-  priority: '',
-  status: 'draft',
+  type: 'announcement' as 'feature' | 'update' | 'maintenance' | 'security' | 'announcement',
+  priority: 'medium' as 'low' | 'medium' | 'high' | 'critical',
+  status: 'draft' as 'draft' | 'scheduled' | 'published' | 'archived',
   scheduledAt: '',
   version: '',
   targetAudience: [] as string[],
@@ -707,9 +707,9 @@ const resetForm = () => {
     title: '',
     summary: '',
     content: '',
-    type: '',
-    priority: '',
-    status: 'draft',
+    type: 'announcement' as 'feature' | 'update' | 'maintenance' | 'security' | 'announcement',
+    priority: 'medium' as 'low' | 'medium' | 'high' | 'critical',
+    status: 'draft' as 'draft' | 'scheduled' | 'published' | 'archived',
     scheduledAt: '',
     version: '',
     targetAudience: [],

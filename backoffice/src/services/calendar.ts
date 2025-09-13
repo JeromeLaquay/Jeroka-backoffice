@@ -50,20 +50,20 @@ interface ApiResponse<T> {
 export const availabilityApi = {
   // Get all availability rules
   getAll: async (): Promise<AvailabilityRule[]> => {
-    const response = await api.get<ApiResponse<AvailabilityRule[]>>('/calendar/availability')
-    return response.data.data
+    const response = await api.get<AvailabilityRule[]>('/calendar/availability')
+    return response.data || [] || []
   },
 
   // Create new availability rule
   create: async (rule: Omit<AvailabilityRule, 'id' | 'createdAt' | 'updatedAt'>): Promise<AvailabilityRule> => {
-    const response = await api.post<ApiResponse<AvailabilityRule>>('/calendar/availability', rule)
-    return response.data.data
+    const response = await api.post<AvailabilityRule>('/calendar/availability', rule)
+    return response.data || {} as AvailabilityRule
   },
 
   // Update availability rule
   update: async (id: string, rule: Partial<AvailabilityRule>): Promise<AvailabilityRule> => {
-    const response = await api.put<ApiResponse<AvailabilityRule>>(`/calendar/availability/${id}`, rule)
-    return response.data.data
+    const response = await api.put<AvailabilityRule>(`/calendar/availability/${id}`, rule)
+    return response.data || {} as AvailabilityRule
   },
 
   // Delete availability rule
@@ -76,18 +76,18 @@ export const availabilityApi = {
 export const timeSlotsApi = {
   // Get available time slots for a date range
   getAvailable: async (startDate: string, endDate: string): Promise<TimeSlot[]> => {
-    const response = await api.get<ApiResponse<TimeSlot[]>>('/calendar/slots', {
+    const response = await api.get<TimeSlot[]>('/calendar/slots', {
       params: { startDate, endDate }
     })
-    return response.data.data
+    return response.data || [] || []
   },
 
   // Get available time slots for a specific date
   getAvailableForDate: async (date: string): Promise<TimeSlot[]> => {
-    const response = await api.get<ApiResponse<TimeSlot[]>>('/calendar/slots', {
+    const response = await api.get<TimeSlot[]>('/calendar/slots', {
       params: { startDate: date, endDate: date }
     })
-    return response.data.data
+    return response.data || [] || []
   }
 }
 
@@ -99,26 +99,26 @@ export const appointmentsApi = {
     if (startDate) params.startDate = startDate
     if (endDate) params.endDate = endDate
 
-    const response = await api.get<ApiResponse<Appointment[]>>('/calendar/appointments', { params })
-    return response.data.data
+    const response = await api.get<Appointment[]>('/calendar/appointments', { params })
+    return response.data || [] || []
   },
 
   // Get appointment by ID
   getById: async (id: string): Promise<Appointment> => {
-    const response = await api.get<ApiResponse<Appointment>>(`/calendar/appointments/${id}`)
-    return response.data.data
+    const response = await api.get<Appointment>(`/calendar/appointments/${id}`)
+    return response.data || {} as Appointment
   },
 
   // Create new appointment
   create: async (appointment: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt'>): Promise<Appointment> => {
-    const response = await api.post<ApiResponse<Appointment>>('/calendar/appointments', appointment)
-    return response.data.data
+    const response = await api.post<Appointment>('/calendar/appointments', appointment)
+    return response.data || {} as Appointment
   },
 
   // Update appointment
   update: async (id: string, appointment: Partial<Appointment>): Promise<Appointment> => {
-    const response = await api.put<ApiResponse<Appointment>>(`/calendar/appointments/${id}`, appointment)
-    return response.data.data
+    const response = await api.put<Appointment>(`/calendar/appointments/${id}`, appointment)
+    return response.data || {} as Appointment
   },
 
   // Delete appointment
@@ -132,13 +132,13 @@ export const googleCalendarApi = {
   // Sync with Google Calendar
   sync: async (): Promise<{ success: boolean; message: string }> => {
     const response = await api.post<ApiResponse<{ success: boolean; message: string }>>('/calendar/google/sync')
-    return response.data.data
+    return response.data?.data || { success: false, message: 'Erreur de synchronisation' }
   },
 
   // Get sync status
   getSyncStatus: async (): Promise<{ lastSync: string; isConnected: boolean }> => {
     const response = await api.get<ApiResponse<{ lastSync: string; isConnected: boolean }>>('/calendar/google/status')
-    return response.data.data
+    return response.data?.data || { lastSync: '', isConnected: false }
   }
 }
 
@@ -224,3 +224,5 @@ export const calendarApi = {
   googleCalendar: googleCalendarApi,
   utils: calendarUtils
 }
+
+export default calendarApi

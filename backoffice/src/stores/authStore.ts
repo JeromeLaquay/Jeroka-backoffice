@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { apiService, type User, type LoginRequest, type RegisterRequest } from './services/api'
+import { apiService, type User, type LoginRequest, type RegisterRequest } from '../services/api'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -23,7 +23,12 @@ export const useAuthStore = defineStore('auth', () => {
       
       if (response.success && response.data) {
         token.value = response.data.accessToken
-        user.value = response.data.user
+        user.value = {
+          ...response.data.user,
+          isActive: true,
+          emailVerified: false,
+          createdAt: new Date().toISOString()
+        }
         
         // Sauvegarder dans localStorage
         localStorage.setItem('auth_token', response.data.accessToken)
@@ -50,7 +55,12 @@ export const useAuthStore = defineStore('auth', () => {
       
       if (response.success && response.data) {
         token.value = response.data.accessToken
-        user.value = response.data.user
+        user.value = {
+          ...response.data.user,
+          isActive: true,
+          emailVerified: false,
+          createdAt: new Date().toISOString()
+        }
         
         // Sauvegarder dans localStorage
         localStorage.setItem('auth_token', response.data.accessToken)
@@ -112,7 +122,12 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await apiService.getProfile()
       
       if (response.success && response.data) {
-        user.value = response.data.user
+        user.value = {
+          ...response.data.user,
+          isActive: true,
+          emailVerified: false,
+          createdAt: new Date().toISOString()
+        }
         localStorage.setItem('user', JSON.stringify(response.data.user))
         return response
       } else {
@@ -134,7 +149,12 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await apiService.updateProfile(data)
       
       if (response.success && response.data) {
-        user.value = response.data.user
+        user.value = {
+          ...response.data.user,
+          isActive: true,
+          emailVerified: false,
+          createdAt: new Date().toISOString()
+        }
         localStorage.setItem('user', JSON.stringify(response.data.user))
         return response
       } else {

@@ -6,6 +6,8 @@ export interface InvoiceItem {
   quantity: number
   unitPrice: number
   total: number
+  discountPercent?: number
+  vatRate?: number
 }
 
 export interface Invoice {
@@ -22,6 +24,8 @@ export interface Invoice {
   paidDate?: string
   items: InvoiceItem[]
   notes?: string
+  termsAndConditions?: string
+  paymentTerms?: number
   createdAt: string
 }
 
@@ -68,7 +72,7 @@ class InvoiceService {
     clientId?: number
     dateFrom?: string
     dateTo?: string
-  }): Promise<ApiResponse<InvoicesListResponse>> {
+  }): Promise<ApiResponse<any>> {
     return await apiService.getInvoices(params)
   }
 
@@ -138,43 +142,50 @@ class InvoiceService {
   /**
    * Récupère les factures par statut
    */
-  async getInvoicesByStatus(status: string): Promise<ApiResponse<InvoicesListResponse>> {
+  async getInvoicesByStatus(status: string): Promise<ApiResponse<any>> {
     return await this.getInvoices({ status, limit: 100 })
   }
 
   /**
    * Récupère les factures d'un client
    */
-  async getInvoicesByClient(clientId: number): Promise<ApiResponse<InvoicesListResponse>> {
+  async getInvoicesByClient(clientId: number): Promise<ApiResponse<any>> {
     return await this.getInvoices({ clientId, limit: 100 })
   }
 
   /**
    * Récupère les factures en retard
    */
-  async getOverdueInvoices(): Promise<ApiResponse<InvoicesListResponse>> {
+  async getOverdueInvoices(): Promise<ApiResponse<any>> {
     return await this.getInvoicesByStatus('overdue')
   }
 
   /**
    * Récupère les factures en attente
    */
-  async getPendingInvoices(): Promise<ApiResponse<InvoicesListResponse>> {
+  async getPendingInvoices(): Promise<ApiResponse<any>> {
     return await this.getInvoicesByStatus('pending')
   }
 
   /**
    * Récupère les factures payées
    */
-  async getPaidInvoices(): Promise<ApiResponse<InvoicesListResponse>> {
+  async getPaidInvoices(): Promise<ApiResponse<any>> {
     return await this.getInvoicesByStatus('paid')
   }
 
   /**
    * Récupère les factures par période
    */
-  async getInvoicesByDateRange(dateFrom: string, dateTo: string): Promise<ApiResponse<InvoicesListResponse>> {
+  async getInvoicesByDateRange(dateFrom: string, dateTo: string): Promise<ApiResponse<any>> {
     return await this.getInvoices({ dateFrom, dateTo, limit: 100 })
+  }
+
+  /**
+   * Génère le prochain numéro de facture
+   */
+  async getNextInvoiceNumber(): Promise<ApiResponse<{ invoiceNumber: string }>> {
+    return await apiService.get('/invoices/next-number')
   }
 
   /**

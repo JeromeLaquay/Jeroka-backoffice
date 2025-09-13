@@ -324,9 +324,9 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/vue/24/outline'
-import OrderStatusBadge from './components/orders/OrderStatusBadge.vue'
-import DeleteConfirmModal from './components/common/DeleteConfirmModal.vue'
-import { ordersService } from './services/orders'
+import OrderStatusBadge from '../../components/orders/OrderStatusBadge.vue'
+import DeleteConfirmModal from '../../components/common/DeleteConfirmModal.vue'
+import { ordersService } from '../../services/orders'
 import { debounce } from 'lodash-es'
 
 // Types

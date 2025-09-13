@@ -33,6 +33,7 @@ export interface CreatePublicationRequest {
   content: string
   hashtags?: string
   image?: File | string
+  imageUrl?: string
   platforms: string[]
   type: Publication['type']
   status: Publication['status']
@@ -104,7 +105,7 @@ class PublicationsService {
   /**
    * Récupère la liste des publications avec filtres
    */
-  async getPublications(filters?: PublicationFilters): Promise<ApiResponse<PublicationsListResponse>> {
+  async getPublications(filters?: PublicationFilters): Promise<ApiResponse<any>> {
     return await apiService.getPublications(filters)
   }
 
@@ -388,8 +389,8 @@ class PublicationsService {
   /**
    * Recherche de publications avec recherche full-text
    */
-  async searchPublications(query: string, filters?: Omit<PublicationFilters, 'search'>): Promise<ApiResponse<PublicationsListResponse>> {
-    const response = await apiService.axiosInstance.get<ApiResponse<PublicationsListResponse>>('/publications/search', {
+  async searchPublications(query: string, filters?: Omit<PublicationFilters, 'search'>): Promise<ApiResponse<any>> {
+    const response = await apiService.axiosInstance.get<ApiResponse<any>>('/publications/search', {
       params: { query, ...filters }
     })
     return response.data
