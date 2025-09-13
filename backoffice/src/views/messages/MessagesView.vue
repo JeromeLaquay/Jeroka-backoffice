@@ -16,13 +16,6 @@
           <CheckIcon class="h-4 w-4 mr-2" />
           Tout marquer comme lu
         </button>
-        <button
-          @click="exportMessages"
-          class="btn-primary inline-flex items-center"
-        >
-          <ArrowDownTrayIcon class="h-4 w-4 mr-2" />
-          Exporter
-        </button>
       </div>
     </div>
 
@@ -384,7 +377,7 @@
             Créer un devis
           </button>
           <a
-            :href="`mailto:${selectedMessage.email}?subject=Re: ${selectedMessage.subject}`"
+            :href="`mailto:${selectedMessage.email}?subject=Re: ${selectedMessage.subject}&body=${selectedMessage.response}`"
             class="btn-secondary mb-3 sm:mb-0 sm:ml-3"
           >
             Répondre par email
@@ -409,7 +402,6 @@ import {
   ExclamationCircleIcon,
   DocumentTextIcon,
   CheckIcon,
-  ArrowDownTrayIcon,
   XMarkIcon,
   UserGroupIcon
 } from '@heroicons/vue/24/outline'
@@ -443,7 +435,6 @@ const stats = ref<MessageStats>({
   averageResponseTime: 0,
   responseRate: 0
 })
-const selectedMessages = ref<string[]>([])
 const filters = ref({
   search: '',
   status: '',
@@ -504,13 +495,13 @@ const loadMessages = async () => {
     const response = await messagesService.getMessages({
       page: currentPage.value,
       limit: itemsPerPage,
-      search: filters.value.search,
-      status: filters.value.status || undefined,
-      priority: filters.value.priority || undefined,
-      dateFrom: filters.value.dateFrom || undefined,
+      search: searchQuery.value || filters.value.search,
+      status: (statusFilter.value as 'new' | 'read' | 'replied' | 'archived') || filters.value.status || undefined,
+      priority: (filters.value.priority as 'low' | 'medium' | 'high') || undefined,
+      dateFrom: dateFilter.value || filters.value.dateFrom || undefined,
       dateTo: filters.value.dateTo || undefined
     })
-    messages.value = response.data.messages
+    messages.value = response.data.messages || []
   } catch (error) {
     console.error('Erreur lors du chargement des messages:', error)
   } finally {
@@ -527,15 +518,6 @@ const loadStats = async () => {
   }
 }
 
-const markAsRead = async (messageId: string) => {
-  try {
-    await messagesService.markAsRead(messageId)
-    await loadMessages()
-    await loadStats()
-  } catch (error) {
-    console.error('Erreur lors du marquage:', error)
-  }
-}
 
 const markAllAsRead = async () => {
   try {
@@ -547,23 +529,6 @@ const markAllAsRead = async () => {
   }
 }
 
-const exportMessages = async () => {
-  try {
-    const blob = await messagesService.exportMessages({
-      format: 'excel',
-      ...filters.value
-    })
-    
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `messages-${new Date().toISOString().split('T')[0]}.xlsx`
-    link.click()
-    window.URL.revokeObjectURL(url)
-  } catch (error) {
-    console.error('Erreur lors de l\'export:', error)
-  }
-}
 
 const deleteMessage = async (messageId: string) => {
   if (confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) {
@@ -624,33 +589,14 @@ const generateAIDraft = async (message: ContactMessage) => {
   try {
     // Appel API pour génération IA
     const { data } = await messagesService.generateAIDraft(message.id, {
-      tone: aiOptions.value.tone,
-      language: aiOptions.value.language
+      tone: aiOptions.value.tone as 'professionnel' | 'amical' | 'formel' | 'concis',
+      language: aiOptions.value.language as 'fr' | 'en'
     })
     aiDraft.value = data.draft
+    selectedMessage.value!.response = data.draft
+    console.log("selectedMessage", selectedMessage.value!.response)
   } catch (e) {
     console.error('Erreur génération IA:', e)
-    // Fallback en cas d'erreur API
-    const salut = aiOptions.value.language === 'fr' ? 'Bonjour' : 'Hello'
-    const merci = aiOptions.value.language === 'fr' ? 'Merci pour votre message.' : 'Thank you for your message.'
-    const signature = aiOptions.value.language === 'fr'
-      ? 'Cordialement,\nL\'équipe Jeroka'
-      : 'Kind regards,\nJeroka Team'
-
-    aiDraft.value = `${salut} ${getMessageName(message)},
-
-${merci}
-
-Nous avons bien reçu votre message et nous vous remercions de nous avoir contactés. Nous vous répondrons dans les plus brefs délais.
-
-Résumé de votre message:
-${message.message.slice(0, 200)}${message.message.length > 200 ? '...' : ''}
-
-Prochaine étape:
-- Nous revenons vers vous sous 24-48h avec les informations demandées
-- Si urgent, vous pouvez répondre à cet email en précisant votre disponibilité
-
-${signature}`
   } finally {
     aiLoading.value = false
   }
@@ -733,24 +679,6 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const getPriorityClass = (priority: string) => {
-  switch (priority) {
-    case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-    case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-    case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-    default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-  }
-}
-
-const getStatusClass = (status: string) => {
-  switch (status) {
-    case 'new': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-    case 'read': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-    case 'replied': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-    case 'archived': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-    default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-  }
-}
 
 // Lifecycle
 onMounted(async () => {
@@ -762,6 +690,7 @@ onMounted(async () => {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Messages - Documentation Jeroka</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>📚 Documentation Jeroka</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="modules.html">Modules</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="deployment.html">Déploiement</a></li>
+                <li><a href="messages.html" class="active">Messages</a></li>
+                <li><a href="factures.html">Factures</a></li>
+                <li><a href="devis.html">Devis</a></li>
+            </ul>
+        </nav>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Basculer le thème">
+            <span id="theme-icon">🌙</span>
+        </button>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>💬 Module Gestion des Messages</h1>
+            <p>Module intelligent de gestion des messages avec génération automatique de réponses par IA</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Vue d'ensemble</h2>
+            <p>Le module Messages de Jeroka est un système avancé de gestion des communications clients qui intègre l'intelligence artificielle pour automatiser et optimiser les réponses. Il permet de recevoir, classer, traiter et répondre aux messages provenant du site web ou d'autres sources.</p>
+            
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Réception des messages</strong> - Collecte automatique depuis le site web</li>
+                    <li><strong>Classification intelligente</strong> - Catégorisation par type et priorité</li>
+                    <li><strong>Génération IA de réponses</strong> - Brouillons automatiques avec ChatGPT</li>
+                    <li><strong>Gestion des statuts</strong> - Nouveau, lu, répondu, archivé</li>
+                    <li><strong>Filtres et recherche</strong> - Recherche multicritères avancée</li>
+                    <li><strong>Notifications temps réel</strong> - Alertes instantanées</li>
+                    <li><strong>Historique complet</strong> - Suivi des échanges clients</li>
+                    <li><strong>Multi-tenant</strong> - Isolation des données par entreprise</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Architecture du Module</h2>
+            <div class="module-card">
+                <h3>Composants principaux</h3>
+                <ul>
+                    <li><strong>MessageService</strong> - Logique métier et gestion des données</li>
+                    <li><strong>MessageIAService</strong> - Intégration avec l'IA pour génération de réponses</li>
+                    <li><strong>MessageRepository</strong> - Accès aux données et requêtes</li>
+                    <li><strong>Validation</strong> - Contrôles de données et sécurité</li>
+                    <li><strong>Middleware d'authentification</strong> - Sécurisation des endpoints</li>
+                </ul>
+
+                <h3>Technologies utilisées</h3>
+                <ul>
+                    <li><strong>Backend</strong> - Node.js, Express.js, TypeScript</li>
+                    <li><strong>Base de données</strong> - PostgreSQL avec requêtes optimisées</li>
+                    <li><strong>IA</strong> - OpenAI ChatGPT API (GPT-3.5-turbo)</li>
+                    <li><strong>Authentification</strong> - JWT avec middleware de vérification</li>
+                    <li><strong>Validation</strong> - Joi pour la validation des données</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>API Endpoints</h2>
+            <div class="module-card">
+                <h3>Gestion des Messages</h3>
+                <div class="code-block">
+                    <h4>Endpoints principaux</h4>
+                    <pre><code>POST   /api/v1/messages              - Créer un nouveau message
+GET    /api/v1/messages              - Liste des messages (avec filtres)
+GET    /api/v1/messages/:id          - Détails d'un message
+PUT    /api/v1/messages/:id          - Modifier un message
+DELETE /api/v1/messages/:id          - Supprimer un message
+GET    /api/v1/messages/stats        - Statistiques des messages</code></pre>
+                </div>
+
+                <h3>Gestion des Statuts</h3>
+                <div class="code-block">
+                    <h4>Endpoints de statut</h4>
+                    <pre><code>POST   /api/v1/messages/:id/mark-read    - Marquer comme lu
+POST   /api/v1/messages/:id/mark-unread  - Marquer comme non lu
+POST   /api/v1/messages/mark-all-read    - Marquer tous comme lus</code></pre>
+                </div>
+
+                <h3>Intégration IA</h3>
+                <div class="code-block">
+                    <h4>Génération de réponses IA</h4>
+                    <pre><code>POST   /api/v1/messages/:id/ai-draft     - Générer brouillon IA</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Intégration Intelligence Artificielle</h2>
+            <div class="module-card">
+                <h3>Service IA Modulaire</h3>
+                <p>Le système utilise une architecture modulaire pour l'IA, permettant de supporter différents fournisseurs :</p>
+                <ul>
+                    <li><strong>ChatGPT (OpenAI)</strong> - Fournisseur principal actuel</li>
+                    <li><strong>Claude (Anthropic)</strong> - Support prévu</li>
+                    <li><strong>Modèles locaux</strong> - Support pour déploiements privés</li>
+                </ul>
+
+                <h3>Génération de Brouillons</h3>
+                <div class="code-block">
+                    <h4>Options de génération</h4>
+                    <pre><code>{
+  "tone": "professionnel" | "amical" | "formel" | "concis",
+  "language": "fr" | "en"
+}</code></pre>
+                </div>
+
+                <h3>Processus de génération</h3>
+                <ol>
+                    <li><strong>Récupération du message</strong> - Lecture du message original</li>
+                    <li><strong>Récupération des infos entreprise</strong> - Contexte de l'entreprise</li>
+                    <li><strong>Construction du prompt</strong> - Génération du prompt personnalisé</li>
+                    <li><strong>Appel à l'IA</strong> - Génération de la réponse</li>
+                    <li><strong>Retour du brouillon</strong> - Réponse prête à être personnalisée</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Structure des Données</h2>
+            <div class="module-card">
+                <h3>Modèle de Message</h3>
+                <div class="code-block">
+                    <h4>Structure complète</h4>
+                    <pre><code>{
+  "id": "uuid",
+  "first_name": "string",
+  "last_name": "string", 
+  "email": "string",
+  "phone": "string",
+  "company": "string",
+  "subject": "string",
+  "message": "string",
+  "status": "new" | "read" | "replied" | "archived",
+  "priority": "low" | "medium" | "high",
+  "source": "website" | "email" | "phone",
+  "tags": ["string"],
+  "company_id": "uuid",
+  "read_at": "datetime",
+  "created_at": "datetime",
+  "updated_at": "datetime"
+}</code></pre>
+                </div>
+
+                <h3>Statistiques</h3>
+                <div class="code-block">
+                    <h4>Données de statistiques</h4>
+                    <pre><code>{
+  "total": "number",
+  "new": "number",
+  "read": "number", 
+  "replied": "number",
+  "archived": "number",
+  "byPriority": {
+    "low": "number",
+    "medium": "number", 
+    "high": "number"
+  },
+  "bySource": {
+    "website": "number",
+    "email": "number",
+    "phone": "number"
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Filtres et Recherche</h2>
+            <div class="module-card">
+                <h3>Paramètres de filtrage</h3>
+                <div class="code-block">
+                    <h4>Query parameters supportés</h4>
+                    <pre><code>GET /api/v1/messages?
+  page=1&
+  limit=10&
+  status=new&
+  priority=high&
+  source=website&
+  search=terme&
+  dateFrom=2024-01-01&
+  dateTo=2024-12-31&
+  tags=urgent,important</code></pre>
+                </div>
+
+                <h3>Fonctionnalités de recherche</h3>
+                <ul>
+                    <li><strong>Recherche textuelle</strong> - Dans le contenu, sujet, nom</li>
+                    <li><strong>Filtres par statut</strong> - Nouveau, lu, répondu, archivé</li>
+                    <li><strong>Filtres par priorité</strong> - Basse, moyenne, haute</li>
+                    <li><strong>Filtres par source</strong> - Site web, email, téléphone</li>
+                    <li><strong>Filtres par date</strong> - Période personnalisable</li>
+                    <li><strong>Filtres par tags</strong> - Étiquettes personnalisées</li>
+                    <li><strong>Pagination</strong> - Navigation par pages</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Sécurité et Authentification</h2>
+            <div class="module-card">
+                <h3>Mécanismes de sécurité</h3>
+                <ul>
+                    <li><strong>Authentification JWT</strong> - Tokens sécurisés pour l'accès</li>
+                    <li><strong>Isolation multi-tenant</strong> - Données séparées par entreprise</li>
+                    <li><strong>Validation des données</strong> - Contrôles stricts sur les entrées</li>
+                    <li><strong>Logs d'audit</strong> - Traçabilité des actions</li>
+                    <li><strong>Rate limiting</strong> - Protection contre les abus</li>
+                </ul>
+
+                <h3>Permissions</h3>
+                <ul>
+                    <li><strong>Lecture</strong> - Consultation des messages de l'entreprise</li>
+                    <li><strong>Écriture</strong> - Modification et création de messages</li>
+                    <li><strong>Suppression</strong> - Suppression des messages (admin)</li>
+                    <li><strong>IA</strong> - Génération de réponses IA</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Exemples d'utilisation</h2>
+            <div class="module-card">
+                <h3>Création d'un message</h3>
+                <div class="code-block">
+                    <h4>Requête POST</h4>
+                    <pre><code>POST /api/v1/messages
+Content-Type: application/json
+
+{
+  "firstName": "Jean",
+  "lastName": "Dupont", 
+  "email": "jean.dupont@example.com",
+  "phone": "+33123456789",
+  "company": "Entreprise ABC",
+  "subject": "Demande de devis",
+  "message": "Bonjour, je souhaiterais obtenir un devis...",
+  "priority": "medium",
+  "source": "website",
+  "tags": ["devis", "nouveau-client"]
+}</code></pre>
+                </div>
+
+                <h3>Génération de réponse IA</h3>
+                <div class="code-block">
+                    <h4>Requête POST</h4>
+                    <pre><code>POST /api/v1/messages/123/ai-draft
+Content-Type: application/json
+
+{
+  "tone": "professionnel",
+  "language": "fr"
+}</code></pre>
+                </div>
+
+                <h3>Réponse IA</h3>
+                <div class="code-block">
+                    <h4>Réponse générée</h4>
+                    <pre><code>{
+  "success": true,
+  "data": {
+    "draft": "Bonjour M. Dupont,\n\nMerci pour votre message...",
+    "messageId": "123",
+    "generatedAt": "2024-01-15T10:30:00Z",
+    "options": {
+      "tone": "professionnel",
+      "language": "fr"
+    },
+    "provider": "chatgpt"
+  },
+  "message": "Brouillon IA généré avec succès"
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Configuration et Déploiement</h2>
+            <div class="module-card">
+                <h3>Variables d'environnement</h3>
+                <div class="code-block">
+                    <h4>Configuration requise</h4>
+                    <pre><code># Base de données
+DATABASE_URL=postgresql://user:pass@localhost:5432/jeroka
+
+# OpenAI API
+OPENAI_API_KEY=sk-...
+
+# JWT
+JWT_SECRET=your-secret-key
+
+# Environnement
+NODE_ENV=production</code></pre>
+                </div>
+
+                <h3>Dépendances</h3>
+                <ul>
+                    <li><strong>express</strong> - Framework web</li>
+                    <li><strong>jsonwebtoken</strong> - Gestion JWT</li>
+                    <li><strong>joi</strong> - Validation des données</li>
+                    <li><strong>pg</strong> - Client PostgreSQL</li>
+                    <li><strong>openai</strong> - SDK OpenAI</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Monitoring et Logs</h2>
+            <div class="module-card">
+                <h3>Métriques importantes</h3>
+                <ul>
+                    <li><strong>Volume de messages</strong> - Nombre de messages reçus par jour</li>
+                    <li><strong>Temps de réponse</strong> - Délai moyen de traitement</li>
+                    <li><strong>Taux d'utilisation IA</strong> - Pourcentage de réponses générées</li>
+                    <li><strong>Erreurs API</strong> - Taux d'échec des appels IA</li>
+                    <li><strong>Performance base</strong> - Temps de requête DB</li>
+                </ul>
+
+                <h3>Logs d'audit</h3>
+                <ul>
+                    <li><strong>Création de messages</strong> - Traçabilité des nouveaux messages</li>
+                    <li><strong>Génération IA</strong> - Logs des appels à l'API OpenAI</li>
+                    <li><strong>Modifications</strong> - Historique des changements</li>
+                    <li><strong>Erreurs</strong> - Logs d'erreur détaillés</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Jeroka - Documentation Technique</p>
+    </footer>
+
+    <script>
+        // Gestion du thème
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Initialiser le thème au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                themeIcon.textContent = '☀️';
+            } else {
+                themeIcon.textContent = '🌙';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -12,8 +12,7 @@ export const messageSchemas = {
     status: Joi.string().valid('new', 'read', 'replied', 'archived').default('new'),
     priority: Joi.string().valid('low', 'medium', 'high').default('medium'),
     source: Joi.string().allow(null, '').optional(),
-    tags: Joi.array().items(Joi.string().max(50)).optional(),
-    assigned_to: Joi.string().uuid().allow(null).optional()
+    tags: Joi.array().items(Joi.string().max(50)).optional()
   }),
 
   update: Joi.object({
@@ -28,14 +27,15 @@ export const messageSchemas = {
     priority: Joi.string().valid('low', 'medium', 'high').optional(),
     source: Joi.string().allow(null, '').optional(),
     tags: Joi.array().items(Joi.string().max(50)).optional(),
-    assigned_to: Joi.string().uuid().allow(null).optional()
+    prompt: Joi.string().optional(),
+    response: Joi.string().optional()
   }),
 
   filters: Joi.object({
-    search: Joi.string().max(100).optional(),
+    search: Joi.string().max(100).allow('').optional(),
     status: Joi.string().valid('new', 'read', 'replied', 'archived').optional(),
     priority: Joi.string().valid('low', 'medium', 'high').optional(),
-    source: Joi.string().max(100).optional(),
+    source: Joi.string().max(100).allow('').optional(),
     tags: Joi.array().items(Joi.string().max(50)).optional(),
     sortBy: Joi.string().valid('created_at', 'updated_at', 'priority', 'status', 'subject').default('created_at'),
     sortOrder: Joi.string().valid('asc', 'desc').default('desc'),

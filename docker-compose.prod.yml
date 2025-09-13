@@ -48,7 +48,8 @@ services:
       JWT_EXPIRES_IN: 7d
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_REFRESH_EXPIRES_IN: 30d
-      
+
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
       # CORS
       BACKOFFICE_URL: https://backoffice.jerokaxperience.fr
       FRONTEND_URL: https://apibackoffice.jerokaxperience.fr

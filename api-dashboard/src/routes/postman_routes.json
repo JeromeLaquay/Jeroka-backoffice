@@ -1,0 +1,1428 @@
+{
+  "info": {
+    "name": "Jeroka API",
+    "description": "Collection complète des endpoints de l'API Jeroka",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Authentification",
+      "item": [
+        {
+          "name": "Inscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@jeroka.fr\",\n  \"password\": \"password123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Connexion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@jeroka.fr\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.token) {",
+                  "        pm.collectionVariables.set('jwt_token', response.token);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rafraîchir Token",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Déconnexion",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Profil Utilisateur",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Modifier Profil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"phone\": \"+33123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Changer Mot de Passe",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"password123\",\n  \"newPassword\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "change-password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Utilisateurs",
+      "item": [
+        {
+          "name": "Liste Utilisateurs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/users?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Détails Utilisateur",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": ["{{base_url}}"],
+              "path": ["users", "1"]
+            }
+          }
+        },
+        {
+          "name": "Créer Utilisateur",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@jeroka.fr\",\n  \"password\": \"password123\",\n  \"firstName\": \"New\",\n  \"lastName\": \"User\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Modifier Utilisateur",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated\",\n  \"lastName\": \"User\",\n  \"phone\": \"+33987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": ["{{base_url}}"],
+              "path": ["users", "1"]
+            }
+          }
+        },
+        {
+          "name": "Supprimer Utilisateur",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": ["{{base_url}}"],
+              "path": ["users", "1"]
+            }
+          }
+        },
+        {
+          "name": "Statistiques Utilisateurs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/users/stats",
+              "host": ["{{base_url}}"],
+              "path": ["users", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏢 Clients",
+      "item": [
+        {
+          "name": "Liste Clients",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/clients?page=1&limit=10&search=&status=active",
+              "host": ["{{base_url}}"],
+              "path": ["clients"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer Client",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"individual\",\n  \"firstName\": \"Jean\",\n  \"lastName\": \"Dupont\",\n  \"email\": \"jean.dupont@example.com\",\n  \"phone\": \"+33123456789\",\n  \"status\": \"active\",\n  \"address\": {\n    \"line1\": \"123 Rue Example\",\n    \"city\": \"Paris\",\n    \"postalCode\": \"75001\",\n    \"country\": \"France\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/clients",
+              "host": ["{{base_url}}"],
+              "path": ["clients"]
+            }
+          }
+        },
+        {
+          "name": "Détails Client",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/clients/1",
+              "host": ["{{base_url}}"],
+              "path": ["clients", "1"]
+            }
+          }
+        },
+        {
+          "name": "Modifier Client",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jean\",\n  \"lastName\": \"Dupont\",\n  \"email\": \"jean.dupont@example.com\",\n  \"phone\": \"+33987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/clients/1",
+              "host": ["{{base_url}}"],
+              "path": ["clients", "1"]
+            }
+          }
+        },
+        {
+          "name": "Supprimer Client",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/clients/1",
+              "host": ["{{base_url}}"],
+              "path": ["clients", "1"]
+            }
+          }
+        },
+        {
+          "name": "Statistiques Clients",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/clients/stats",
+              "host": ["{{base_url}}"],
+              "path": ["clients", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📦 Produits",
+      "item": [
+        {
+          "name": "Liste Produits",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/products?page=1&limit=10&search=&category=&type=",
+              "host": ["{{base_url}}"],
+              "path": ["products"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                },
+                {
+                  "key": "category",
+                  "value": ""
+                },
+                {
+                  "key": "type",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer Produit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nouveau Produit\",\n  \"description\": \"Description du nouveau produit\",\n  \"price\": 99.99,\n  \"stock\": 50,\n  \"category\": \"Catégorie A\",\n  \"featured\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": ["{{base_url}}"],
+              "path": ["products"]
+            }
+          }
+        },
+        {
+          "name": "Détails Produit",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["products", "1"]
+            }
+          }
+        },
+        {
+          "name": "Modifier Produit",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Produit Modifié\",\n  \"description\": \"Description mise à jour\",\n  \"price\": 149.99,\n  \"stock\": 75\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["products", "1"]
+            }
+          }
+        },
+        {
+          "name": "Supprimer Produit",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["products", "1"]
+            }
+          }
+        },
+        {
+          "name": "Mettre à Jour Stock",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stock\": 100,\n  \"operation\": \"set\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products/1/stock",
+              "host": ["{{base_url}}"],
+              "path": ["products", "1", "stock"]
+            }
+          }
+        },
+        {
+          "name": "Catégories Produits",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/products/categories",
+              "host": ["{{base_url}}"],
+              "path": ["products", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Statistiques Produits",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/products/stats",
+              "host": ["{{base_url}}"],
+              "path": ["products", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 Devis",
+      "item": [
+        {
+          "name": "Liste Devis",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/quotes?page=1&limit=10&status=&clientId=&dateFrom=&dateTo=",
+              "host": ["{{base_url}}"],
+              "path": ["quotes"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": ""
+                },
+                {
+                  "key": "clientId",
+                  "value": ""
+                },
+                {
+                  "key": "dateFrom",
+                  "value": ""
+                },
+                {
+                  "key": "dateTo",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer Devis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"items\": [\n    {\n      \"description\": \"Service de développement\",\n      \"quantity\": 1,\n      \"unitPrice\": 240.00\n    }\n  ],\n  \"validUntil\": \"2024-03-15\",\n  \"notes\": \"Devis valable 30 jours\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/quotes",
+              "host": ["{{base_url}}"],
+              "path": ["quotes"]
+            }
+          }
+        },
+        {
+          "name": "Détails Devis",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/quotes/1",
+              "host": ["{{base_url}}"],
+              "path": ["quotes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Modifier Devis",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"description\": \"Service de développement mis à jour\",\n      \"quantity\": 2,\n      \"unitPrice\": 240.00\n    }\n  ],\n  \"notes\": \"Devis mis à jour\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/quotes/1",
+              "host": ["{{base_url}}"],
+              "path": ["quotes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Supprimer Devis",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/quotes/1",
+              "host": ["{{base_url}}"],
+              "path": ["quotes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Modifier Statut Devis",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"sent\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/quotes/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["quotes", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Convertir en Facture",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/quotes/1/convert",
+              "host": ["{{base_url}}"],
+              "path": ["quotes", "1", "convert"]
+            }
+          }
+        },
+        {
+          "name": "Statistiques Devis",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/quotes/stats",
+              "host": ["{{base_url}}"],
+              "path": ["quotes", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧾 Factures",
+      "item": [
+        {
+          "name": "Liste Factures",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/invoices?page=1&limit=10&status=&clientId=&dateFrom=&dateTo=",
+              "host": ["{{base_url}}"],
+              "path": ["invoices"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": ""
+                },
+                {
+                  "key": "clientId",
+                  "value": ""
+                },
+                {
+                  "key": "dateFrom",
+                  "value": ""
+                },
+                {
+                  "key": "dateTo",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer Facture",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"items\": [\n    {\n      \"description\": \"Service de développement\",\n      \"quantity\": 1,\n      \"unitPrice\": 240.00\n    }\n  ],\n  \"dueDate\": \"2024-02-15\",\n  \"notes\": \"Facture pour services rendus\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/invoices",
+              "host": ["{{base_url}}"],
+              "path": ["invoices"]
+            }
+          }
+        },
+        {
+          "name": "Détails Facture",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/invoices/1",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "1"]
+            }
+          }
+        },
+        {
+          "name": "Modifier Facture",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"description\": \"Service de développement mis à jour\",\n      \"quantity\": 2,\n      \"unitPrice\": 240.00\n    }\n  ],\n  \"notes\": \"Facture mise à jour\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/invoices/1",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "1"]
+            }
+          }
+        },
+        {
+          "name": "Supprimer Facture",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/invoices/1",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "1"]
+            }
+          }
+        },
+        {
+          "name": "Modifier Statut Facture",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"paid\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/invoices/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Envoyer Facture",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/invoices/1/send",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "1", "send"]
+            }
+          }
+        },
+        {
+          "name": "Statistiques Factures",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/invoices/stats",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💬 Messages",
+      "item": [
+        {
+          "name": "Liste Messages",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/messages?page=1&limit=20&search=&status=&priority=&source=",
+              "host": ["{{base_url}}"],
+              "path": ["messages"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                },
+                {
+                  "key": "status",
+                  "value": ""
+                },
+                {
+                  "key": "priority",
+                  "value": ""
+                },
+                {
+                  "key": "source",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jean\",\n  \"lastName\": \"Dupont\",\n  \"email\": \"jean.dupont@example.com\",\n  \"phone\": \"+33123456789\",\n  \"company\": \"Entreprise ABC\",\n  \"subject\": \"Demande de devis\",\n  \"message\": \"Bonjour, je souhaiterais obtenir un devis pour...\",\n  \"source\": \"website\",\n  \"priority\": \"medium\",\n  \"tags\": [\"devis\", \"nouveau-client\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/messages",
+              "host": ["{{base_url}}"],
+              "path": ["messages"]
+            }
+          }
+        },
+        {
+          "name": "Détails Message",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/messages/1",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "1"]
+            }
+          }
+        },
+        {
+          "name": "Modifier Message",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"read\",\n  \"priority\": \"high\",\n  \"tags\": [\"devis\", \"urgent\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/messages/1",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "1"]
+            }
+          }
+        },
+        {
+          "name": "Supprimer Message",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/messages/1",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "1"]
+            }
+          }
+        },
+        {
+          "name": "Marquer comme Lu",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/messages/1/mark-read",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "1", "mark-read"]
+            }
+          }
+        },
+        {
+          "name": "Marquer comme Non Lu",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/messages/1/mark-unread",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "1", "mark-unread"]
+            }
+          }
+        },
+        {
+          "name": "Marquer Tous comme Lus",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/messages/mark-all-read",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "mark-all-read"]
+            }
+          }
+        },
+        {
+          "name": "Générer Réponse IA",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tone\": \"professionnel\",\n  \"language\": \"fr\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/messages/1/ai-draft",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "1", "ai-draft"]
+            }
+          }
+        },
+        {
+          "name": "Statistiques Messages",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/messages/stats",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🤖 Service IA",
+      "item": [
+        {
+          "name": "Liste Providers IA",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/messages/ai/providers",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "ai", "providers"]
+            }
+          }
+        },
+        {
+          "name": "Tester Connexion IA",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/messages/ai/test",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "ai", "test"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📅 Calendrier",
+      "item": [
+        {
+          "name": "Règles Disponibilité",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/calendar/availability",
+              "host": ["{{base_url}}"],
+              "path": ["calendar", "availability"]
+            }
+          }
+        },
+        {
+          "name": "Créer Règle Disponibilité",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dayOfWeek\": 1,\n  \"startTime\": \"09:00\",\n  \"endTime\": \"17:00\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/calendar/availability",
+              "host": ["{{base_url}}"],
+              "path": ["calendar", "availability"]
+            }
+          }
+        },
+        {
+          "name": "Liste Créneaux",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/calendar/slots?date=2024-01-15",
+              "host": ["{{base_url}}"],
+              "path": ["calendar", "slots"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-01-15"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer Créneau",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2024-01-15\",\n  \"startTime\": \"14:00\",\n  \"endTime\": \"15:00\",\n  \"clientName\": \"Jean Dupont\",\n  \"clientEmail\": \"jean.dupont@example.com\",\n  \"clientPhone\": \"+33123456789\",\n  \"notes\": \"Rendez-vous pour devis\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/calendar/slots",
+              "host": ["{{base_url}}"],
+              "path": ["calendar", "slots"]
+            }
+          }
+        },
+        {
+          "name": "Modifier Créneau",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startTime\": \"15:00\",\n  \"endTime\": \"16:00\",\n  \"notes\": \"Rendez-vous reporté\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/calendar/slots/1",
+              "host": ["{{base_url}}"],
+              "path": ["calendar", "slots", "1"]
+            }
+          }
+        },
+        {
+          "name": "Supprimer Créneau",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/calendar/slots/1",
+              "host": ["{{base_url}}"],
+              "path": ["calendar", "slots", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📧 Emails",
+      "item": [
+        {
+          "name": "Liste Catégories Email",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/emails/categories",
+              "host": ["{{base_url}}"],
+              "path": ["emails", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Créer Catégorie Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fournisseurs\",\n  \"downloadAttachments\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/emails/categories",
+              "host": ["{{base_url}}"],
+              "path": ["emails", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Liste Expéditeurs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/emails/senders",
+              "host": ["{{base_url}}"],
+              "path": ["emails", "senders"]
+            }
+          }
+        },
+        {
+          "name": "Créer Expéditeur",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"contact@fournisseur.com\",\n  \"name\": \"Fournisseur ABC\",\n  \"categoryId\": \"1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/emails/senders",
+              "host": ["{{base_url}}"],
+              "path": ["emails", "senders"]
+            }
+          }
+        },
+        {
+          "name": "Liste Emails",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/emails?page=1&limit=20&categoryId=&senderId=&hasAttachments=",
+              "host": ["{{base_url}}"],
+              "path": ["emails"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "categoryId",
+                  "value": ""
+                },
+                {
+                  "key": "senderId",
+                  "value": ""
+                },
+                {
+                  "key": "hasAttachments",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Détails Email",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/emails/1",
+              "host": ["{{base_url}}"],
+              "path": ["emails", "1"]
+            }
+          }
+        },
+        {
+          "name": "Télécharger Pièce Jointe",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/emails/attachments/1/download",
+              "host": ["{{base_url}}"],
+              "path": ["emails", "attachments", "1", "download"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📝 Publications",
+      "item": [
+        {
+          "name": "Liste Publications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/publications?page=1&limit=10&status=&type=&category=&search=",
+              "host": ["{{base_url}}"],
+              "path": ["publications"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": ""
+                },
+                {
+                  "key": "type",
+                  "value": ""
+                },
+                {
+                  "key": "category",
+                  "value": ""
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer Publication",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nouvelle Publication\",\n  \"content\": \"Contenu de la nouvelle publication...\",\n  \"hashtags\": \"#jeroka #nouveauté\",\n  \"platforms\": [\"facebook\", \"linkedin\"],\n  \"type\": \"standard\",\n  \"status\": \"draft\",\n  \"category\": \"business\",\n  \"keywords\": \"jeroka, nouveauté, innovation\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/publications",
+              "host": ["{{base_url}}"],
+              "path": ["publications"]
+            }
+          }
+        },
+        {
+          "name": "Détails Publication",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/publications/1",
+              "host": ["{{base_url}}"],
+              "path": ["publications", "1"]
+            }
+          }
+        },
+        {
+          "name": "Modifier Publication",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Publication Modifiée\",\n  \"content\": \"Contenu mis à jour...\",\n  \"status\": \"scheduled\",\n  \"scheduledAt\": \"2024-01-20T14:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/publications/1",
+              "host": ["{{base_url}}"],
+              "path": ["publications", "1"]
+            }
+          }
+        },
+        {
+          "name": "Supprimer Publication",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/publications/1",
+              "host": ["{{base_url}}"],
+              "path": ["publications", "1"]
+            }
+          }
+        },
+        {
+          "name": "Publier Publication",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/publications/1/publish",
+              "host": ["{{base_url}}"],
+              "path": ["publications", "1", "publish"]
+            }
+          }
+        },
+        {
+          "name": "Upload Image Publication",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/publications/upload-image",
+              "host": ["{{base_url}}"],
+              "path": ["publications", "upload-image"]
+            }
+          }
+        },
+        {
+          "name": "Statistiques Publications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/publications/stats",
+              "host": ["{{base_url}}"],
+              "path": ["publications", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Dashboard",
+      "item": [
+        {
+          "name": "Statistiques Dashboard",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/dashboard/stats",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Activité Récente",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/dashboard/recent-activity",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "recent-activity"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

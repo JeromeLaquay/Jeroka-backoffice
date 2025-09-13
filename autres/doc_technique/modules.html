@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modules - Documentation Jeroka</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>📚 Documentation Jeroka</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="modules.html" class="active">Modules</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="deployment.html">Déploiement</a></li>
+                <li><a href="messages.html">Messages</a></li>
+                <li><a href="factures.html">Factures</a></li>
+                <li><a href="devis.html">Devis</a></li>
+            </ul>
+        </nav>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Basculer le thème">
+            <span id="theme-icon">🌙</span>
+        </button>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>🧩 Modules et Fonctionnalités</h1>
+            <p>Présentation détaillée des modules du système Jeroka et de leurs fonctionnalités</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Vue d'ensemble des Modules</h2>
+            <p>Le système Jeroka est organisé en modules fonctionnels qui couvrent tous les aspects de la gestion d'entreprise. Chaque module est conçu pour être autonome tout en s'intégrant parfaitement avec les autres.</p>
+        </div>
+
+        <!-- Module Authentification -->
+        <div class="content-section">
+            <h2>🔐 Module Authentification</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Connexion/Déconnexion</strong> - Authentification sécurisée avec JWT</li>
+                    <li><strong>Gestion des rôles</strong> - Système de permissions granulaire</li>
+                    <li><strong>Réinitialisation de mot de passe</strong> - Processus sécurisé par email</li>
+                    <li><strong>Refresh tokens</strong> - Renouvellement automatique des sessions</li>
+                    <li><strong>Multi-tenant</strong> - Support des entreprises multiples</li>
+                </ul>
+                
+                <h3>Endpoints API</h3>
+                <div class="code-block">
+                    <pre><code>POST /api/auth/login          - Connexion utilisateur
+POST /api/auth/register       - Inscription utilisateur
+POST /api/auth/refresh        - Renouveler le token
+POST /api/auth/logout         - Déconnexion
+POST /api/auth/forgot-password - Demande de réinitialisation
+POST /api/auth/reset-password  - Réinitialisation du mot de passe</code></pre>
+                </div>
+
+                <h3>Technologies utilisées</h3>
+                <ul>
+                    <li>JWT (JSON Web Tokens)</li>
+                    <li>bcrypt pour le hachage des mots de passe</li>
+                    <li>Middleware d'authentification Express</li>
+                    <li>Validation des données avec Joi</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Module Gestion des Utilisateurs -->
+        <div class="content-section">
+            <h2>👥 Module Gestion des Utilisateurs</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>CRUD utilisateurs</strong> - Création, lecture, mise à jour, suppression</li>
+                    <li><strong>Profils utilisateurs</strong> - Gestion des informations personnelles</li>
+                    <li><strong>Gestion des permissions</strong> - Attribution des rôles et droits</li>
+                    <li><strong>Historique des connexions</strong> - Suivi des activités</li>
+                    <li><strong>Gestion des équipes</strong> - Organisation des utilisateurs par équipes</li>
+                </ul>
+
+                <h3>Endpoints API</h3>
+                <div class="code-block">
+                    <pre><code>GET    /api/users              - Liste des utilisateurs
+POST   /api/users              - Créer un utilisateur
+GET    /api/users/:id          - Détails d'un utilisateur
+PUT    /api/users/:id          - Modifier un utilisateur
+DELETE /api/users/:id          - Supprimer un utilisateur
+GET    /api/users/:id/profile  - Profil utilisateur
+PUT    /api/users/:id/profile  - Modifier le profil</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module Gestion des Clients -->
+        <div class="content-section">
+            <h2>🏢 Module Gestion des Clients</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Base de données clients</strong> - Gestion complète des informations clients</li>
+                    <li><strong>Historique des interactions</strong> - Suivi des communications</li>
+                    <li><strong>Segmentation clients</strong> - Catégorisation et étiquetage</li>
+                    <li><strong>Import/Export</strong> - Migration des données clients</li>
+                    <li><strong>Recherche avancée</strong> - Filtres et recherche multicritères</li>
+                </ul>
+
+                <h3>Endpoints API</h3>
+                <div class="code-block">
+                    <pre><code>GET    /api/clients            - Liste des clients
+POST   /api/clients            - Créer un client
+GET    /api/clients/:id        - Détails d'un client
+PUT    /api/clients/:id        - Modifier un client
+DELETE /api/clients/:id        - Supprimer un client
+GET    /api/clients/:id/history - Historique du client
+POST   /api/clients/import     - Import en masse</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module Gestion des Produits -->
+        <div class="content-section">
+            <h2>📦 Module Gestion des Produits</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Catalogue produits</strong> - Gestion complète du catalogue</li>
+                    <li><strong>Catégories et sous-catégories</strong> - Organisation hiérarchique</li>
+                    <li><strong>Gestion des stocks</strong> - Suivi des quantités disponibles</li>
+                    <li><strong>Prix et promotions</strong> - Gestion tarifaire flexible</li>
+                    <li><strong>Images et médias</strong> - Gestion des ressources visuelles</li>
+                    <li><strong>Variantes produits</strong> - Gestion des options (couleur, taille, etc.)</li>
+                </ul>
+
+                <h3>Endpoints API</h3>
+                <div class="code-block">
+                    <pre><code>GET    /api/products           - Liste des produits
+POST   /api/products           - Créer un produit
+GET    /api/products/:id       - Détails d'un produit
+PUT    /api/products/:id       - Modifier un produit
+DELETE /api/products/:id       - Supprimer un produit
+GET    /api/products/categories - Liste des catégories
+POST   /api/products/:id/stock - Mise à jour du stock</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module Gestion des Devis -->
+        <div class="content-section">
+            <h2>📋 Module Gestion des Devis</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Création de devis</strong> - Génération automatique avec templates</li>
+                    <li><strong>Calculs automatiques</strong> - TVA, remises, totaux</li>
+                    <li><strong>Génération PDF</strong> - Export en format professionnel</li>
+                    <li><strong>Envoi par email</strong> - Envoi automatique aux clients</li>
+                    <li><strong>Suivi des statuts</strong> - Brouillon, envoyé, accepté, refusé</li>
+                    <li><strong>Conversion en facture</strong> - Transformation automatique</li>
+                    <li><strong>Modèles personnalisables</strong> - Templates de devis</li>
+                </ul>
+
+                <h3>Endpoints API</h3>
+                <div class="code-block">
+                    <pre><code>GET    /api/quotes             - Liste des devis
+POST   /api/quotes             - Créer un devis
+GET    /api/quotes/:id         - Détails d'un devis
+PUT    /api/quotes/:id         - Modifier un devis
+POST   /api/quotes/:id/send    - Envoyer un devis
+GET    /api/quotes/:id/pdf     - Télécharger le PDF
+POST   /api/quotes/:id/convert - Convertir en facture</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module Gestion des Factures -->
+        <div class="content-section">
+            <h2>🧾 Module Gestion des Factures</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Génération de factures</strong> - Création automatique depuis les devis</li>
+                    <li><strong>Numérotation automatique</strong> - Séquence de numéros personnalisable</li>
+                    <li><strong>Gestion des paiements</strong> - Suivi des échéances et règlements</li>
+                    <li><strong>Relances automatiques</strong> - Système de relance configurable</li>
+                    <li><strong>Export comptable</strong> - Intégration avec les logiciels comptables</li>
+                    <li><strong>Génération PDF</strong> - Factures au format professionnel</li>
+                </ul>
+
+                <h3>Endpoints API</h3>
+                <div class="code-block">
+                    <pre><code>GET    /api/invoices           - Liste des factures
+POST   /api/invoices           - Créer une facture
+GET    /api/invoices/:id       - Détails d'une facture
+PUT    /api/invoices/:id       - Modifier une facture
+POST   /api/invoices/:id/send  - Envoyer une facture
+GET    /api/invoices/:id/pdf   - Télécharger le PDF
+POST   /api/invoices/:id/pay   - Enregistrer un paiement</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module Gestion des Messages -->
+        <div class="content-section">
+            <h2>💬 Module Gestion des Messages</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Réception des messages</strong> - Collecte depuis le site web</li>
+                    <li><strong>Classification automatique</strong> - Catégorisation par type et priorité</li>
+                    <li><strong>Génération IA de réponses</strong> - Brouillons automatiques avec ChatGPT</li>
+                    <li><strong>Gestion des statuts</strong> - Nouveau, lu, répondu, archivé</li>
+                    <li><strong>Filtres et recherche</strong> - Recherche multicritères</li>
+                    <li><strong>Notifications</strong> - Alertes en temps réel</li>
+                    <li><strong>Historique des communications</strong> - Suivi des échanges</li>
+                </ul>
+
+                <h3>Endpoints API</h3>
+                <div class="code-block">
+                    <pre><code>GET    /api/messages           - Liste des messages
+POST   /api/messages           - Créer un message
+GET    /api/messages/:id       - Détails d'un message
+PUT    /api/messages/:id       - Modifier un message
+POST   /api/messages/:id/mark-read - Marquer comme lu
+POST   /api/messages/:id/ai-draft - Générer réponse IA
+GET    /api/messages/stats     - Statistiques des messages</code></pre>
+                </div>
+
+                <h3>Intégration IA</h3>
+                <ul>
+                    <li><strong>Service IA modulaire</strong> - Support de différents LLMs (ChatGPT, Claude)</li>
+                    <li><strong>Génération de brouillons</strong> - Réponses personnalisées selon le ton</li>
+                    <li><strong>Templates intelligents</strong> - Adaptation selon le type de message</li>
+                    <li><strong>Multi-langues</strong> - Support français et anglais</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Module Calendrier -->
+        <div class="content-section">
+            <h2>📅 Module Calendrier</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Gestion des rendez-vous</strong> - Planification et suivi</li>
+                    <li><strong>Calendrier partagé</strong> - Collaboration en équipe</li>
+                    <li><strong>Rappels automatiques</strong> - Notifications par email/SMS</li>
+                    <li><strong>Synchronisation externe</strong> - Intégration Google Calendar, Outlook</li>
+                    <li><strong>Gestion des disponibilités</strong> - Planning des ressources</li>
+                    <li><strong>Réservation en ligne</strong> - Interface client pour prise de RDV</li>
+                </ul>
+
+                <h3>Endpoints API</h3>
+                <div class="code-block">
+                    <pre><code>GET    /api/calendar/events    - Liste des événements
+POST   /api/calendar/events    - Créer un événement
+GET    /api/calendar/events/:id - Détails d'un événement
+PUT    /api/calendar/events/:id - Modifier un événement
+DELETE /api/calendar/events/:id - Supprimer un événement
+GET    /api/calendar/availability - Vérifier disponibilité</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module Publications -->
+        <div class="content-section">
+            <h2>📝 Module Publications</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Gestion de contenu</strong> - Articles, actualités, documentation</li>
+                    <li><strong>Éditeur WYSIWYG</strong> - Création de contenu riche</li>
+                    <li><strong>Gestion des médias</strong> - Upload et organisation des fichiers</li>
+                    <li><strong>Planification de publication</strong> - Publication différée</li>
+                    <li><strong>SEO et métadonnées</strong> - Optimisation pour les moteurs de recherche</li>
+                    <li><strong>Versioning</strong> - Historique des modifications</li>
+                </ul>
+
+                <h3>Endpoints API</h3>
+                <div class="code-block">
+                    <pre><code>GET    /api/publications       - Liste des publications
+POST   /api/publications       - Créer une publication
+GET    /api/publications/:id   - Détails d'une publication
+PUT    /api/publications/:id   - Modifier une publication
+DELETE /api/publications/:id   - Supprimer une publication
+POST   /api/publications/:id/publish - Publier une publication</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module E-boutique -->
+        <div class="content-section">
+            <h2>🛒 Module E-boutique</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Catalogue en ligne</strong> - Affichage des produits</li>
+                    <li><strong>Panier d'achat</strong> - Gestion des commandes</li>
+                    <li><strong>Processus de commande</strong> - Tunnel de vente optimisé</li>
+                    <li><strong>Gestion des stocks</strong> - Synchronisation temps réel</li>
+                    <li><strong>Paiements en ligne</strong> - Intégration Stripe, PayPal</li>
+                    <li><strong>Comptes clients</strong> - Espace personnel</li>
+                    <li><strong>Suivi des commandes</strong> - Statuts et notifications</li>
+                </ul>
+
+                <h3>Technologies utilisées</h3>
+                <ul>
+                    <li>Vue.js 3 avec Composition API</li>
+                    <li>Pinia pour la gestion d'état</li>
+                    <li>Vue Router pour la navigation</li>
+                    <li>Axios pour les appels API</li>
+                    <li>Tailwind CSS pour le styling</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Module Backoffice -->
+        <div class="content-section">
+            <h2>⚙️ Module Backoffice</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Tableau de bord</strong> - Vue d'ensemble des KPIs</li>
+                    <li><strong>Gestion centralisée</strong> - Interface unifiée pour tous les modules</li>
+                    <li><strong>Rapports et analytics</strong> - Tableaux de bord personnalisables</li>
+                    <li><strong>Configuration système</strong> - Paramètres et préférences</li>
+                    <li><strong>Gestion des utilisateurs</strong> - Administration des comptes</li>
+                    <li><strong>Logs et monitoring</strong> - Suivi des activités système</li>
+                </ul>
+
+                <h3>Technologies utilisées</h3>
+                <ul>
+                    <li>Vue.js 3 avec TypeScript</li>
+                    <li>Pinia pour la gestion d'état</li>
+                    <li>Vue Router pour la navigation</li>
+                    <li>Headless UI pour les composants</li>
+                    <li>Chart.js pour les graphiques</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Intégrations et APIs -->
+        <div class="content-section">
+            <h2>🔗 Intégrations et APIs</h2>
+            <div class="module-card">
+                <h3>Services externes intégrés</h3>
+                <ul>
+                    <li><strong>OpenAI ChatGPT</strong> - Génération de réponses IA</li>
+                    <li><strong>Stripe</strong> - Paiements en ligne</li>
+                    <li><strong>SendGrid</strong> - Envoi d'emails transactionnels</li>
+                    <li><strong>Google Calendar</strong> - Synchronisation calendrier</li>
+                    <li><strong>Dropbox/Google Drive</strong> - Stockage de fichiers</li>
+                </ul>
+
+                <h3>APIs publiques</h3>
+                <ul>
+                    <li><strong>REST API</strong> - Interface standardisée</li>
+                    <li><strong>Webhooks</strong> - Notifications en temps réel</li>
+                    <li><strong>GraphQL</strong> - Requêtes flexibles (en développement)</li>
+                    <li><strong>SDK JavaScript</strong> - Intégration facilitée</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Jeroka - Documentation Technique</p>
+    </footer>
+
+    <script>
+        // Gestion du thème
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Initialiser le thème au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                themeIcon.textContent = '☀️';
+            } else {
+                themeIcon.textContent = '🌙';
+            }
+        });
+    </script>
+</body>
+</html>

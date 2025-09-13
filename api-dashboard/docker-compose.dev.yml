@@ -47,6 +47,7 @@ services:
       JWT_REFRESH_SECRET: b8e9f0a3d5c7e2f9a1d4c6e8b0f3a5d7c9e1f4a6d8c0e3f5a7d9c1e4f6a8d0c3f5a7e9c1f4a6d8c0e3f5a7d9c1e4f6a8d0c3f5a7e9c1f4a6d8c0e3f5a7d9c1e4f6a8
       JWT_REFRESH_EXPIRES_IN: 30d
       
+      OPENAI_API_KEY: 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
       # CORS
       FRONTEND_URL: http://localhost:3000
       BACKOFFICE_URL: http://localhost:3001

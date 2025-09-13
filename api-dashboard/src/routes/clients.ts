@@ -5,8 +5,6 @@ import { ClientService } from '../services/clientService';
 
 const router = Router();
 
-// Types locaux supprimés: on s'appuie sur AuthRequest (req.user)
-
 router.use(verifyToken);
 
 /**

@@ -1,194 +1,250 @@
 <template>
-  <div class="clients-view">
-    <!-- En-tête avec statistiques -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 mb-4">Gestion des Clients</h1>
+  <div class="space-y-6">
+    <!-- En-tête -->
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Gestion des Clients</h1>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Gérez votre base de données clients et prospects
+        </p>
+      </div>
       
-      <!-- Statistiques -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white p-4 rounded-lg shadow">
+      <div class="flex space-x-3">
+        <button
+          @click="refreshClients"
+          class="btn-secondary inline-flex items-center"
+        >
+          <ArrowPathIcon class="h-4 w-4 mr-2" />
+          Actualiser
+        </button>
+        
+        <button
+          @click="createClient"
+          class="btn-primary inline-flex items-center"
+        >
+          <PlusIcon class="h-4 w-4 mr-2" />
+          Nouveau Client
+        </button>
+      </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-4">
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
           <div class="flex items-center">
-            <div class="p-2 bg-blue-100 rounded-lg">
-              <UsersIcon class="h-6 w-6 text-blue-600" />
+            <div class="flex-shrink-0">
+              <UsersIcon class="h-6 w-6 text-primary-600" />
             </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">Total Clients</p>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.total }}</p>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Total Clients
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {{ stats.total }}
+                </dd>
+              </dl>
             </div>
           </div>
         </div>
-        
-        <div class="bg-white p-4 rounded-lg shadow">
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
           <div class="flex items-center">
-            <div class="p-2 bg-green-100 rounded-lg">
-              <CheckCircleIcon class="h-6 w-6 text-green-600" />
+            <div class="flex-shrink-0">
+              <CheckCircleIcon class="h-6 w-6 text-success-600" />
             </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">Clients Actifs</p>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.active }}</p>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Clients Actifs
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {{ stats.active }}
+                </dd>
+              </dl>
             </div>
           </div>
         </div>
-        
-        <div class="bg-white p-4 rounded-lg shadow">
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
           <div class="flex items-center">
-            <div class="p-2 bg-yellow-100 rounded-lg">
-              <UserPlusIcon class="h-6 w-6 text-yellow-600" />
+            <div class="flex-shrink-0">
+              <UserPlusIcon class="h-6 w-6 text-warning-600" />
             </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">Prospects</p>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.prospects }}</p>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Prospects
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {{ stats.prospects }}
+                </dd>
+              </dl>
             </div>
           </div>
         </div>
-        
-        <div class="bg-white p-4 rounded-lg shadow">
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
           <div class="flex items-center">
-            <div class="p-2 bg-purple-100 rounded-lg">
-              <BuildingOfficeIcon class="h-6 w-6 text-purple-600" />
+            <div class="flex-shrink-0">
+              <BuildingOfficeIcon class="h-6 w-6 text-secondary-600" />
             </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">Entreprises</p>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.companies }}</p>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Entreprises
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {{ stats.companies }}
+                </dd>
+              </dl>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Filtres et actions -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
-      <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <!-- Filtres -->
-        <div class="flex flex-wrap gap-4 items-center">
+    <!-- Filtres et recherche -->
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Recherche -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Recherche
+          </label>
           <div class="relative">
             <MagnifyingGlassIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               v-model="filters.search"
               type="text"
-              placeholder="Rechercher un client..."
-              class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Nom, email, entreprise..."
+              class="pl-10 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               @input="debouncedSearch"
             />
           </div>
-          
-          <select v-model="filters.status" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+        </div>
+        
+        <!-- Statut -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Statut
+          </label>
+          <select 
+            v-model="filters.status" 
+            class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          >
             <option value="">Tous les statuts</option>
             <option value="active">Actif</option>
             <option value="prospect">Prospect</option>
             <option value="inactive">Inactif</option>
           </select>
-          
-          <select v-model="filters.type" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+        </div>
+        
+        <!-- Type -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Type
+          </label>
+          <select 
+            v-model="filters.type" 
+            class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          >
             <option value="">Tous les types</option>
             <option value="individual">Particulier</option>
             <option value="company">Entreprise</option>
           </select>
         </div>
-        
-        <!-- Actions -->
-        <div class="flex gap-2">
-          <button
-            @click="refreshClients"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            <ArrowPathIcon class="h-4 w-4 inline mr-2" />
-            Actualiser
-          </button>
-          <button
-            @click="createClient"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <PlusIcon class="h-4 w-4 inline mr-2" />
-            Nouveau Client
-          </button>
-        </div>
       </div>
     </div>
 
     <!-- Tableau des clients -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-800">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="table-header">
                 Client
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="table-header">
                 Type
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="table-header">
                 Contact
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="table-header">
                 Statut
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="table-header">
                 Créé le
               </th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="table-header text-right">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="client in clients" :key="client.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap">
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tr v-for="client in clients" :key="client.id" class="table-row">
+              <td class="table-cell">
                 <div class="flex items-center">
                   <div class="flex-shrink-0 h-10 w-10">
-                    <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                      <span class="text-sm font-medium text-gray-700">
+                    <div class="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                      <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
                         {{ getInitials(client.first_name, client.last_name) }}
                       </span>
                     </div>
                   </div>
                   <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900">
+                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                       {{ client.first_name }} {{ client.last_name }}
                     </div>
-                    <div v-if="client.company_name" class="text-sm text-gray-500">
+                    <div v-if="client.company_name" class="text-sm text-gray-500 dark:text-gray-400">
                       {{ client.company_name }}
                     </div>
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      :class="client.type === 'company' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'">
+              <td class="table-cell">
+                <span class="badge" :class="client.type === 'company' ? 'badge-primary' : 'badge-success'">
                   {{ client.type === 'company' ? 'Entreprise' : 'Particulier' }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">{{ client.email }}</div>
-                <div v-if="client.phone" class="text-sm text-gray-500">{{ client.phone }}</div>
+              <td class="table-cell">
+                <div class="text-sm text-gray-900 dark:text-gray-100">{{ client.email }}</div>
+                <div v-if="client.phone" class="text-sm text-gray-500 dark:text-gray-400">{{ client.phone }}</div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      :class="getStatusClass(client.status)">
+              <td class="table-cell">
+                <span class="badge" :class="getStatusClass(client.status)">
                   {{ getStatusLabel(client.status) }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="table-cell text-sm text-gray-500 dark:text-gray-400">
                 {{ formatDate(client.created_at) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td class="table-cell text-right text-sm font-medium">
                 <div class="flex justify-end gap-2">
                   <button
                     @click="viewClient(client.id)"
-                    class="text-blue-600 hover:text-blue-900"
+                    class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
                   >
                     Voir
                   </button>
                   <button
                     @click="editClient(client.id)"
-                    class="text-indigo-600 hover:text-indigo-900"
+                    class="text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-secondary-300"
                   >
                     Modifier
                   </button>
                   <button
                     @click="deleteClient(client.id)"
-                    class="text-red-600 hover:text-red-900"
+                    class="text-danger-600 hover:text-danger-900 dark:text-danger-400 dark:hover:text-danger-300"
                   >
                     Supprimer
                   </button>
@@ -200,26 +256,26 @@
       </div>
       
       <!-- Pagination -->
-      <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+      <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
         <div class="flex-1 flex justify-between sm:hidden">
           <button
             @click="previousPage"
             :disabled="pagination.page === 1"
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            class="btn-secondary disabled:opacity-50"
           >
             Précédent
           </button>
           <button
             @click="nextPage"
             :disabled="pagination.page === pagination.totalPages"
-            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            class="btn-secondary disabled:opacity-50"
           >
             Suivant
           </button>
         </div>
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div>
-            <p class="text-sm text-gray-700">
+            <p class="text-sm text-gray-700 dark:text-gray-300">
               Affichage de
               <span class="font-medium">{{ (pagination.page - 1) * pagination.limit + 1 }}</span>
               à
@@ -234,7 +290,7 @@
               <button
                 @click="previousPage"
                 :disabled="pagination.page === 1"
-                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
               >
                 Précédent
               </button>
@@ -245,8 +301,8 @@
                 :class="[
                   'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
                   page === pagination.page
-                    ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                    ? 'z-10 bg-primary-50 dark:bg-primary-900 border-primary-500 text-primary-600 dark:text-primary-300'
+                    : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
                 ]"
               >
                 {{ page }}
@@ -254,7 +310,7 @@
               <button
                 @click="nextPage"
                 :disabled="pagination.page === pagination.totalPages"
-                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
               >
                 Suivant
               </button>
@@ -265,28 +321,28 @@
     </div>
 
     <!-- Modal de confirmation de suppression -->
-    <div v-if="showDeleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div v-if="showDeleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 overflow-y-auto h-full w-full z-50">
+      <div class="relative top-20 mx-auto p-5 border border-gray-200 dark:border-gray-700 w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
         <div class="mt-3 text-center">
-          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-            <ExclamationTriangleIcon class="h-6 w-6 text-red-600" />
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-danger-100 dark:bg-danger-900">
+            <ExclamationTriangleIcon class="h-6 w-6 text-danger-600 dark:text-danger-400" />
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mt-4">Confirmer la suppression</h3>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mt-4">Confirmer la suppression</h3>
           <div class="mt-2 px-7 py-3">
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
               Êtes-vous sûr de vouloir supprimer ce client ? Cette action est irréversible.
             </p>
           </div>
           <div class="items-center px-4 py-3">
             <button
               @click="confirmDelete"
-              class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300 mr-2"
+              class="btn-danger w-full mb-3"
             >
               Supprimer
             </button>
             <button
               @click="cancelDelete"
-              class="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+              class="btn-secondary w-full"
             >
               Annuler
             </button>
@@ -470,13 +526,13 @@ const getInitials = (firstName: string, lastName: string) => {
 const getStatusClass = (status: string) => {
   switch (status) {
     case 'active':
-      return 'bg-green-100 text-green-800'
+      return 'badge-success'
     case 'prospect':
-      return 'bg-yellow-100 text-yellow-800'
+      return 'badge-warning'
     case 'inactive':
-      return 'bg-red-100 text-red-800'
+      return 'badge-danger'
     default:
-      return 'bg-gray-100 text-gray-800'
+      return 'badge-secondary'
   }
 }
 
@@ -527,9 +583,3 @@ onMounted(() => {
   loadStats()
 })
 </script>
-
-<style scoped>
-.clients-view {
-  padding: 1.5rem;
-}
-</style>

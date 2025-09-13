@@ -138,4 +138,8 @@ export class ClientService {
 
     return ClientRepository.getClientStats(companyId);
   }
+
+  static async getClientByEmail(email: string, companyId: string): Promise<Client | null> {
+    return ClientRepository.getClientByEmail(email, companyId);
+  }
 }

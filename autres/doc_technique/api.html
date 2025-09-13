@@ -15,8 +15,12 @@
             <ul class="nav-links">
                 <li><a href="index.html">Accueil</a></li>
                 <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="modules.html">Modules</a></li>
                 <li><a href="api.html" class="active">API</a></li>
                 <li><a href="deployment.html">Déploiement</a></li>
+                <li><a href="messages.html">Messages</a></li>
+                <li><a href="factures.html">Factures</a></li>
+                <li><a href="devis.html">Devis</a></li>
             </ul>
         </nav>
         <button class="theme-toggle" onclick="toggleTheme()" title="Basculer le thème">
@@ -309,6 +313,110 @@ Production: https://api.jeroka.com/api</code></pre>
         </div>
 
         <div class="content-section">
+            <h2>Gestion des Messages</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Auth</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/messages</td>
+                        <td>Liste des messages</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/messages</td>
+                        <td>Créer un message</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/messages/:id</td>
+                        <td>Détails d'un message</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>PUT</td>
+                        <td>/api/messages/:id</td>
+                        <td>Modifier un message</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/messages/:id/mark-read</td>
+                        <td>Marquer comme lu</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/messages/:id/mark-unread</td>
+                        <td>Marquer comme non lu</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/messages/mark-all-read</td>
+                        <td>Marquer tous comme lus</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/messages/:id/ai-draft</td>
+                        <td>Générer réponse IA</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/messages/stats</td>
+                        <td>Statistiques des messages</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>DELETE</td>
+                        <td>/api/messages/:id</td>
+                        <td>Supprimer un message</td>
+                        <td>✅</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2>Service IA</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Auth</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GET</td>
+                        <td>/api/messages/ai/providers</td>
+                        <td>Liste des providers IA disponibles</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/messages/ai/test</td>
+                        <td>Tester la connexion IA</td>
+                        <td>✅</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-section">
             <h2>Codes de Réponse HTTP</h2>
             <table>
                 <thead>
@@ -407,6 +515,34 @@ Response:
     "address": "123 Rue Example, 75001 Paris",
     "createdAt": "2024-01-01T00:00:00.000Z"
   }
+}</code></pre>
+            </div>
+
+            <h3>Générer une réponse IA pour un message</h3>
+            <div class="code-block">
+                <pre><code>POST /api/messages/123/ai-draft
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+  "tone": "professionnel",
+  "language": "fr"
+}
+
+Response:
+{
+  "success": true,
+  "data": {
+    "draft": "Bonjour [Nom du client],\n\nMerci pour votre message concernant...",
+    "messageId": "123",
+    "generatedAt": "2024-01-01T12:00:00.000Z",
+    "options": {
+      "tone": "professionnel",
+      "language": "fr"
+    },
+    "provider": "chatgpt"
+  },
+  "message": "Brouillon IA généré avec succès"
 }</code></pre>
             </div>
         </div>

@@ -7,8 +7,9 @@
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       ]"
     >
-      <div class="flex items-center justify-center h-16 px-4 bg-primary-600 dark:bg-primary-700">
-        <h1 class="text-xl font-bold text-white">Jeroka Backoffice</h1>
+      <div class="flex items-center justify-center h-16 px-4">
+        <img src="../assets/x-logo.png" alt="Jeroka" class="h-12 w-12" />
+        <h1 class="text-xl font-bold text-primary-600">Jeroka Xperience</h1>
       </div>
       
       <nav class="mt-8">

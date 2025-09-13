@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Devis - Documentation Jeroka</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>📚 Documentation Jeroka</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="modules.html">Modules</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="deployment.html">Déploiement</a></li>
+                <li><a href="messages.html">Messages</a></li>
+                <li><a href="factures.html">Factures</a></li>
+                <li><a href="devis.html" class="active">Devis</a></li>
+            </ul>
+        </nav>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Basculer le thème">
+            <span id="theme-icon">🌙</span>
+        </button>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>📋 Module Gestion des Devis</h1>
+            <p>Système complet de création et gestion des devis avec conversion automatique en factures</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Vue d'ensemble</h2>
+            <p>Le module Devis de Jeroka est un système professionnel de création et gestion des devis qui permet de générer des propositions commerciales détaillées, de les envoyer aux clients et de les convertir automatiquement en factures une fois acceptés.</p>
+            
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Création de devis</strong> - Génération automatique avec templates</li>
+                    <li><strong>Calculs automatiques</strong> - TVA, remises, totaux en temps réel</li>
+                    <li><strong>Génération PDF</strong> - Export en format professionnel</li>
+                    <li><strong>Envoi par email</strong> - Transmission automatique aux clients</li>
+                    <li><strong>Suivi des statuts</strong> - Brouillon, envoyé, accepté, refusé, expiré</li>
+                    <li><strong>Conversion en facture</strong> - Transformation automatique</li>
+                    <li><strong>Modèles personnalisables</strong> - Templates de devis adaptables</li>
+                    <li><strong>Gestion des validités</strong> - Dates d'expiration configurables</li>
+                    <li><strong>Relances automatiques</strong> - Rappels avant expiration</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Architecture du Module</h2>
+            <div class="module-card">
+                <h3>Composants principaux</h3>
+                <ul>
+                    <li><strong>QuoteService</strong> - Logique métier et gestion des devis</li>
+                    <li><strong>PDFGenerator</strong> - Génération des devis en PDF</li>
+                    <li><strong>EmailService</strong> - Envoi automatique des devis</li>
+                    <li><strong>TemplateEngine</strong> - Gestion des modèles personnalisables</li>
+                    <li><strong>ConversionService</strong> - Transformation en factures</li>
+                    <li><strong>ExpirationTracker</strong> - Suivi des dates de validité</li>
+                    <li><strong>ReminderService</strong> - Relances avant expiration</li>
+                </ul>
+
+                <h3>Technologies utilisées</h3>
+                <ul>
+                    <li><strong>Backend</strong> - Node.js, Express.js, TypeScript</li>
+                    <li><strong>Base de données</strong> - PostgreSQL avec relations optimisées</li>
+                    <li><strong>PDF</strong> - Puppeteer ou PDFKit pour génération</li>
+                    <li><strong>Email</strong> - SendGrid ou Nodemailer</li>
+                    <li><strong>Templates</strong> - Handlebars pour personnalisation</li>
+                    <li><strong>Calculs</strong> - Bibliothèques mathématiques précises</li>
+                    <li><strong>Authentification</strong> - JWT avec permissions granulaires</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>API Endpoints</h2>
+            <div class="module-card">
+                <h3>Gestion des Devis</h3>
+                <div class="code-block">
+                    <h4>Endpoints principaux</h4>
+                    <pre><code>GET    /api/v1/quotes              - Liste des devis (avec filtres)
+POST   /api/v1/quotes              - Créer un nouveau devis
+GET    /api/v1/quotes/:id          - Détails d'un devis
+PUT    /api/v1/quotes/:id          - Modifier un devis
+DELETE /api/v1/quotes/:id          - Supprimer un devis
+GET    /api/v1/quotes/stats        - Statistiques des devis</code></pre>
+                </div>
+
+                <h3>Gestion des Statuts</h3>
+                <div class="code-block">
+                    <h4>Endpoints de statut</h4>
+                    <pre><code>PUT    /api/v1/quotes/:id/status   - Modifier le statut
+POST   /api/v1/quotes/:id/send     - Envoyer le devis par email
+GET    /api/v1/quotes/:id/pdf      - Télécharger le PDF</code></pre>
+                </div>
+
+                <h3>Conversion en Facture</h3>
+                <div class="code-block">
+                    <h4>Endpoint de conversion</h4>
+                    <pre><code>POST   /api/v1/quotes/:id/convert  - Convertir en facture</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Structure des Données</h2>
+            <div class="module-card">
+                <h3>Modèle de Devis</h3>
+                <div class="code-block">
+                    <h4>Structure complète</h4>
+                    <pre><code>{
+  "id": "uuid",
+  "quoteNumber": "QUO-2024-001",
+  "clientId": "uuid",
+  "clientName": "string",
+  "clientEmail": "string",
+  "clientAddress": {
+    "street": "string",
+    "city": "string",
+    "postalCode": "string",
+    "country": "string"
+  },
+  "status": "draft" | "sent" | "accepted" | "rejected" | "expired" | "converted",
+  "issueDate": "date",
+  "validUntil": "date",
+  "acceptedDate": "date",
+  "items": [
+    {
+      "id": "uuid",
+      "description": "string",
+      "quantity": "number",
+      "unitPrice": "number",
+      "total": "number",
+      "taxRate": "number",
+      "discount": "number"
+    }
+  ],
+  "subtotal": "number",
+  "discountAmount": "number",
+  "taxAmount": "number",
+  "total": "number",
+  "notes": "string",
+  "terms": "string",
+  "companyId": "uuid",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}</code></pre>
+                </div>
+
+                <h3>Modèle d'Article</h3>
+                <div class="code-block">
+                    <h4>Structure d'article</h4>
+                    <pre><code>{
+  "id": "uuid",
+  "description": "string",
+  "quantity": "number",
+  "unitPrice": "number",
+  "total": "number",
+  "taxRate": "number",
+  "discount": "number",
+  "category": "string",
+  "productId": "uuid"
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Workflow de Devis</h2>
+            <div class="module-card">
+                <h3>Processus complet</h3>
+                <ol>
+                    <li><strong>Création</strong> - Génération depuis template ou création manuelle</li>
+                    <li><strong>Configuration</strong> - Définition des articles et prix</li>
+                    <li><strong>Calculs</strong> - Application des remises et TVA</li>
+                    <li><strong>Validation</strong> - Vérification des données</li>
+                    <li><strong>Génération PDF</strong> - Création du document final</li>
+                    <li><strong>Envoi</strong> - Transmission par email au client</li>
+                    <li><strong>Suivi</strong> - Monitoring des réponses client</li>
+                    <li><strong>Acceptation</strong> - Validation par le client</li>
+                    <li><strong>Conversion</strong> - Transformation en facture</li>
+                    <li><strong>Archivage</strong> - Conservation des documents</li>
+                </ol>
+
+                <h3>Statuts des Devis</h3>
+                <ul>
+                    <li><strong>Draft</strong> - Brouillon en cours de création</li>
+                    <li><strong>Sent</strong> - Envoyé au client</li>
+                    <li><strong>Accepted</strong> - Accepté par le client</li>
+                    <li><strong>Rejected</strong> - Refusé par le client</li>
+                    <li><strong>Expired</strong> - Expiré (date dépassée)</li>
+                    <li><strong>Converted</strong> - Converti en facture</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Système de Templates</h2>
+            <div class="module-card">
+                <h3>Types de Templates</h3>
+                <ul>
+                    <li><strong>Templates par défaut</strong> - Modèles standards</li>
+                    <li><strong>Templates personnalisés</strong> - Adaptés à l'entreprise</li>
+                    <li><strong>Templates par secteur</strong> - Spécialisés par activité</li>
+                    <li><strong>Templates par client</strong> - Personnalisés par client</li>
+                </ul>
+
+                <h3>Éléments personnalisables</h3>
+                <ul>
+                    <li><strong>En-tête</strong> - Logo, nom entreprise, coordonnées</li>
+                    <li><strong>Informations client</strong> - Adresse, contact</li>
+                    <li><strong>Corps du devis</strong> - Articles, descriptions, prix</li>
+                    <li><strong>Calculs</strong> - Remises, TVA, totaux</li>
+                    <li><strong>Conditions</strong> - Termes et conditions</li>
+                    <li><strong>Pied de page</strong> - Mentions légales, signature</li>
+                </ul>
+
+                <h3>Configuration de Template</h3>
+                <div class="code-block">
+                    <h4>Structure de template</h4>
+                    <pre><code>{
+  "id": "uuid",
+  "name": "string",
+  "description": "string",
+  "isDefault": "boolean",
+  "sections": {
+    "header": {
+      "logo": "url",
+      "companyInfo": "object",
+      "layout": "string"
+    },
+    "client": {
+      "showAddress": "boolean",
+      "showContact": "boolean"
+    },
+    "items": {
+      "showImages": "boolean",
+      "showDescriptions": "boolean",
+      "showDiscounts": "boolean"
+    },
+    "totals": {
+      "showSubtotal": "boolean",
+      "showTax": "boolean",
+      "showDiscount": "boolean"
+    },
+    "footer": {
+      "terms": "string",
+      "signature": "boolean"
+    }
+  },
+  "styling": {
+    "primaryColor": "string",
+    "fontFamily": "string",
+    "fontSize": "number"
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Calculs et Tarification</h2>
+            <div class="module-card">
+                <h3>Système de calculs</h3>
+                <ul>
+                    <li><strong>Calculs en temps réel</strong> - Mise à jour automatique</li>
+                    <li><strong>Remises multiples</strong> - Par article, par quantité, globale</li>
+                    <li><strong>TVA configurable</strong> - Taux variables par article</li>
+                    <li><strong>Arrondis précis</strong> - Gestion des centimes</li>
+                    <li><strong>Validation des calculs</strong> - Vérification d'intégrité</li>
+                </ul>
+
+                <h3>Types de remises</h3>
+                <ul>
+                    <li><strong>Remise pourcentage</strong> - % sur le prix unitaire</li>
+                    <li><strong>Remise fixe</strong> - Montant en euros</li>
+                    <li><strong>Remise par quantité</strong> - Tarifs dégressifs</li>
+                    <li><strong>Remise globale</strong> - Sur le total du devis</li>
+                    <li><strong>Remise client</strong> - Tarifs préférentiels</li>
+                </ul>
+
+                <h3>Exemple de calcul</h3>
+                <div class="code-block">
+                    <h4>Calcul détaillé</h4>
+                    <pre><code>Article: Développement web
+Quantité: 1
+Prix unitaire: 1000.00€
+Remise: 10%
+Sous-total: 900.00€
+TVA (20%): 180.00€
+Total: 1080.00€</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Conversion en Facture</h2>
+            <div class="module-card">
+                <h3>Processus de conversion</h3>
+                <ol>
+                    <li><strong>Vérification du statut</strong> - Devis doit être accepté</li>
+                    <li><strong>Copie des données</strong> - Transfert des informations</li>
+                    <li><strong>Génération numéro</strong> - Nouveau numéro de facture</li>
+                    <li><strong>Calcul échéance</strong> - Date de paiement</li>
+                    <li><strong>Mise à jour statut</strong> - Devis marqué comme converti</li>
+                    <li><strong>Création facture</strong> - Nouveau document généré</li>
+                    <li><strong>Notification</strong> - Alerte équipe commerciale</li>
+                </ol>
+
+                <h3>Données transférées</h3>
+                <ul>
+                    <li><strong>Informations client</strong> - Coordonnées complètes</li>
+                    <li><strong>Articles et prix</strong> - Détail des prestations</li>
+                    <li><strong>Calculs</strong> - Totaux et TVA</li>
+                    <li><strong>Notes</strong> - Commentaires et conditions</li>
+                    <li><strong>Référence</strong> - Lien vers le devis original</li>
+                </ul>
+
+                <h3>Personnalisation de la conversion</h3>
+                <ul>
+                    <li><strong>Délai de paiement</strong> - Échéance personnalisable</li>
+                    <li><strong>Conditions spéciales</strong> - Adaptation des termes</li>
+                    <li><strong>Numérotation</strong> - Séquence de facturation</li>
+                    <li><strong>Template facture</strong> - Mise en page différente</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Statistiques et Analytics</h2>
+            <div class="module-card">
+                <h3>Métriques commerciales</h3>
+                <div class="code-block">
+                    <h4>Données de statistiques</h4>
+                    <pre><code>{
+  "total": "number",
+  "sent": "number",
+  "accepted": "number",
+  "rejected": "number",
+  "expired": "number",
+  "converted": "number",
+  "totalValue": "number",
+  "averageQuote": "number",
+  "acceptanceRate": "number",
+  "conversionRate": "number",
+  "averageResponseTime": "number",
+  "byMonth": [
+    {
+      "month": "string",
+      "count": "number",
+      "value": "number",
+      "accepted": "number"
+    }
+  ],
+  "byClient": [
+    {
+      "clientId": "uuid",
+      "clientName": "string",
+      "count": "number",
+      "value": "number",
+      "accepted": "number"
+    }
+  ]
+}</code></pre>
+                </div>
+
+                <h3>Tableaux de bord</h3>
+                <ul>
+                    <li><strong>Performance commerciale</strong> - Taux d'acceptation</li>
+                    <li><strong>Pipeline de vente</strong> - Devis en cours</li>
+                    <li><strong>Évolution mensuelle</strong> - Tendances de vente</li>
+                    <li><strong>Top clients</strong> - Meilleurs prospects</li>
+                    <li><strong>Devis expirés</strong> - Relances à effectuer</li>
+                    <li><strong>Prévisions</strong> - Estimations de CA</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Gestion des Expirations</h2>
+            <div class="module-card">
+                <h3>Système d'expiration</h3>
+                <ul>
+                    <li><strong>Dates de validité</strong> - Durée personnalisable</li>
+                    <li><strong>Alertes automatiques</strong> - Notifications avant expiration</li>
+                    <li><strong>Relances préventives</strong> - Rappels aux clients</li>
+                    <li><strong>Prolongation</strong> - Extension de validité</li>
+                    <li><strong>Archivage automatique</strong> - Gestion des expirés</li>
+                </ul>
+
+                <h3>Types d'alertes</h3>
+                <ul>
+                    <li><strong>J-7</strong> - Rappel une semaine avant</li>
+                    <li><strong>J-3</strong> - Alerte 3 jours avant</li>
+                    <li><strong>J-1</strong> - Dernière chance</li>
+                    <li><strong>J+0</strong> - Notification d'expiration</li>
+                    <li><strong>J+7</strong> - Relance post-expiration</li>
+                </ul>
+
+                <h3>Actions automatiques</h3>
+                <ul>
+                    <li><strong>Changement de statut</strong> - Passage en "expiré"</li>
+                    <li><strong>Envoi d'emails</strong> - Notifications clients</li>
+                    <li><strong>Mise à jour CRM</strong> - Synchronisation</li>
+                    <li><strong>Génération de rapports</strong> - Statistiques</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Exemples d'utilisation</h2>
+            <div class="module-card">
+                <h3>Création d'un devis</h3>
+                <div class="code-block">
+                    <h4>Requête POST</h4>
+                    <pre><code>POST /api/v1/quotes
+Content-Type: application/json
+
+{
+  "clientId": "uuid",
+  "validUntil": "2024-03-15",
+  "items": [
+    {
+      "description": "Développement site web",
+      "quantity": 1,
+      "unitPrice": 5000.00,
+      "taxRate": 20,
+      "discount": 10
+    },
+    {
+      "description": "Formation utilisateur",
+      "quantity": 2,
+      "unitPrice": 500.00,
+      "taxRate": 20
+    }
+  ],
+  "notes": "Devis valable 30 jours",
+  "terms": "Paiement à 30 jours"
+}</code></pre>
+                </div>
+
+                <h3>Conversion en facture</h3>
+                <div class="code-block">
+                    <h4>Requête POST</h4>
+                    <pre><code>POST /api/v1/quotes/123/convert
+Content-Type: application/json
+
+{
+  "dueDate": "2024-02-15",
+  "notes": "Facture générée depuis le devis QUO-2024-001"
+}</code></pre>
+                </div>
+
+                <h3>Réponse de conversion</h3>
+                <div class="code-block">
+                    <h4>Réponse générée</h4>
+                    <pre><code>{
+  "success": true,
+  "message": "Devis converti en facture avec succès",
+  "data": {
+    "quote": {
+      "id": "123",
+      "status": "converted",
+      "quoteNumber": "QUO-2024-001"
+    },
+    "invoice": {
+      "id": "456",
+      "invoiceNumber": "INV-2024-001",
+      "status": "draft",
+      "total": 5400.00,
+      "dueDate": "2024-02-15"
+    }
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Intégrations</h2>
+            <div class="module-card">
+                <h3>Modules connectés</h3>
+                <ul>
+                    <li><strong>Module Clients</strong> - Informations client automatiques</li>
+                    <li><strong>Module Produits</strong> - Catalogue et prix</li>
+                    <li><strong>Module Factures</strong> - Conversion automatique</li>
+                    <li><strong>Module Messages</strong> - Notifications clients</li>
+                    <li><strong>Module Calendrier</strong> - Suivi des échéances</li>
+                </ul>
+
+                <h3>Services externes</h3>
+                <ul>
+                    <li><strong>Email</strong> - SendGrid, Mailgun</li>
+                    <li><strong>PDF</strong> - Puppeteer, PDFKit</li>
+                    <li><strong>Stockage</strong> - AWS S3, Google Cloud</li>
+                    <li><strong>CRM</strong> - HubSpot, Salesforce</li>
+                    <li><strong>Comptabilité</strong> - Sage, Ciel</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Configuration et Déploiement</h2>
+            <div class="module-card">
+                <h3>Variables d'environnement</h3>
+                <div class="code-block">
+                    <h4>Configuration requise</h4>
+                    <pre><code># Base de données
+DATABASE_URL=postgresql://user:pass@localhost:5432/jeroka
+
+# Email
+SENDGRID_API_KEY=SG...
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+
+# PDF
+PDF_TEMPLATE_PATH=/templates/quote.hbs
+PDF_OUTPUT_PATH=/uploads/quotes
+
+# Numérotation
+QUOTE_NUMBER_PREFIX=QUO
+QUOTE_NUMBER_START=1
+
+# Validité par défaut
+DEFAULT_QUOTE_VALIDITY_DAYS=30
+
+# JWT
+JWT_SECRET=your-secret-key
+
+# Environnement
+NODE_ENV=production</code></pre>
+                </div>
+
+                <h3>Dépendances</h3>
+                <ul>
+                    <li><strong>express</strong> - Framework web</li>
+                    <li><strong>puppeteer</strong> - Génération PDF</li>
+                    <li><strong>handlebars</strong> - Templates</li>
+                    <li><strong>sendgrid</strong> - Envoi d'emails</li>
+                    <li><strong>decimal.js</strong> - Calculs précis</li>
+                    <li><strong>jsonwebtoken</strong> - Authentification</li>
+                    <li><strong>joi</strong> - Validation</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Jeroka - Documentation Technique</p>
+    </footer>
+
+    <script>
+        // Gestion du thème
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Initialiser le thème au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                themeIcon.textContent = '☀️';
+            } else {
+                themeIcon.textContent = '🌙';
+            }
+        });
+    </script>
+</body>
+</html>

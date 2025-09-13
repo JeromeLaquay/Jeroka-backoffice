@@ -189,6 +189,68 @@ body {
     font-weight: 600;
 }
 
+/* Module Cards */
+.module-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.dark .module-card {
+    background: var(--gray-800);
+    border-color: var(--gray-700);
+}
+
+.module-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-500);
+}
+
+.dark .module-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.module-card h3 {
+    color: var(--primary-600);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary-100);
+    padding-bottom: 0.5rem;
+}
+
+.dark .module-card h3 {
+    border-bottom-color: var(--primary-800);
+}
+
+.module-card ul {
+    margin-bottom: 1.5rem;
+}
+
+.module-card li {
+    margin-bottom: 0.5rem;
+    color: var(--gray-600);
+    line-height: 1.6;
+}
+
+.dark .module-card li {
+    color: var(--gray-300);
+}
+
+.module-card li strong {
+    color: var(--gray-800);
+    font-weight: 600;
+}
+
+.dark .module-card li strong {
+    color: var(--gray-100);
+}
+
 .dark .card h4 {
     color: var(--primary-400);
 }

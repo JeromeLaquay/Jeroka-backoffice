@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Factures - Documentation Jeroka</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>📚 Documentation Jeroka</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="modules.html">Modules</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="deployment.html">Déploiement</a></li>
+                <li><a href="messages.html">Messages</a></li>
+                <li><a href="factures.html" class="active">Factures</a></li>
+                <li><a href="devis.html">Devis</a></li>
+            </ul>
+        </nav>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Basculer le thème">
+            <span id="theme-icon">🌙</span>
+        </button>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>🧾 Module Gestion des Factures</h1>
+            <p>Système complet de facturation avec génération automatique, suivi des paiements et relances</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Vue d'ensemble</h2>
+            <p>Le module Factures de Jeroka est un système de facturation professionnel qui permet de créer, gérer et suivre les factures de manière automatisée. Il intègre la génération de PDF, l'envoi par email, le suivi des paiements et les relances automatiques.</p>
+            
+            <div class="module-card">
+                <h3>Fonctionnalités principales</h3>
+                <ul>
+                    <li><strong>Génération automatique</strong> - Création depuis les devis acceptés</li>
+                    <li><strong>Numérotation séquentielle</strong> - Système de numéros personnalisable</li>
+                    <li><strong>Calculs automatiques</strong> - TVA, remises, totaux</li>
+                    <li><strong>Génération PDF</strong> - Factures au format professionnel</li>
+                    <li><strong>Envoi par email</strong> - Envoi automatique aux clients</li>
+                    <li><strong>Suivi des paiements</strong> - Gestion des échéances et règlements</li>
+                    <li><strong>Relances automatiques</strong> - Système de relance configurable</li>
+                    <li><strong>Export comptable</strong> - Intégration avec logiciels comptables</li>
+                    <li><strong>Statistiques avancées</strong> - Tableaux de bord financiers</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Architecture du Module</h2>
+            <div class="module-card">
+                <h3>Composants principaux</h3>
+                <ul>
+                    <li><strong>InvoiceService</strong> - Logique métier et gestion des factures</li>
+                    <li><strong>PDFGenerator</strong> - Génération des factures en PDF</li>
+                    <li><strong>EmailService</strong> - Envoi automatique des factures</li>
+                    <li><strong>PaymentTracker</strong> - Suivi des paiements et échéances</li>
+                    <li><strong>ReminderService</strong> - Système de relances automatiques</li>
+                    <li><strong>AccountingExport</strong> - Export vers systèmes comptables</li>
+                </ul>
+
+                <h3>Technologies utilisées</h3>
+                <ul>
+                    <li><strong>Backend</strong> - Node.js, Express.js, TypeScript</li>
+                    <li><strong>Base de données</strong> - PostgreSQL avec contraintes d'intégrité</li>
+                    <li><strong>PDF</strong> - Puppeteer ou PDFKit pour génération</li>
+                    <li><strong>Email</strong> - SendGrid ou Nodemailer</li>
+                    <li><strong>Templates</strong> - Handlebars pour personnalisation</li>
+                    <li><strong>Authentification</strong> - JWT avec permissions granulaires</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>API Endpoints</h2>
+            <div class="module-card">
+                <h3>Gestion des Factures</h3>
+                <div class="code-block">
+                    <h4>Endpoints principaux</h4>
+                    <pre><code>GET    /api/v1/invoices              - Liste des factures (avec filtres)
+POST   /api/v1/invoices              - Créer une nouvelle facture
+GET    /api/v1/invoices/:id          - Détails d'une facture
+PUT    /api/v1/invoices/:id          - Modifier une facture
+DELETE /api/v1/invoices/:id          - Supprimer une facture
+GET    /api/v1/invoices/stats        - Statistiques des factures</code></pre>
+                </div>
+
+                <h3>Gestion des Statuts</h3>
+                <div class="code-block">
+                    <h4>Endpoints de statut</h4>
+                    <pre><code>PUT    /api/v1/invoices/:id/status   - Modifier le statut
+POST   /api/v1/invoices/:id/send     - Envoyer la facture par email
+GET    /api/v1/invoices/:id/pdf      - Télécharger le PDF</code></pre>
+                </div>
+
+                <h3>Gestion des Paiements</h3>
+                <div class="code-block">
+                    <h4>Endpoints de paiement</h4>
+                    <pre><code>POST   /api/v1/invoices/:id/pay      - Enregistrer un paiement
+GET    /api/v1/invoices/:id/payments - Historique des paiements
+POST   /api/v1/invoices/:id/remind   - Envoyer une relance</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Structure des Données</h2>
+            <div class="module-card">
+                <h3>Modèle de Facture</h3>
+                <div class="code-block">
+                    <h4>Structure complète</h4>
+                    <pre><code>{
+  "id": "uuid",
+  "invoiceNumber": "INV-2024-001",
+  "clientId": "uuid",
+  "clientName": "string",
+  "clientEmail": "string",
+  "clientAddress": {
+    "street": "string",
+    "city": "string",
+    "postalCode": "string",
+    "country": "string"
+  },
+  "status": "draft" | "sent" | "paid" | "overdue" | "cancelled",
+  "issueDate": "date",
+  "dueDate": "date",
+  "paidDate": "date",
+  "items": [
+    {
+      "id": "uuid",
+      "description": "string",
+      "quantity": "number",
+      "unitPrice": "number",
+      "total": "number",
+      "taxRate": "number"
+    }
+  ],
+  "subtotal": "number",
+  "taxAmount": "number",
+  "total": "number",
+  "notes": "string",
+  "companyId": "uuid",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}</code></pre>
+                </div>
+
+                <h3>Modèle de Paiement</h3>
+                <div class="code-block">
+                    <h4>Structure de paiement</h4>
+                    <pre><code>{
+  "id": "uuid",
+  "invoiceId": "uuid",
+  "amount": "number",
+  "paymentDate": "date",
+  "paymentMethod": "bank_transfer" | "card" | "cash" | "check",
+  "reference": "string",
+  "notes": "string",
+  "createdAt": "datetime"
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Workflow de Facturation</h2>
+            <div class="module-card">
+                <h3>Processus complet</h3>
+                <ol>
+                    <li><strong>Création</strong> - Génération depuis devis ou création manuelle</li>
+                    <li><strong>Validation</strong> - Vérification des données et calculs</li>
+                    <li><strong>Génération PDF</strong> - Création du document final</li>
+                    <li><strong>Envoi</strong> - Transmission par email au client</li>
+                    <li><strong>Suivi</strong> - Monitoring des échéances</li>
+                    <li><strong>Paiement</strong> - Enregistrement des règlements</li>
+                    <li><strong>Relance</strong> - Envoi automatique si retard</li>
+                    <li><strong>Archivage</strong> - Conservation des documents</li>
+                </ol>
+
+                <h3>Statuts des Factures</h3>
+                <ul>
+                    <li><strong>Draft</strong> - Brouillon en cours de création</li>
+                    <li><strong>Sent</strong> - Envoyée au client</li>
+                    <li><strong>Paid</strong> - Paiement reçu</li>
+                    <li><strong>Overdue</strong> - En retard de paiement</li>
+                    <li><strong>Cancelled</strong> - Annulée</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Génération PDF</h2>
+            <div class="module-card">
+                <h3>Fonctionnalités PDF</h3>
+                <ul>
+                    <li><strong>Templates personnalisables</strong> - Design adapté à l'entreprise</li>
+                    <li><strong>Logo et branding</strong> - Intégration de l'identité visuelle</li>
+                    <li><strong>Mise en page responsive</strong> - Adaptation automatique</li>
+                    <li><strong>Codes-barres</strong> - QR codes pour paiement</li>
+                    <li><strong>Signature électronique</strong> - Validation numérique</li>
+                    <li><strong>Filigrane</strong> - Protection contre la contrefaçon</li>
+                </ul>
+
+                <h3>Configuration des Templates</h3>
+                <div class="code-block">
+                    <h4>Structure de template</h4>
+                    <pre><code>{
+  "header": {
+    "logo": "url",
+    "companyName": "string",
+    "address": "object",
+    "contact": "object"
+  },
+  "client": {
+    "name": "string",
+    "address": "object"
+  },
+  "invoice": {
+    "number": "string",
+    "date": "date",
+    "dueDate": "date"
+  },
+  "items": "array",
+  "totals": {
+    "subtotal": "number",
+    "tax": "number",
+    "total": "number"
+  },
+  "footer": {
+    "notes": "string",
+    "paymentTerms": "string"
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Système de Relances</h2>
+            <div class="module-card">
+                <h3>Configuration des Relances</h3>
+                <ul>
+                    <li><strong>Relances automatiques</strong> - Déclenchement par échéance</li>
+                    <li><strong>Échelons personnalisables</strong> - J+7, J+15, J+30, etc.</li>
+                    <li><strong>Templates de relance</strong> - Messages adaptés au délai</li>
+                    <li><strong>Escalade</strong> - Relances de plus en plus fermes</li>
+                    <li><strong>Exclusions</strong> - Clients exemptés de relances</li>
+                    <li><strong>Pause automatique</strong> - Arrêt si paiement partiel</li>
+                </ul>
+
+                <h3>Types de Relances</h3>
+                <ul>
+                    <li><strong>Courtoise</strong> - Rappel amical (J+7)</li>
+                    <li><strong>Ferme</strong> - Demande de règlement (J+15)</li>
+                    <li><strong>Mise en demeure</strong> - Formalisation (J+30)</li>
+                    <li><strong>Recouvrement</strong> - Transmission à un tiers (J+60)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Statistiques et Reporting</h2>
+            <div class="module-card">
+                <h3>Métriques financières</h3>
+                <div class="code-block">
+                    <h4>Données de statistiques</h4>
+                    <pre><code>{
+  "total": "number",
+  "paid": "number",
+  "pending": "number",
+  "overdue": "number",
+  "totalRevenue": "number",
+  "averageInvoice": "number",
+  "paymentRate": "number",
+  "averagePaymentTime": "number",
+  "byMonth": [
+    {
+      "month": "string",
+      "count": "number",
+      "amount": "number"
+    }
+  ],
+  "byClient": [
+    {
+      "clientId": "uuid",
+      "clientName": "string",
+      "count": "number",
+      "amount": "number"
+    }
+  ]
+}</code></pre>
+                </div>
+
+                <h3>Tableaux de bord</h3>
+                <ul>
+                    <li><strong>Vue d'ensemble</strong> - KPIs principaux</li>
+                    <li><strong>Évolution mensuelle</strong> - Graphiques de tendance</li>
+                    <li><strong>Top clients</strong> - Classement par CA</li>
+                    <li><strong>Retards de paiement</strong> - Factures en souffrance</li>
+                    <li><strong>Prévisions</strong> - Estimations de trésorerie</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Intégrations Comptables</h2>
+            <div class="module-card">
+                <h3>Formats d'export</h3>
+                <ul>
+                    <li><strong>FEC (Fichier des Écritures Comptables)</strong> - Obligatoire en France</li>
+                    <li><strong>CSV/Excel</strong> - Export générique</li>
+                    <li><strong>XML</strong> - Format structuré</li>
+                    <li><strong>JSON</strong> - API d'intégration</li>
+                </ul>
+
+                <h3>Logiciels compatibles</h3>
+                <ul>
+                    <li><strong>Sage</strong> - Import automatique</li>
+                    <li><strong>Ciel</strong> - Synchronisation</li>
+                    <li><strong>EBP</strong> - Export natif</li>
+                    <li><strong>QuickBooks</strong> - Intégration API</li>
+                    <li><strong>Xero</strong> - Connecteur dédié</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Exemples d'utilisation</h2>
+            <div class="module-card">
+                <h3>Création d'une facture</h3>
+                <div class="code-block">
+                    <h4>Requête POST</h4>
+                    <pre><code>POST /api/v1/invoices
+Content-Type: application/json
+
+{
+  "clientId": "uuid",
+  "dueDate": "2024-02-15",
+  "items": [
+    {
+      "description": "Service de développement",
+      "quantity": 1,
+      "unitPrice": 240.00,
+      "taxRate": 20
+    }
+  ],
+  "notes": "Facture pour services de développement web"
+}</code></pre>
+                </div>
+
+                <h3>Enregistrement d'un paiement</h3>
+                <div class="code-block">
+                    <h4>Requête POST</h4>
+                    <pre><code>POST /api/v1/invoices/123/pay
+Content-Type: application/json
+
+{
+  "amount": 288.00,
+  "paymentDate": "2024-01-20",
+  "paymentMethod": "bank_transfer",
+  "reference": "VIR-2024-001",
+  "notes": "Virement bancaire reçu"
+}</code></pre>
+                </div>
+
+                <h3>Envoi d'une relance</h3>
+                <div class="code-block">
+                    <h4>Requête POST</h4>
+                    <pre><code>POST /api/v1/invoices/123/remind
+Content-Type: application/json
+
+{
+  "type": "courtoise",
+  "message": "Rappel amical de votre facture en retard"
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Sécurité et Conformité</h2>
+            <div class="module-card">
+                <h3>Exigences légales</h3>
+                <ul>
+                    <li><strong>Numérotation séquentielle</strong> - Obligation française</li>
+                    <li><strong>Conservation 10 ans</strong> - Archivage légal</li>
+                    <li><strong>Intégrité des données</strong> - Protection contre modification</li>
+                    <li><strong>Traçabilité</strong> - Logs d'audit complets</li>
+                    <li><strong>RGPD</strong> - Protection des données clients</li>
+                </ul>
+
+                <h3>Mécanismes de sécurité</h3>
+                <ul>
+                    <li><strong>Chiffrement</strong> - Données sensibles protégées</li>
+                    <li><strong>Authentification forte</strong> - 2FA pour les accès admin</li>
+                    <li><strong>Permissions granulaires</strong> - Contrôle d'accès fin</li>
+                    <li><strong>Sauvegarde automatique</strong> - Protection contre perte</li>
+                    <li><strong>Monitoring</strong> - Détection d'anomalies</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Configuration et Déploiement</h2>
+            <div class="module-card">
+                <h3>Variables d'environnement</h3>
+                <div class="code-block">
+                    <h4>Configuration requise</h4>
+                    <pre><code># Base de données
+DATABASE_URL=postgresql://user:pass@localhost:5432/jeroka
+
+# Email
+SENDGRID_API_KEY=SG...
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=user@domain.com
+SMTP_PASS=password
+
+# PDF
+PDF_TEMPLATE_PATH=/templates/invoice.hbs
+PDF_OUTPUT_PATH=/uploads/invoices
+
+# JWT
+JWT_SECRET=your-secret-key
+
+# Environnement
+NODE_ENV=production</code></pre>
+                </div>
+
+                <h3>Dépendances</h3>
+                <ul>
+                    <li><strong>express</strong> - Framework web</li>
+                    <li><strong>puppeteer</strong> - Génération PDF</li>
+                    <li><strong>handlebars</strong> - Templates</li>
+                    <li><strong>sendgrid</strong> - Envoi d'emails</li>
+                    <li><strong>jsonwebtoken</strong> - Authentification</li>
+                    <li><strong>joi</strong> - Validation</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Jeroka - Documentation Technique</p>
+    </footer>
+
+    <script>
+        // Gestion du thème
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Initialiser le thème au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                themeIcon.textContent = '☀️';
+            } else {
+                themeIcon.textContent = '🌙';
+            }
+        });
+    </script>
+</body>
+</html>

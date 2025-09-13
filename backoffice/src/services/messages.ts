@@ -12,13 +12,14 @@ export interface ContactMessage {
   status: 'new' | 'read' | 'replied' | 'archived'
   priority: 'low' | 'medium' | 'high'
   source: 'website' | 'email' | 'phone' | 'other'
+  prompt: string
+  response: string
   tags?: string[]
   ipAddress?: string
   userAgent?: string
   referrer?: string
   attachments?: string[]
   replies?: MessageReply[]
-  assignedTo?: string
   createdAt: string
   updatedAt: string
   readAt?: string
@@ -66,7 +67,6 @@ export interface UpdateMessageRequest {
   status?: 'new' | 'read' | 'replied' | 'archived'
   priority?: 'low' | 'medium' | 'high'
   tags?: string[]
-  assignedTo?: string
 }
 
 export interface ReplyToMessageRequest {
@@ -82,7 +82,6 @@ export interface MessagesListParams {
   priority?: 'low' | 'medium' | 'high'
   dateFrom?: string
   dateTo?: string
-  assignedTo?: string
   tags?: string[]
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
@@ -96,6 +95,54 @@ export interface BulkActionRequest {
 
 class MessagesService {
   /**
+   * Transformer les données du backend vers le frontend
+   */
+  private transformMessageFromBackend(backendMessage: any): ContactMessage {
+    return {
+      id: backendMessage.id,
+      firstName: backendMessage.first_name || backendMessage.firstName,
+      lastName: backendMessage.last_name || backendMessage.lastName,
+      email: backendMessage.email,
+      phone: backendMessage.phone,
+      company: backendMessage.company,
+      subject: backendMessage.subject,
+      message: backendMessage.message,
+      status: backendMessage.status,
+      priority: backendMessage.priority,
+      source: backendMessage.source || 'website',
+      tags: backendMessage.tags || [],
+      ipAddress: backendMessage.ip_address,
+      userAgent: backendMessage.user_agent,
+      referrer: backendMessage.referrer,
+      attachments: backendMessage.attachments || [],
+      replies: backendMessage.replies || [],
+      createdAt: backendMessage.created_at || backendMessage.createdAt,
+      updatedAt: backendMessage.updated_at || backendMessage.updatedAt,
+      readAt: backendMessage.read_at || backendMessage.readAt,
+      repliedAt: backendMessage.replied_at || backendMessage.repliedAt
+    }
+  }
+
+  /**
+   * Transformer les données du frontend vers le backend
+   */
+  private transformMessageToBackend(frontendMessage: any): any {
+    return {
+      first_name: frontendMessage.firstName,
+      last_name: frontendMessage.lastName,
+      email: frontendMessage.email,
+      phone: frontendMessage.phone,
+      company: frontendMessage.company,
+      subject: frontendMessage.subject,
+      message: frontendMessage.message,
+      status: frontendMessage.status,
+      priority: frontendMessage.priority,
+      source: frontendMessage.source,
+      tags: frontendMessage.tags,
+    }
+  }
+
+  /**
    * Récupérer les statistiques des messages
    */
   async getMessagesStats() {
@@ -108,7 +155,17 @@ class MessagesService {
    */
   async getMessages(params: MessagesListParams = {}) {
     const response = await apiService.axiosInstance.get('/messages', { params })
-    return response.data
+    const transformedMessages = response.data.data?.messages?.map((msg: any) => 
+      this.transformMessageFromBackend(msg)
+    ) || []
+    
+    return {
+      ...response.data,
+      data: {
+        ...response.data.data,
+        messages: transformedMessages
+      }
+    }
   }
 
   /**
@@ -116,23 +173,34 @@ class MessagesService {
    */
   async getMessage(id: string) {
     const response = await apiService.axiosInstance.get(`/messages/${id}`)
-    return response.data
+    return {
+      ...response.data,
+      data: this.transformMessageFromBackend(response.data.data)
+    }
   }
 
   /**
    * Créer un nouveau message de contact (depuis le formulaire public)
    */
   async createMessage(data: CreateMessageRequest) {
-    const response = await apiService.axiosInstance.post('/messages', data)
-    return response.data
+    const transformedData = this.transformMessageToBackend(data)
+    const response = await apiService.axiosInstance.post('/messages', transformedData)
+    return {
+      ...response.data,
+      data: this.transformMessageFromBackend(response.data.data)
+    }
   }
 
   /**
    * Mettre à jour un message
    */
   async updateMessage(id: string, data: UpdateMessageRequest) {
-    const response = await apiService.axiosInstance.put(`/messages/${id}`, data)
-    return response.data
+    const transformedData = this.transformMessageToBackend(data)
+    const response = await apiService.axiosInstance.put(`/messages/${id}`, transformedData)
+    return {
+      ...response.data,
+      data: this.transformMessageFromBackend(response.data.data)
+    }
   }
 
   /**
@@ -156,6 +224,14 @@ class MessagesService {
    */
   async markAsUnread(id: string) {
     const response = await apiService.axiosInstance.post(`/messages/${id}/mark-unread`)
+    return response.data
+  }
+
+  /**
+   * Mettre à jour le statut d'un message
+   */
+  async updateMessageStatus(id: string, data: { status: 'new' | 'read' | 'replied' | 'archived' }) {
+    const response = await apiService.axiosInstance.put(`/messages/${id}`, data)
     return response.data
   }
 
@@ -409,7 +485,6 @@ class MessagesService {
   async generateAIDraft(messageId: string, options: {
     tone?: 'professionnel' | 'amical' | 'formel' | 'concis'
     language?: 'fr' | 'en'
-    template?: string
   }) {
     const response = await apiService.axiosInstance.post(`/messages/${messageId}/ai-draft`, options)
     return response.data

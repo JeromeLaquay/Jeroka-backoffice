@@ -1,5 +1,6 @@
 import { MessageRepository, Message, MessageFilters, PaginatedResult } from '../repositories/messageRepository';
 import { MessageValidation } from '../validations/messageValidation';
+import { ClientService } from './clientService';
 
 export class MessageService {
   static async getMessages(companyId: string, filters: MessageFilters = {}): Promise<PaginatedResult<Message>> {
@@ -22,6 +23,20 @@ export class MessageService {
     const { error, value } = MessageValidation.validateCreate(data);
     if (error) {
       throw new Error(error.message);
+    }
+    //créer client si pas existant
+    let client = await ClientService.getClientByEmail(value.email, companyId);
+    if (!client) {
+      const clientData = {
+        company_id: companyId,
+        first_name: value.first_name,
+        last_name: value.last_name,
+        email: value.email,
+        phone: value.phone,
+        status: 'prospect' as const,
+        type: 'individual' as const
+      }
+      client = await ClientService.createClient(clientData);
     }
     return MessageRepository.create(companyId, value);
   }

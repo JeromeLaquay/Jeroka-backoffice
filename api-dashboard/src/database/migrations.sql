@@ -369,6 +369,8 @@ CREATE TABLE messages (
     company VARCHAR(255),
     subject VARCHAR(500) NOT NULL,
     message TEXT NOT NULL,
+    prompt TEXT,
+    response TEXT,
     status VARCHAR(20) DEFAULT 'new' CHECK (status IN ('new', 'read', 'replied', 'archived')),
     priority VARCHAR(10) DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high')),
     source VARCHAR(20) DEFAULT 'website' CHECK (source IN ('website', 'email', 'phone', 'other')),

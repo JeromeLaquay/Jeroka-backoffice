@@ -10,11 +10,12 @@ export interface Message {
   company?: string | null;
   subject: string;
   message: string;
+  prompt: string;
+  response: string;
   status: 'new' | 'read' | 'replied' | 'archived';
   priority: 'low' | 'medium' | 'high';
   source?: string | null;
   tags?: string[] | null;
-  assigned_to?: string | null;
   created_at: string;
   updated_at: string;
   read_at?: string | null;
@@ -62,9 +63,9 @@ export class MessageRepository {
     const params: any[] = [companyId];
     let i = 2;
 
-    if (search) {
+    if (search && search.trim() !== '') {
       where.push(`(LOWER(first_name || ' ' || last_name) LIKE LOWER($${i}) OR LOWER(email) LIKE LOWER($${i}) OR LOWER(subject) LIKE LOWER($${i}) OR LOWER(message) LIKE LOWER($${i}))`);
-      params.push(`%${search}%`);
+      params.push(`%${search.trim()}%`);
       i++;
     }
 
@@ -80,15 +81,15 @@ export class MessageRepository {
       i++;
     }
 
-    if (source) {
+    if (source && source.trim() !== '') {
       where.push(`source = $${i}`);
-      params.push(source);
+      params.push(source.trim());
       i++;
     }
 
     if (tags && tags.length > 0) {
       where.push(`tags && $${i}`);
-      params.push(tags);
+      params.push(JSON.stringify(tags));
       i++;
     }
 
@@ -113,8 +114,14 @@ export class MessageRepository {
     const dataParams = [...params, limit, offset];
     const dataResult = await query(dataSql, dataParams);
 
+    // Parser les tags JSON pour chaque message
+    const parsedData = dataResult.rows.map((row: any) => ({
+      ...row,
+      tags: row.tags ? (typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags) : null
+    }));
+
     return {
-      data: dataResult.rows,
+      data: parsedData,
       total,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
@@ -151,15 +158,22 @@ export class MessageRepository {
 
   static async getById(id: string, companyId: string): Promise<Message | null> {
     const result = await query('SELECT * FROM messages WHERE id = $1 AND company_id = $2', [id, companyId]);
-    return result.rows[0] || null;
+    if (result.rows[0]) {
+      const row = result.rows[0];
+      return {
+        ...row,
+        tags: row.tags ? (typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags) : null
+      };
+    }
+    return null;
   }
 
   static async create(companyId: string, data: Omit<Message, 'id' | 'company_id' | 'created_at' | 'updated_at' | 'read_at' | 'replied_at'>): Promise<{ id: string; created_at: string; }> {
     const sql = `
       INSERT INTO messages (
         company_id, first_name, last_name, email, phone, company, subject, message,
-        status, priority, source, tags, assigned_to
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        status, priority, source, tags
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING id, created_at
     `;
     const params = [
@@ -174,8 +188,7 @@ export class MessageRepository {
       data.status || 'new',
       data.priority || 'medium',
       data.source || null,
-      data.tags || null,
-      data.assigned_to || null
+      data.tags ? JSON.stringify(data.tags) : null
     ];
     const result = await query(sql, params);
     return result.rows[0];
@@ -192,7 +205,13 @@ export class MessageRepository {
     let i = 1;
     for (const field of fields) {
       setParts.push(`${field} = $${i}`);
-      params.push((data as any)[field]);
+      // Convertir les tags en JSON si c'est un tableau
+      const value = (data as any)[field];
+      if (field === 'tags' && Array.isArray(value)) {
+        params.push(JSON.stringify(value));
+      } else {
+        params.push(value);
+      }
       i++;
     }
 
@@ -206,7 +225,14 @@ export class MessageRepository {
       RETURNING *
     `;
     const result = await query(sql, params);
-    return result.rows[0] || null;
+    if (result.rows[0]) {
+      const row = result.rows[0];
+      return {
+        ...row,
+        tags: row.tags ? (typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags) : null
+      };
+    }
+    return null;
   }
 
   static async markRead(id: string, companyId: string): Promise<Message | null> {
@@ -215,7 +241,14 @@ export class MessageRepository {
        WHERE id = $1 AND company_id = $2 RETURNING *`,
       [id, companyId]
     );
-    return result.rows[0] || null;
+    if (result.rows[0]) {
+      const row = result.rows[0];
+      return {
+        ...row,
+        tags: row.tags ? (typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags) : null
+      };
+    }
+    return null;
   }
 
   static async markAllRead(companyId: string): Promise<{ updatedCount: number; }> {
