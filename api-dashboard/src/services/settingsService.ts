@@ -16,13 +16,16 @@ export class SettingsService {
     }
 
     return {
-      companySettings,
-      userSettings,
-      systemSettings
+      companySettings: await this.setCompanySettings(company),
+      userSettings: await this.setUserSettings(user),
+      systemSettings: {
+        version: '1.0.0',
+        environment: process.env.NODE_ENV || 'development'
+      }
     }
   }
 
-  private async setUserSettings(user: User) {
+  static async setUserSettings(user: User) {
     //préparer les données pour le front 
     return {
       id: user.id,
@@ -36,7 +39,7 @@ export class SettingsService {
     }
   }
 
-  private async setCompanySettings(company: any) {
+  static async setCompanySettings(company: any) {
     //préparer les données pour le front 
     return {
       id: company.id,
@@ -59,6 +62,5 @@ export class SettingsService {
       theme: company.theme,
     }
   }
-  
-}   
+}
 export default SettingsService;
