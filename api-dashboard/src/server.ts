@@ -111,6 +111,7 @@ app.use(`${API_PREFIX}/dashboard`, dashboardRoutes);
 app.use(`${API_PREFIX}/emails`, emailsRoutes);
 app.use(`${API_PREFIX}/announcements`, announcementsRoutes);
 app.use(`${API_PREFIX}/calendar`, calendarRoutes);
+app.use(`${API_PREFIX}/social-networks`, socialNetworksRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -131,8 +132,13 @@ async function startServer() {
     await connectDatabase();
     logger.info('Base de données connectée avec succès');
 
-    // Create HTTP server
+    // Create HTTP server with extended timeouts
     const server = createServer(app);
+    
+    // Configure server timeouts
+    server.timeout = 300000; // 5 minutes
+    server.keepAliveTimeout = 65000; // 65 seconds
+    server.headersTimeout = 66000; // 66 seconds
 
     server.listen(PORT, () => {
       logger.info(`🚀 Serveur démarré sur le port ${PORT}`);

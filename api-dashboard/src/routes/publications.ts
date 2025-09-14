@@ -6,14 +6,10 @@ import path from 'path';
 import fs from 'fs';
 // import OpenAI from 'openai';
 import { PublicationService } from '../services/publicationService';
+import { PublicationIAService } from '../services/publicationIAService';
 import { PublicationValidation } from '../validations/publicationValidation';
 
 const router = Router();
-
-// Configuration OpenAI - Temporairement désactivé
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY || ''
-// });
 
 // Configuration multer pour l'upload d'images
 const storage = multer.diskStorage({
@@ -370,104 +366,25 @@ router.post('/generate-content', [
       });
     }
 
-    const { 
-      topic, 
-      contentType, 
-      targetAudience, 
-      tone, 
-      platforms, 
-      keywords, 
-      callToAction, 
-      length = 'medium',
-      generateImage = true
-    } = req.body;
+    const configPublicationIa = { 
+      topic: req.body.topic, 
+      contentType: req.body.contentType, 
+      targetAudience: req.body.targetAudience, 
+      tone: req.body.tone, 
+      platforms: req.body.platforms, 
+      keywords: req.body.keywords, 
+      callToAction: req.body.callToAction, 
+      length: req.body.length,
+      generateImage: true
+    };
 
-    // Récupérer les informations de l'entreprise
-    const companyInfo = await getCompanyInfo((req as any).user?.companyId);
-
-    // Construire le prompt pour ChatGPT
-    const prompt = buildContentPrompt({
-      topic,
-      contentType,
-      targetAudience,
-      tone,
-      platforms,
-      keywords,
-      callToAction,
-      length,
-      companyInfo
-    });
-
-    // Appeler l'API OpenAI pour générer le contenu texte - Temporairement désactivé
-    // const completion = await openai.chat.completions.create({
-    //   model: "gpt-4",
-    //   messages: [
-    //     {
-    //       role: "system",
-    //       content: "Tu es un expert en marketing digital et création de contenu pour les réseaux sociaux. Tu crées du contenu engageant et personnalisé pour les entreprises."
-    //     },
-    //     {
-    //       role: "user",
-    //       content: prompt
-    //     }
-    //   ],
-    //   max_tokens: 1000,
-    //   temperature: 0.7
-    // });
-
-    // const generatedContent = completion.choices[0]?.message?.content;
-    const generatedContent = 'Contenu généré temporairement désactivé - OpenAI non configuré';
-    
-    if (!generatedContent) {
-      throw new Error('Aucun contenu généré par l\'IA');
-    }
-
-    // Parser le contenu généré (format JSON attendu)
-    const parsedContent = parseGeneratedContent(generatedContent);
-
-    // Générer une image avec DALL-E si demandé et configuré
-    let imageUrl = '';
-    try {
-      if (generateImage && process.env.OPENAI_API_KEY) {
-        const imagePrompt = buildImagePrompt({
-          topic,
-          contentType,
-          companyInfo,
-          title: parsedContent.title
-        });
-
-        // const imageResponse = await openai.images.generate({
-        //   model: "dall-e-3",
-        //   prompt: imagePrompt,
-        //   n: 1,
-        //   size: "1024x1024",
-        //   quality: "standard",
-        //   style: "vivid"
-        // });
-
-        // imageUrl = imageResponse.data[0]?.url || '';
-        imageUrl = ''; // Temporairement désactivé - OpenAI non configuré
-      }
-    } catch (imageError) {
-      console.error('Erreur génération image:', imageError);
-      // Continuer sans image si erreur
-    }
+    const companyId=(req as any).user?.companyId;
+    const resultIa = await PublicationIAService.generateContent(companyId, configPublicationIa);
 
     return res.json({
       success: true,
       message: 'Contenu généré avec succès',
-      data: {
-        title: parsedContent.title,
-        content: parsedContent.content,
-        hashtags: parsedContent.hashtags,
-        image: imageUrl,
-        suggestedKeywords: parsedContent.keywords,
-        metadata: {
-          confidence: parsedContent.confidence || 0.8,
-          suggestions: parsedContent.suggestions || [],
-          imageGenerated: !!imageUrl
-        }
-      }
+      data: resultIa
     });
 
   } catch (error) {

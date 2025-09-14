@@ -168,6 +168,24 @@ const loadBackups = async () => {
   }
 }
 
+const loadIntegrations = async () => {
+  try {
+    // Placeholder - à implémenter quand le service sera disponible
+    console.log('Chargement des intégrations...')
+  } catch (error) {
+    console.error('Erreur lors du chargement des intégrations:', error)
+  }
+}
+
+const loadDevelopment = async () => {
+  try {
+    // Placeholder - à implémenter quand le service sera disponible
+    console.log('Chargement du développement...')
+  } catch (error) {
+    console.error('Erreur lors du chargement du développement:', error)
+  }
+}
+
 const onProfileUpdated = () => {
   loadUserProfile()
 }
@@ -202,7 +220,12 @@ const onIntegrationsUpdated = () => {
 
 // Lifecycle
 onMounted(async () => {
-  // Charger les données de base
+  loadUserProfile()
+  loadCompanySettings()
+  loadSystemSettings()
+  loadBackups()
+  loadIntegrations()
+  loadDevelopment()
   console.log('Chargement des paramètres...')
 })
 </script>

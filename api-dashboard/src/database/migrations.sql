@@ -467,6 +467,30 @@ CREATE INDEX idx_publication_platforms_publication_id ON publication_platforms(p
 CREATE INDEX idx_publication_platforms_platform ON publication_platforms(platform);
 CREATE INDEX idx_publication_platforms_status ON publication_platforms(status);
 
+
+-- Table pour stocker les identifiants de réseaux sociaux par entreprise
+CREATE TABLE company_social_credentials (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    platform VARCHAR(20) NOT NULL CHECK (platform IN ('facebook', 'linkedin', 'twitter', 'site web')),
+    
+    -- Champs chiffrés (AES-256)
+    encrypted_credentials JSONB NOT NULL,
+    
+    -- Métadonnées
+    is_active BOOLEAN DEFAULT true,
+    expires_at TIMESTAMP,
+    last_used_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    UNIQUE(company_id, platform)
+);
+
+CREATE INDEX idx_company_social_credentials_company_id ON company_social_credentials(company_id);
+CREATE INDEX idx_company_social_credentials_platform ON company_social_credentials(platform);
+CREATE INDEX idx_company_social_credentials_is_active ON company_social_credentials(is_active);
+
 -- =============================================
 -- TABLE: availability_rules (Règles de disponibilité liées aux entreprises)
 -- =============================================

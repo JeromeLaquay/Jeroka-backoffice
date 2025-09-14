@@ -72,3 +72,4 @@ export class CompanyService {
   }
 
 }
+export default CompanyService;

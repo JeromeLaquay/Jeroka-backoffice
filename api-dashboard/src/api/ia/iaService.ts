@@ -3,6 +3,7 @@ import { ChatgptService } from './chatgptService'
 export interface IAProvider {
   name: string
   callOpenAI(prompt: string): Promise<string>
+  callOpenAIImage(prompt: string): Promise<string>
 }
 
 export interface EmailDraftOptions {
@@ -36,6 +37,10 @@ export class IaService {
 
   callOpenAI(prompt: string) {
     return this.providers.get(this.defaultProvider)?.callOpenAI(prompt)
+  }
+
+  callOpenAIImage(prompt: string) {
+    return this.providers.get(this.defaultProvider)?.callOpenAIImage(prompt)
   }
 
 }

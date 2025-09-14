@@ -465,7 +465,9 @@ class PublicationsService {
       imageGenerated?: boolean
     }
   }>> {
-    const response = await apiService.axiosInstance.post<ApiResponse<any>>('/publications/generate-content', config)
+    const response = await apiService.axiosInstance.post<ApiResponse<any>>('/publications/generate-content', config, {
+      timeout: 300000 // 5 minutes spécifiquement pour la génération IA
+    })
     return response.data
   }
 }

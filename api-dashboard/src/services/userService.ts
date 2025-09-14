@@ -6,6 +6,8 @@ export interface User {
   first_name: string;
   last_name: string;
   role: string;
+  telephone: string;
+  avatar_url: string;
   company_id: string;
   is_active: boolean;
   email_verified: boolean;
@@ -85,3 +87,4 @@ export class UserService {
     return result.rowCount > 0;
   }
 }
+export default UserService;

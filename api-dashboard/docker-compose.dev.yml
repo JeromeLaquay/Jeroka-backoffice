@@ -19,9 +19,9 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d jeroka_dashboard"]
       interval: 30s
-      timeout: 10s
+      timeout: 60s
       retries: 10
-      start_period: 30s
+      start_period: 60s
 
   # API Backend en mode développement
   api-dev:
@@ -58,10 +58,17 @@ services:
       
       # Rate Limiting (plus permissif en dev)
       RATE_LIMIT_WINDOW_MS: 900000
-      RATE_LIMIT_MAX_REQUESTS: 1000
+      RATE_LIMIT_MAX_REQUESTS: 10000 
       
       # Logs
       LOG_LEVEL: debug
+      
+      # Timeouts
+      AI_REQUEST_TIMEOUT: 300000
+      AI_IMAGE_TIMEOUT: 300000
+      SERVER_TIMEOUT: 300000
+      
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       
     volumes:
       # - .:/app  # ← Commenter cette ligne
@@ -79,9 +86,9 @@ services:
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/health"]
       interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+      timeout: 60s
+      retries: 5
+      start_period: 120s
 
   # Adminer pour le développement
   adminer-dev:

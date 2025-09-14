@@ -69,7 +69,7 @@ class ApiService {
   constructor() {
     this.api = axios.create({
       baseURL: API_BASE_URL,
-      timeout: 10000,
+      timeout: 300000, // 5 minutes pour les appels IA
       withCredentials: true, // Pour les cookies
       headers: {
         'Content-Type': 'application/json'

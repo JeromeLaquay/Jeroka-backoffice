@@ -143,3 +143,4 @@ export class ClientService {
     return ClientRepository.getClientByEmail(email, companyId);
   }
 }
+export default ClientService;
