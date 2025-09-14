@@ -1,5 +1,5 @@
 // api-dashboard/src/repositories/socialCredentialsRepository.ts
-import { DatabaseConnection } from '../database/connection';
+import { query } from '../database/connection';
 import { EncryptionService } from '../services/encryptionService';
 
 export interface SocialCredentials {
@@ -18,14 +18,14 @@ export class SocialCredentialsRepository {
   static async create(companyId: string, platform: string, credentials: any): Promise<SocialCredentials> {
     const encryptedCredentials = EncryptionService.encrypt(JSON.stringify(credentials));
     
-    const query = `
+    const sql = `
       INSERT INTO company_social_credentials 
       (company_id, platform, encrypted_credentials, expires_at)
       VALUES ($1, $2, $3, $4)
       RETURNING *
     `;
     
-    const result = await DatabaseConnection.query(query, [
+    const result = await query(sql, [
       companyId,
       platform,
       encryptedCredentials,
@@ -36,12 +36,12 @@ export class SocialCredentialsRepository {
   }
 
   static async getByCompanyAndPlatform(companyId: string, platform: string): Promise<SocialCredentials | null> {
-    const query = `
+    const sql = `
       SELECT * FROM company_social_credentials 
       WHERE company_id = $1 AND platform = $2 AND is_active = true
     `;
     
-    const result = await DatabaseConnection.query(query, [companyId, platform]);
+    const result = await query(sql, [companyId, platform]);
     
     if (result.rows.length === 0) {
       return null;
@@ -51,28 +51,28 @@ export class SocialCredentialsRepository {
   }
 
   static async getByCompany(companyId: string): Promise<SocialCredentials[]> {
-    const query = `
+    const sql = `
       SELECT * FROM company_social_credentials 
       WHERE company_id = $1 AND is_active = true
       ORDER BY platform
     `;
     
-    const result = await DatabaseConnection.query(query, [companyId]);
+    const result = await query(sql, [companyId]);
     
-    return result.rows.map(row => this.mapRowToCredentials(row));
+    return result.rows.map((row: any) => this.mapRowToCredentials(row));
   }
 
   static async update(companyId: string, platform: string, credentials: any): Promise<SocialCredentials> {
     const encryptedCredentials = EncryptionService.encrypt(JSON.stringify(credentials));
     
-    const query = `
+    const sql = `
       UPDATE company_social_credentials 
       SET encrypted_credentials = $1, expires_at = $2, updated_at = CURRENT_TIMESTAMP
       WHERE company_id = $3 AND platform = $4
       RETURNING *
     `;
     
-    const result = await DatabaseConnection.query(query, [
+    const result = await query(sql, [
       encryptedCredentials,
       credentials.expiresAt || null,
       companyId,
@@ -83,13 +83,13 @@ export class SocialCredentialsRepository {
   }
 
   static async deactivate(companyId: string, platform: string): Promise<void> {
-    const query = `
+    const sql = `
       UPDATE company_social_credentials 
       SET is_active = false, updated_at = CURRENT_TIMESTAMP
       WHERE company_id = $1 AND platform = $2
     `;
     
-    await DatabaseConnection.query(query, [companyId, platform]);
+    await query(sql, [companyId, platform]);
   }
 
   private static mapRowToCredentials(row: any): SocialCredentials {
