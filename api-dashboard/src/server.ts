@@ -27,6 +27,7 @@ import dashboardRoutes from './routes/dashboard';
 import emailsRoutes from './routes/emails';
 import announcementsRoutes from './routes/announcements';
 import calendarRoutes from './routes/calendar';
+import socialNetworksRoutes from './routes/socialNetworks';
 
 // Load environment variables
 dotenv.config();

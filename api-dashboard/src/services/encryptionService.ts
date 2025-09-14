@@ -18,7 +18,7 @@ export class EncryptionService {
   static encrypt(text: string): string {
     const key = this.getEncryptionKey();
     const iv = crypto.randomBytes(this.IV_LENGTH);
-    const cipher = crypto.createCipher(this.ALGORITHM, key);
+    const cipher = crypto.createCipheriv(this.ALGORITHM, key, iv);
     cipher.setAAD(Buffer.from('jeroka-social-credentials'));
     
     let encrypted = cipher.update(text, 'utf8', 'hex');
@@ -37,7 +37,7 @@ export class EncryptionService {
     const key = this.getEncryptionKey();
     const { encrypted, iv, tag } = JSON.parse(encryptedData);
     
-    const decipher = crypto.createDecipher(this.ALGORITHM, key);
+    const decipher = crypto.createDecipheriv(this.ALGORITHM, key, Buffer.from(iv, 'hex'));
     decipher.setAAD(Buffer.from('jeroka-social-credentials'));
     decipher.setAuthTag(Buffer.from(tag, 'hex'));
     

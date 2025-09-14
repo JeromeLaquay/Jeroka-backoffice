@@ -38,7 +38,7 @@ export class TwitterService implements SocialNetworkProvider {
         text = text.substring(0, 277) + '...';
       }
 
-      const tweetData = {
+      const tweetData: any = {
         text: text
       };
 
@@ -53,11 +53,11 @@ export class TwitterService implements SocialNetworkProvider {
       const response = await this.makeAuthenticatedRequest('/tweets', 'POST', tweetData);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json().catch(() => ({})) as any;
         throw new Error(`Twitter API Error: ${response.status} - ${errorData.detail || 'Unknown error'}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       
       return {
         success: true,
@@ -84,7 +84,7 @@ export class TwitterService implements SocialNetworkProvider {
         throw new Error(`Twitter API Error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const user = data.data;
       
       return {
@@ -140,7 +140,7 @@ export class TwitterService implements SocialNetworkProvider {
         throw new Error(`Twitter media upload error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.media_id_string;
 
     } catch (error) {
@@ -228,7 +228,7 @@ export class TwitterService implements SocialNetworkProvider {
         throw new Error(`Twitter API Error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.data || [];
 
     } catch (error) {

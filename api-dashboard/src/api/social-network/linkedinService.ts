@@ -33,7 +33,7 @@ export class LinkedInService implements SocialNetworkProvider {
       }
 
       // Créer le contenu de la publication
-      const shareData = {
+      const shareData: any = {
         author: targetUrn,
         lifecycleState: 'PUBLISHED',
         specificContent: {
@@ -75,11 +75,11 @@ export class LinkedInService implements SocialNetworkProvider {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json().catch(() => ({})) as any;
         throw new Error(`LinkedIn API Error: ${response.status} - ${errorData.message || 'Unknown error'}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const postId = data.id;
       
       return {
@@ -111,7 +111,7 @@ export class LinkedInService implements SocialNetworkProvider {
         throw new Error(`LinkedIn API Error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       
       return {
         id: data.id,
@@ -160,7 +160,7 @@ export class LinkedInService implements SocialNetworkProvider {
         throw new Error(`LinkedIn API Error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.id;
 
     } catch (error) {
@@ -200,7 +200,7 @@ export class LinkedInService implements SocialNetworkProvider {
         throw new Error(`LinkedIn upload init error: ${initializeResponse.status}`);
       }
 
-      const initData = await initializeResponse.json();
+      const initData = await initializeResponse.json() as any;
       const uploadUrl = initData.value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'].uploadUrl;
       const assetUrn = initData.value.asset;
 
@@ -249,7 +249,7 @@ export class LinkedInService implements SocialNetworkProvider {
         throw new Error(`LinkedIn API Error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.elements?.map((element: any) => ({
         id: element.organizationalTarget.id,
         name: element.organizationalTarget.name

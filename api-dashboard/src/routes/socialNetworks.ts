@@ -30,14 +30,13 @@ router.post('/:platform/configure', [
 
     await CompanySocialNetworkService.configureCredentials(companyId, platform, credentials);
 
-    res.json({
+    return res.status(200).json({
       success: true,
       message: `Identifiants ${platform} configurés avec succès`
     });
-
   } catch (error) {
     console.error(`Erreur configuration ${req.params.platform}:`, error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: `Erreur lors de la configuration de ${req.params.platform}`,
       error: {

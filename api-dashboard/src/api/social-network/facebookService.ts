@@ -60,11 +60,11 @@ export class FacebookService implements SocialNetworkProvider {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json().catch(() => ({})) as any;
         throw new Error(`Facebook API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       
       return {
         success: true,
@@ -94,7 +94,7 @@ export class FacebookService implements SocialNetworkProvider {
         throw new Error(`Facebook API Error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       
       return {
         id: data.id,
@@ -142,7 +142,7 @@ export class FacebookService implements SocialNetworkProvider {
         throw new Error(`Facebook API Error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       return data.data || [];
 
     } catch (error) {
@@ -174,11 +174,11 @@ export class FacebookService implements SocialNetworkProvider {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json().catch(() => ({})) as any;
         throw new Error(`Facebook API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       
       return {
         success: true,
