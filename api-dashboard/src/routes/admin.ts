@@ -23,10 +23,10 @@ router.get('/admin/companies', verifyToken, async (req: AuthRequest, res: Respon
     try {
         const filters = req.query as AdminFilters;
         const result = await AdminService.getCompanies(req.user!.id, filters);
-        res.json({ success: true, data: result.data, pagination: result.pagination });
+        return res.json({ success: true, data: result.data, pagination: result.pagination });
     } catch (error) {
         console.error('Erreur lors de la récupération des entreprises:', error);
-        res.status(500).json({ success: false, message: 'Erreur serveur' });
+        return res.status(500).json({ success: false, message: 'Erreur serveur' });
     }
 });
 
@@ -36,20 +36,20 @@ router.get('/admin/companies/:id', verifyToken, async (req: AuthRequest, res: Re
         if (!company) {
             return res.status(404).json({ success: false, message: 'Entreprise non trouvée' });
         }
-        res.json({ success: true, data: company });
+        return res.json({ success: true, data: company });
     } catch (error) {
         console.error('Erreur lors de la récupération de l\'entreprise:', error);
-        res.status(500).json({ success: false, message: 'Erreur serveur' });
+        return res.status(500).json({ success: false, message: 'Erreur serveur' });
     }
 });
 
 router.post('/admin/companies', verifyToken, async (req: AuthRequest, res: Response) => {
     try {
         const company = await AdminService.createCompany(req.user!.id, req.body);
-        res.status(201).json({ success: true, data: company });
+        return res.status(201).json({ success: true, data: company });
     } catch (error) {
         console.error('Erreur lors de la création de l\'entreprise:', error);
-        res.status(500).json({ success: false, message: 'Erreur serveur' });
+        return res.status(500).json({ success: false, message: 'Erreur serveur' });
     }
 });
 
@@ -59,10 +59,10 @@ router.put('/admin/companies/:id', verifyToken, async (req: AuthRequest, res: Re
         if (!company) {
             return res.status(404).json({ success: false, message: 'Entreprise non trouvée' });
         }
-        res.json({ success: true, data: company });
+        return res.json({ success: true, data: company });
     } catch (error) {
         console.error('Erreur lors de la mise à jour de l\'entreprise:', error);
-        res.status(500).json({ success: false, message: 'Erreur serveur' });
+        return res.status(500).json({ success: false, message: 'Erreur serveur' });
     }
 });
 
@@ -72,10 +72,10 @@ router.patch('/admin/companies/:id/toggle-status', verifyToken, async (req: Auth
         if (!company) {
             return res.status(404).json({ success: false, message: 'Entreprise non trouvée' });
         }
-        res.json({ success: true, data: company });
+        return res.json({ success: true, data: company });
     } catch (error) {
         console.error('Erreur lors du changement de statut de l\'entreprise:', error);
-        res.status(500).json({ success: false, message: 'Erreur serveur' });
+        return res.status(500).json({ success: false, message: 'Erreur serveur' });
     }
 });
 
@@ -84,33 +84,33 @@ router.get('/admin/users', verifyToken, async (req: AuthRequest, res: Response) 
     try {
         const filters = req.query as AdminFilters;
         const result = await AdminService.getUsers(req.user!.id, filters);
-        res.json({ success: true, data: result.data, pagination: result.pagination });
+        return res.json({ success: true, data: result.data, pagination: result.pagination });
     } catch (error) {
         console.error('Erreur lors de la récupération des utilisateurs:', error);
-        res.status(500).json({ success: false, message: 'Erreur serveur' });
+        return res.status(500).json({ success: false, message: 'Erreur serveur' });
     }
 });
 
 router.get('/admin/users/:id', verifyToken, async (req: AuthRequest, res: Response) => {
     try {
-        const user = await AdminService.getUser(req.params.id);
+        const user = await AdminService.getUser(req.user!.id, req.params.id);
         if (!user) {
             return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
         }
-        res.json({ success: true, data: user });
+        return res.json({ success: true, data: user });
     } catch (error) {
         console.error('Erreur lors de la récupération de l\'utilisateur:', error);
-        res.status(500).json({ success: false, message: 'Erreur serveur' });
+        return res.status(500).json({ success: false, message: 'Erreur serveur' });
     }
 });
 
 router.post('/admin/users', verifyToken, async (req: AuthRequest, res: Response) => {
     try {
         const user = await AdminService.createUser(req.user!.id, req.body);
-        res.status(201).json({ success: true, data: user });
+        return res.status(201).json({ success: true, data: user });
     } catch (error) {
         console.error('Erreur lors de la création de l\'utilisateur:', error);
-        res.status(500).json({ success: false, message: 'Erreur serveur' });
+        return res.status(500).json({ success: false, message: 'Erreur serveur' });
     }
 });
 
@@ -120,10 +120,10 @@ router.put('/admin/users/:id', verifyToken, async (req: AuthRequest, res: Respon
         if (!user) {
             return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
         }
-        res.json({ success: true, data: user });
+        return res.json({ success: true, data: user });
     } catch (error) {
         console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
-        res.status(500).json({ success: false, message: 'Erreur serveur' });
+        return res.status(500).json({ success: false, message: 'Erreur serveur' });
     }
 });
 
@@ -133,10 +133,10 @@ router.patch('/admin/users/:id/toggle-status', verifyToken, async (req: AuthRequ
         if (!user) {
             return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
         }
-        res.json({ success: true, data: user });
+        return res.json({ success: true, data: user });
     } catch (error) {
         console.error('Erreur lors du changement de statut de l\'utilisateur:', error);
-        res.status(500).json({ success: false, message: 'Erreur serveur' });
+        return res.status(500).json({ success: false, message: 'Erreur serveur' });
     }
 });
 

@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { verifyToken, AuthRequest } from '../middleware/auth';
 import { body, param, validationResult } from 'express-validator';
 import { CompanySocialNetworkService } from '../services/companySocialNetworkService';
+import socialNetworkManager, { SocialNetworkManager } from '../services/credentialsService';
 
 const router = Router();
 
@@ -11,7 +12,7 @@ const router = Router();
  * @access Private
  */
 router.post('/:platform/configure', [
-  param('platform').isIn(['facebook', 'linkedin', 'twitter']).withMessage('Plateforme invalide'),
+  param('platform').isIn(['meta', 'linkedin', 'twitter', 'site web', 'google']).withMessage('Plateforme invalide'),
   body('credentials').isObject().withMessage('Les identifiants sont requis')
 ], verifyToken, async (req: AuthRequest, res: Response) => {
   try {
@@ -81,6 +82,44 @@ router.get('/credentials', verifyToken, async (req: AuthRequest, res: Response) 
       error: {
         message: error instanceof Error ? error.message : 'Erreur inconnue',
         code: 'CREDENTIALS_FETCH_ERROR',
+        statusCode: 500
+      }
+    });
+  }
+});
+
+/**
+ * @route POST /api/v1/company/social-networks/:platform/test
+ * @desc Teste la connexion pour une plateforme configurée
+ * @access Private
+ */
+router.post('/:platform/test', [
+  param('platform').isIn(['meta', 'linkedin', 'twitter']).withMessage('Plateforme invalide')
+], verifyToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, message: 'Paramètres invalides', errors: errors.array() });
+    }
+
+    const { platform } = req.params;
+    const companyId = req.user!.company_id;
+
+    // Map 'meta' -> test Facebook via SocialNetworkService
+    const platformForTest = platform === 'meta' ? 'facebook' : platform;
+
+    const manager = new SocialNetworkManager();
+    const ok = await manager.testPlatformConnection(platformForTest);
+
+    return res.json({ success: true, data: { platform, ok } });
+  } catch (error) {
+    console.error('Erreur test connexion plateforme:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erreur lors du test de connexion',
+      error: {
+        message: error instanceof Error ? error.message : 'Erreur inconnue',
+        code: 'CREDENTIALS_TEST_ERROR',
         statusCode: 500
       }
     });

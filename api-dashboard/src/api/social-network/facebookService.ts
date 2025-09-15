@@ -16,7 +16,7 @@ export class FacebookService implements SocialNetworkProvider {
     this.config = config;
   }
 
-  async publishPost(content: PublishContent): Promise<PublishResult> {
+  async publishPost(credentials: any, content: PublishContent): Promise<PublishResult> {
     try {
       const pageId = this.config.pageId || 'me';
       const endpoint = `${this.baseUrl}/${pageId}/feed`;
@@ -32,7 +32,7 @@ export class FacebookService implements SocialNetworkProvider {
 
       const postData: any = {
         message: message,
-        access_token: this.config.accessToken
+        access_token: credentials.accessToken
       };
 
       // Ajouter l'image si fournie
@@ -83,10 +83,10 @@ export class FacebookService implements SocialNetworkProvider {
     }
   }
 
-  async getAccountInfo(): Promise<AccountInfo> {
+  async getAccountInfo(credentials: any): Promise<AccountInfo> {
     try {
       const pageId = this.config.pageId || 'me';
-      const endpoint = `${this.baseUrl}/${pageId}?fields=id,name,username,followers_count,picture&access_token=${this.config.accessToken}`;
+      const endpoint = `${this.baseUrl}/${pageId}?fields=id,name,username,followers_count,picture&access_token=${credentials.accessToken}`;
 
       const response = await fetch(endpoint);
       
@@ -115,10 +115,10 @@ export class FacebookService implements SocialNetworkProvider {
     }
   }
 
-  async testConnection(): Promise<boolean> {
+  async testConnection(credentials: any): Promise<boolean> {
     try {
       const pageId = this.config.pageId || 'me';
-      const endpoint = `${this.baseUrl}/${pageId}?fields=id&access_token=${this.config.accessToken}`;
+      const endpoint = `${this.baseUrl}/${pageId}?fields=id&access_token=${credentials.accessToken}`;
 
       const response = await fetch(endpoint);
       return response.ok;
@@ -132,9 +132,9 @@ export class FacebookService implements SocialNetworkProvider {
   /**
    * Récupère les pages Facebook de l'utilisateur
    */
-  async getPages(): Promise<Array<{ id: string; name: string; access_token: string }>> {
+  async getPages(credentials: any): Promise<Array<{ id: string; name: string; access_token: string }>> {
     try {
-      const endpoint = `${this.baseUrl}/me/accounts?access_token=${this.config.accessToken}`;
+      const endpoint = `${this.baseUrl}/me/accounts?access_token=${credentials.accessToken}`;
       
       const response = await fetch(endpoint);
       
@@ -154,7 +154,7 @@ export class FacebookService implements SocialNetworkProvider {
   /**
    * Publie une photo sur Facebook
    */
-  async publishPhoto(imageUrl: string, caption?: string): Promise<PublishResult> {
+  async publishPhoto(credentials: any, imageUrl: string, caption?: string): Promise<PublishResult> {
     try {
       const pageId = this.config.pageId || 'me';
       const endpoint = `${this.baseUrl}/${pageId}/photos`;
@@ -162,7 +162,7 @@ export class FacebookService implements SocialNetworkProvider {
       const postData = {
         url: imageUrl,
         caption: caption || '',
-        access_token: this.config.accessToken
+        access_token: credentials.accessToken
       };
 
       const response = await fetch(endpoint, {

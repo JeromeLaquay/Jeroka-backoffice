@@ -27,7 +27,7 @@ import dashboardRoutes from './routes/dashboard';
 import emailsRoutes from './routes/emails';
 import announcementsRoutes from './routes/announcements';
 import calendarRoutes from './routes/calendar';
-import socialNetworksRoutes from './routes/socialNetworks';
+import socialNetworksRoutes from './routes/credentials';
 import adminRoutes from './routes/admin';
 
 // Load environment variables

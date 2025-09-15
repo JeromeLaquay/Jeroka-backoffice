@@ -4,7 +4,7 @@ export interface Quote {
   id: string;
   quote_number: string;
   client_id: string;
-  client_name?: string;
+   client_name?: string;
   company_id: string;
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted';
   total: number;

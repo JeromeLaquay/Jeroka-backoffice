@@ -90,7 +90,7 @@ class InvoiceService {
     dateFrom?: string
     dateTo?: string
   }): Promise<ApiResponse<InvoicesListResponse>> {
-    return await apiService.getInvoices(params)
+    return await apiService.getInvoices(params) as unknown as ApiResponse<InvoicesListResponse>
   }
 
   /**
@@ -202,7 +202,7 @@ class InvoiceService {
    * Génère le prochain numéro de facture
    */
   async getNextInvoiceNumber(): Promise<ApiResponse<{ invoiceNumber: string }>> {
-    return await apiService.get('/invoices/next-number')
+    return await apiService.getNextInvoiceNumber()
   }
 
   /**

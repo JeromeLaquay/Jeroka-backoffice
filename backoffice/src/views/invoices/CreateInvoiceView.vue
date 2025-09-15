@@ -310,9 +310,9 @@ const isFormValid = computed(() => {
 const loadClients = async () => {
   try {
     const response = await clientsService.getClients({ limit: 100 })
-    if (response.success && response.data) {
+    if (response.success && response.data && Array.isArray(response.data)) {
       // Mapper les clients pour correspondre à l'interface attendue par ClientSelector
-      clients.value = response.data.clients.map((client: any) => ({
+      clients.value = response.data.map((client: any) => ({
         ...client,
         avatar_url: client.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(client.name)}&background=a855f7&color=fff`
       }))
@@ -366,7 +366,12 @@ const loadInvoice = async () => {
 const generateInvoiceNumber = async () => {
   try {
     const response = await invoiceService.getNextInvoiceNumber()
-    form.invoiceNumber = response.data?.invoiceNumber || `FAC-${Date.now()}`
+    if (response.success && response.data?.invoiceNumber) {
+      form.invoiceNumber = response.data.invoiceNumber
+    } else {
+      // Fallback si la réponse n'est pas valide
+      form.invoiceNumber = `FAC-${Date.now()}`
+    }
   } catch (error) {
     console.error('Erreur lors de la génération du numéro:', error)
     // Fallback

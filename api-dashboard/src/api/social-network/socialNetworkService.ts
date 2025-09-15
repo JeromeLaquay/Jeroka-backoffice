@@ -1,12 +1,13 @@
 import { FacebookService } from './facebookService';
 import { LinkedInService } from './linkedinService';
 import { TwitterService } from './twitterService';
+import { SocialCredentialsRepository } from '../../repositories/socialCredentialsRepository';
 
 export interface SocialNetworkProvider {
   name: string;
-  publishPost(content: PublishContent): Promise<PublishResult>;
-  getAccountInfo(): Promise<AccountInfo>;
-  testConnection(): Promise<boolean>;
+  publishPost(credentials: any, content: PublishContent): Promise<PublishResult>;
+  getAccountInfo(credentials: any): Promise<AccountInfo>;
+  testConnection(credentials: any): Promise<boolean>;
 }
 
 export interface PublishContent {
@@ -87,7 +88,7 @@ export class SocialNetworkService {
   /**
    * Publie sur une plateforme spécifique
    */
-  async publishToPlatform(platform: string, content: PublishContent): Promise<PublishResult> {
+  async publishToPlatform(userId: any, platform: string, content: PublishContent): Promise<PublishResult> {
     const provider = this.providers.get(platform);
     if (!provider) {
       return {
@@ -98,7 +99,8 @@ export class SocialNetworkService {
     }
 
     try {
-      return await provider.publishPost(content);
+      const credentials = await SocialCredentialsRepository.getByCompanyAndPlatform(userId, platform);
+      return await provider.publishPost(credentials, content);
     } catch (error) {
       return {
         success: false,
@@ -111,22 +113,25 @@ export class SocialNetworkService {
   /**
    * Publie sur plusieurs plateformes
    */
-  async publishToMultiplePlatforms(platforms: string[], content: PublishContent): Promise<PublishResult[]> {
-    const promises = platforms.map(platform => this.publishToPlatform(platform, content));
+  async publishToMultiplePlatforms(userId: any, platforms: string[], content: PublishContent): Promise<PublishResult[]> {
+    const promises = platforms.map(async platform => {
+      return this.publishToPlatform(userId, platform, content);
+    });
     return Promise.all(promises);
   }
 
   /**
    * Teste la connexion à une plateforme
    */
-  async testPlatformConnection(platform: string): Promise<boolean> {
+  async testPlatformConnection(userId: any, platform: string): Promise<boolean> {
     const provider = this.providers.get(platform);
     if (!provider) {
       return false;
     }
 
     try {
-      return await provider.testConnection();
+      const credentials = await SocialCredentialsRepository.getByCompanyAndPlatform(userId, platform);
+      return await provider.testConnection(credentials);
     } catch (error) {
       console.error(`Erreur test connexion ${platform}:`, error);
       return false;
@@ -136,14 +141,15 @@ export class SocialNetworkService {
   /**
    * Récupère les informations du compte pour une plateforme
    */
-  async getAccountInfo(platform: string): Promise<AccountInfo | null> {
+  async getAccountInfo(userId: any, platform: string): Promise<AccountInfo | null> {
     const provider = this.providers.get(platform);
     if (!provider) {
       return null;
     }
 
     try {
-      return await provider.getAccountInfo();
+      const credentials = await SocialCredentialsRepository.getByCompanyAndPlatform(userId, platform);
+      return await provider.getAccountInfo(credentials);
     } catch (error) {
       console.error(`Erreur récupération info compte ${platform}:`, error);
       return null;
@@ -160,12 +166,12 @@ export class SocialNetworkService {
   /**
    * Récupère les plateformes connectées
    */
-  async getConnectedPlatforms(): Promise<string[]> {
+  async getConnectedPlatforms(userId: any): Promise<string[]> {
     const platforms = this.getAvailablePlatforms();
     const connectedPlatforms: string[] = [];
 
     for (const platform of platforms) {
-      const isConnected = await this.testPlatformConnection(platform);
+      const isConnected = await this.testPlatformConnection(userId, platform);
       if (isConnected) {
         connectedPlatforms.push(platform);
       }

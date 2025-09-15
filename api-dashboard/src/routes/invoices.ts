@@ -299,19 +299,7 @@ router.post('/:id/mark-paid', async (req: AuthRequest, res: Response) => {
  */
 router.get('/next-number', async (req: AuthRequest, res: Response) => {
   try {
-    const user = await UserRepository.findById(req.user!.id);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          message: 'Utilisateur non trouvé',
-          code: 'USER_NOT_FOUND',
-          statusCode: 404
-        }
-      });
-    }
-
-    const invoiceNumber = await InvoiceRepository.generateInvoiceNumber(user.company_id);
+    const invoiceNumber = await InvoiceRepository.generateInvoiceNumber(req.user!.company_id);
     
     return res.json({
       success: true,
