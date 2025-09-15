@@ -1,90 +1,79 @@
-import { query } from '../database/connection';
-
-export interface User {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  telephone: string;
-  avatar_url: string;
-  company_id: string;
-  is_active: boolean;
-  email_verified: boolean;
-  created_at: Date;
-  updated_at: Date;
-  last_login?: Date;
-  password_hash?: string;
-}
+import UserRepository, { User } from '../repositories/userRepository';
 
 export class UserService {
   // Récupérer tous les utilisateurs d'une entreprise
-  static async getUsers(companyId: string): Promise<User[]> {
-    const result = await query(
-      'SELECT id, email, first_name, last_name, role, is_active, email_verified, created_at, updated_at, last_login FROM users WHERE company_id = $1 ORDER BY created_at DESC',
-      [companyId]
-    );
-    return result.rows;
+  static async getUsers(): Promise<User[]> {
+    return UserRepository.findAll();
+  }
+
+  static async getCompanyUsers(): Promise<User[]> {
+    return UserRepository.findByCompany();
   }
 
   // Récupérer un utilisateur par ID
   static async getUser(userId: string): Promise<User | null> {
-    const result = await query(
-      'SELECT id, email, first_name, last_name, role, is_active, email_verified, created_at, updated_at, last_login FROM users WHERE id = $1',
-      [userId]
-    );
-    return result.rows[0] || null;
+    return UserRepository.findById(userId);
   }
 
   // Récupérer l'utilisateur actuel (via token)
   static async getCurrentUser(userId: string): Promise<User | null> {
-    return this.getUser(userId);
+    return UserRepository.findById(userId);
   }
 
   // Créer un utilisateur
   static async createUser(userData: Partial<User>): Promise<User> {
-    const result = await query(
-      `INSERT INTO users (email, first_name, last_name, role, company_id, password_hash, email_verified)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING id, email, first_name, last_name, role, is_active, email_verified, created_at, updated_at`,
-      [
-        userData.email,
-        userData.first_name,
-        userData.last_name,
-        userData.role || 'user',
-        userData.company_id,
-        userData.password_hash,
-        userData.email_verified || false
-      ]
-    );
-    return result.rows[0];
+    return UserRepository.create(userData);
   }
 
   // Mettre à jour un utilisateur
   static async updateUser(userId: string, userData: Partial<User>): Promise<User | null> {
-    const result = await query(
-      `UPDATE users 
-       SET first_name = $1, last_name = $2, email = $3, role = $4, updated_at = NOW()
-       WHERE id = $5
-       RETURNING id, email, first_name, last_name, role, is_active, email_verified, created_at, updated_at`,
-      [
-        userData.first_name,
-        userData.last_name,
-        userData.email,
-        userData.role,
-        userId
-      ]
-    );
-    return result.rows[0] || null;
+    return UserRepository.update(userId, userData);
   }
 
   // Désactiver un utilisateur
   static async deactivateUser(userId: string): Promise<boolean> {
-    const result = await query(
-      'UPDATE users SET is_active = false, updated_at = NOW() WHERE id = $1',
-      [userId]
-    );
-    return result.rowCount > 0;
+    return UserRepository.deactivate(userId);
+  }
+
+  // Activer un utilisateur
+  static async activateUser(userId: string): Promise<boolean> {
+    return UserRepository.activate(userId);
+  }
+
+  // Basculer le statut d'un utilisateur
+  static async toggleUserStatus(userId: string): Promise<User | null> {
+    return UserRepository.toggleStatus(userId);
+  }
+
+  // Vérifier si un utilisateur est admin
+  static async isAdmin(userId: string): Promise<boolean> {
+    return UserRepository.isAdmin(userId);
+  }
+
+  // Mettre à jour le mot de passe
+  static async updatePassword(userId: string, passwordHash: string): Promise<boolean> {
+    return UserRepository.updatePassword(userId, passwordHash);
+  }
+
+  // Mettre à jour la dernière connexion
+  static async updateLastLogin(userId: string): Promise<boolean> {
+    return UserRepository.updateLastLogin(userId);
+  }
+
+  // Supprimer un utilisateur
+  static async deleteUser(userId: string): Promise<boolean> {
+    return UserRepository.delete(userId);
+  }
+
+  // Compter les utilisateurs actifs
+  static async countActiveUsers(): Promise<number> {
+    return UserRepository.countActive();
+  }
+
+  // Compter les nouveaux utilisateurs du mois
+  static async countNewUsersThisMonth(): Promise<number> {
+    return UserRepository.countNewThisMonth();
   }
 }
+
 export default UserService;

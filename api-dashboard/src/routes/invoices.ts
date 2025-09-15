@@ -1,84 +1,38 @@
-import { Router } from 'express';
-import { verifyToken } from '../middleware/auth';
+import { Router, Request, Response } from 'express';
+import { verifyToken, AuthRequest } from '../middleware/auth';
+import { InvoiceService } from '../services/invoiceService';
+import { InvoiceRepository } from '../repositories/invoiceRepository';
+import UserRepository from '../repositories/userRepository';
 
 const router = Router();
 
 // All invoice routes require authentication
 router.use(verifyToken);
 
-// Mock data for invoices
-const mockInvoices = [
-  {
-    id: 1,
-    invoiceNumber: 'INV-2024-001',
-    clientId: 1,
-    clientName: 'Client Test',
-    status: 'paid',
-    total: 299.99,
-    tax: 59.99,
-    subtotal: 240.00,
-    dueDate: new Date('2024-02-15'),
-    issueDate: new Date('2024-01-15'),
-    paidDate: new Date('2024-01-20'),
-    items: [
-      {
-        id: 1,
-        description: 'Service de développement',
-        quantity: 1,
-        unitPrice: 240.00,
-        total: 240.00
-      }
-    ],
-    createdAt: new Date()
-  }
-];
-
 /**
  * @route GET /api/v1/invoices
- * @desc Get all invoices
+ * @desc Get all invoices for user's company
  * @access Private
  */
-router.get('/', async (req, res) => {
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const { page = 1, limit = 10, status, clientId, dateFrom, dateTo } = req.query;
     
-    let filteredInvoices = [...mockInvoices];
-    
-    // Apply filters
-    if (status) {
-      filteredInvoices = filteredInvoices.filter(inv => inv.status === status);
-    }
-    
-    if (clientId) {
-      filteredInvoices = filteredInvoices.filter(inv => inv.clientId === parseInt(clientId as string));
-    }
-    
-    if (dateFrom) {
-      const fromDate = new Date(dateFrom as string);
-      filteredInvoices = filteredInvoices.filter(inv => new Date(inv.issueDate) >= fromDate);
-    }
-    
-    if (dateTo) {
-      const toDate = new Date(dateTo as string);
-      filteredInvoices = filteredInvoices.filter(inv => new Date(inv.issueDate) <= toDate);
-    }
-    
-    // Pagination
-    const startIndex = ((page as number) - 1) * (limit as number);
-    const endIndex = startIndex + (limit as number);
-    const paginatedInvoices = filteredInvoices.slice(startIndex, endIndex);
+    const result = await InvoiceService.getInvoices(req.user!.id, {
+      page: Number(page),
+      limit: Number(limit),
+      status: status as string,
+      clientId: clientId as string,
+      dateFrom: dateFrom as string,
+      dateTo: dateTo as string
+    });
     
     return res.json({
       success: true,
-      data: {
-        invoices: paginatedInvoices,
-        total: filteredInvoices.length,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(filteredInvoices.length / (limit as number))
-      }
+      data: result
     });
   } catch (error) {
+    console.error('Erreur lors de la récupération des factures:', error);
     return res.status(500).json({
       success: false,
       error: {
@@ -91,14 +45,40 @@ router.get('/', async (req, res) => {
 });
 
 /**
+ * @route GET /api/v1/invoices/stats
+ * @desc Get invoice statistics
+ * @access Private
+ */
+router.get('/stats', async (req: AuthRequest, res: Response) => {
+  try {
+    const stats = await InvoiceService.getInvoiceStats(req.user!.id);
+    
+    return res.json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des statistiques:', error);
+    return res.status(500).json({
+      success: false,
+      error: {
+        message: 'Erreur lors de la récupération des statistiques',
+        code: 'INTERNAL_ERROR',
+        statusCode: 500
+      }
+    });
+  }
+});
+
+/**
  * @route GET /api/v1/invoices/:id
  * @desc Get invoice by ID
  * @access Private
  */
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const invoice = mockInvoices.find(inv => inv.id === parseInt(id));
+    const invoice = await InvoiceService.getInvoice(req.user!.id, id);
     
     if (!invoice) {
       return res.status(404).json({
@@ -116,6 +96,7 @@ router.get('/:id', async (req, res) => {
       data: invoice
     });
   } catch (error) {
+    console.error('Erreur lors de la récupération de la facture:', error);
     return res.status(500).json({
       success: false,
       error: {
@@ -132,37 +113,17 @@ router.get('/:id', async (req, res) => {
  * @desc Create new invoice
  * @access Private
  */
-router.post('/', async (req, res) => {
+router.post('/', async (req: AuthRequest, res: Response) => {
   try {
-    const { clientId, items, dueDate, notes } = req.body;
-    
-    // TODO: Implement invoice creation with database
-    const subtotal = items.reduce((sum: number, item: any) => sum + (item.quantity * item.unitPrice), 0);
-    const tax = subtotal * 0.2; // 20% TVA
-    const total = subtotal + tax;
-    
-    const newInvoice = {
-      id: mockInvoices.length + 1,
-      invoiceNumber: `INV-2024-${String(mockInvoices.length + 1).padStart(3, '0')}`,
-      clientId,
-      clientName: 'Client Test', // TODO: Get from client data
-      status: 'draft',
-      total,
-      tax,
-      subtotal,
-      dueDate: new Date(dueDate),
-      issueDate: new Date(),
-      items,
-      notes,
-      createdAt: new Date()
-    };
+    const invoice = await InvoiceService.createInvoice(req.user!.id, req.body);
     
     return res.status(201).json({
       success: true,
       message: 'Facture créée avec succès',
-      data: newInvoice
+      data: invoice
     });
   } catch (error) {
+    console.error('Erreur lors de la création de la facture:', error);
     return res.status(500).json({
       success: false,
       error: {
@@ -179,12 +140,12 @@ router.post('/', async (req, res) => {
  * @desc Update invoice
  * @access Private
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const invoiceIndex = mockInvoices.findIndex(inv => inv.id === parseInt(id));
+    const invoice = await InvoiceService.updateInvoice(req.user!.id, id, req.body);
     
-    if (invoiceIndex === -1) {
+    if (!invoice) {
       return res.status(404).json({
         success: false,
         error: {
@@ -195,19 +156,13 @@ router.put('/:id', async (req, res) => {
       });
     }
     
-    // TODO: Implement invoice update with database
-    const updatedInvoice = {
-      ...mockInvoices[invoiceIndex],
-      ...req.body,
-      id: parseInt(id)
-    };
-    
     return res.json({
       success: true,
       message: 'Facture mise à jour avec succès',
-      data: updatedInvoice
+      data: invoice
     });
   } catch (error) {
+    console.error('Erreur lors de la mise à jour de la facture:', error);
     return res.status(500).json({
       success: false,
       error: {
@@ -224,12 +179,12 @@ router.put('/:id', async (req, res) => {
  * @desc Delete invoice
  * @access Private
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const invoiceIndex = mockInvoices.findIndex(inv => inv.id === parseInt(id));
+    const deleted = await InvoiceService.deleteInvoice(req.user!.id, id);
     
-    if (invoiceIndex === -1) {
+    if (!deleted) {
       return res.status(404).json({
         success: false,
         error: {
@@ -240,12 +195,12 @@ router.delete('/:id', async (req, res) => {
       });
     }
     
-    // TODO: Implement invoice deletion with database
     return res.json({
       success: true,
       message: 'Facture supprimée avec succès'
     });
   } catch (error) {
+    console.error('Erreur lors de la suppression de la facture:', error);
     return res.status(500).json({
       success: false,
       error: {
@@ -262,14 +217,14 @@ router.delete('/:id', async (req, res) => {
  * @desc Update invoice status
  * @access Private
  */
-router.put('/:id/status', async (req, res) => {
+router.put('/:id/status', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
     
-    const invoiceIndex = mockInvoices.findIndex(inv => inv.id === parseInt(id));
+    const invoice = await InvoiceService.updateInvoiceStatus(req.user!.id, id, status);
     
-    if (invoiceIndex === -1) {
+    if (!invoice) {
       return res.status(404).json({
         success: false,
         error: {
@@ -280,19 +235,13 @@ router.put('/:id/status', async (req, res) => {
       });
     }
     
-    // TODO: Implement status update with database
-    const updatedInvoice = {
-      ...mockInvoices[invoiceIndex],
-      status,
-      paidDate: status === 'paid' ? new Date() : null
-    };
-    
     return res.json({
       success: true,
       message: `Facture ${status === 'paid' ? 'marquée comme payée' : 'mise à jour'}`,
-      data: updatedInvoice
+      data: invoice
     });
   } catch (error) {
+    console.error('Erreur lors de la mise à jour du statut:', error);
     return res.status(500).json({
       success: false,
       error: {
@@ -305,38 +254,75 @@ router.put('/:id/status', async (req, res) => {
 });
 
 /**
- * @route GET /api/v1/invoices/stats
- * @desc Get invoice statistics
+ * @route POST /api/v1/invoices/:id/mark-paid
+ * @desc Mark invoice as paid
  * @access Private
  */
-router.get('/stats', async (req, res) => {
+router.post('/:id/mark-paid', async (req: AuthRequest, res: Response) => {
   try {
-    const totalInvoices = mockInvoices.length;
-    const paidInvoices = mockInvoices.filter(inv => inv.status === 'paid').length;
-    const pendingInvoices = mockInvoices.filter(inv => inv.status === 'pending').length;
-    const overdueInvoices = mockInvoices.filter(inv => 
-      inv.status === 'pending' && new Date(inv.dueDate) < new Date()
-    ).length;
-    const totalRevenue = mockInvoices
-      .filter(inv => inv.status === 'paid')
-      .reduce((sum, inv) => sum + inv.total, 0);
+    const { id } = req.params;
+    const invoice = await InvoiceService.markAsPaid(req.user!.id, id);
+    
+    if (!invoice) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          message: 'Facture non trouvée',
+          code: 'INVOICE_NOT_FOUND',
+          statusCode: 404
+        }
+      });
+    }
     
     return res.json({
       success: true,
-      data: {
-        total: totalInvoices,
-        paid: paidInvoices,
-        pending: pendingInvoices,
-        overdue: overdueInvoices,
-        totalRevenue,
-        averageInvoice: totalInvoices > 0 ? totalRevenue / paidInvoices : 0
-      }
+      message: 'Facture marquée comme payée',
+      data: invoice
     });
   } catch (error) {
+    console.error('Erreur lors du marquage de la facture:', error);
     return res.status(500).json({
       success: false,
       error: {
-        message: 'Erreur lors de la récupération des statistiques',
+        message: 'Erreur lors du marquage de la facture',
+        code: 'INTERNAL_ERROR',
+        statusCode: 500
+      }
+    });
+  }
+});
+
+/**
+ * @route GET /api/v1/invoices/next-number
+ * @desc Get next invoice number
+ * @access Private
+ */
+router.get('/next-number', async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await UserRepository.findById(req.user!.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          message: 'Utilisateur non trouvé',
+          code: 'USER_NOT_FOUND',
+          statusCode: 404
+        }
+      });
+    }
+
+    const invoiceNumber = await InvoiceRepository.generateInvoiceNumber(user.company_id);
+    
+    return res.json({
+      success: true,
+      data: { invoiceNumber }
+    });
+  } catch (error) {
+    console.error('Erreur lors de la génération du numéro de facture:', error);
+    return res.status(500).json({
+      success: false,
+      error: {
+        message: 'Erreur lors de la génération du numéro de facture',
         code: 'INTERNAL_ERROR',
         statusCode: 500
       }

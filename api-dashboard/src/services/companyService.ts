@@ -1,16 +1,44 @@
-import pool from '../database/connection';
+import { query } from '../database/connection';
 
 export interface Company {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  postal_code?: string;
+  country?: string;
+  vat_number?: string;
+  siret_number?: string;
+  vat_rate?: number;
+  tax_regime?: string;
+  banking_info?: any;
+  invoice_settings?: any;
+  quote_settings?: any;
+  email_settings?: any;
+  theme?: string;
+  is_active: boolean;
+  subscription_plan?: 'free' | 'basic' | 'premium' | 'enterprise';
+  subscription_status?: 'active' | 'suspended' | 'cancelled';
+  subscription_expires_at?: Date;
+  created_at: Date;
+  updated_at: Date;
+  user_count?: number;
 }
 
 export interface CompanyFilters {
   search?: string;
-  status?: string;
-  type?: string;
+  status?: 'active' | 'inactive';
+  subscription_plan?: 'free' | 'basic' | 'premium' | 'enterprise';
+  subscription_status?: 'active' | 'suspended' | 'cancelled';
+  created_from?: string;
+  created_to?: string;
+  page?: number;
+  limit?: number;
+  sort_by?: 'name' | 'created_at' | 'subscription_plan';
+  sort_order?: 'asc' | 'desc';
 }
 
 export interface CompanySettings {
@@ -29,47 +57,221 @@ export interface CompanyUser {
 
 export class CompanyService {
 
-  static async getCompany(companyId: string): Promise<Company> {
-    const company = await pool.query('SELECT * FROM companies WHERE id = $1', [companyId]);
-    return company;
+  static async getCompany(companyId: string): Promise<Company | null> {
+    const result = await query(`
+      SELECT 
+        c.*,
+        COUNT(u.id) as user_count
+      FROM companies c
+      LEFT JOIN users u ON c.id = u.company_id
+      WHERE c.id = $1
+      GROUP BY c.id
+    `, [companyId]);
+    return result.rows[0] || null;
   }
 
-  static async getCompanies(filters: CompanyFilters): Promise<Company[]> {
-    const companies = await pool.query('SELECT * FROM companies WHERE $1', [filters]);
-    return companies;
+  static async getCompanies(filters: CompanyFilters): Promise<{ data: Company[], pagination?: any }> {
+    let queryStr = `
+      SELECT 
+        c.*,
+        COUNT(u.id) as user_count
+      FROM companies c
+      LEFT JOIN users u ON c.id = u.company_id
+    `;
+    
+    const conditions = [];
+    const params = [];
+    let paramCount = 0;
+
+    if (filters.search) {
+      paramCount++;
+      conditions.push(`(c.name ILIKE $${paramCount} OR c.email ILIKE $${paramCount})`);
+      params.push(`%${filters.search}%`);
+    }
+
+    if (filters.status) {
+      paramCount++;
+      conditions.push(`c.is_active = $${paramCount}`);
+      params.push(filters.status === 'active');
+    }
+
+    if (filters.subscription_plan) {
+      paramCount++;
+      conditions.push(`c.subscription_plan = $${paramCount}`);
+      params.push(filters.subscription_plan);
+    }
+
+    if (filters.subscription_status) {
+      paramCount++;
+      conditions.push(`c.subscription_status = $${paramCount}`);
+      params.push(filters.subscription_status);
+    }
+
+    if (filters.created_from) {
+      paramCount++;
+      conditions.push(`c.created_at >= $${paramCount}`);
+      params.push(filters.created_from);
+    }
+
+    if (filters.created_to) {
+      paramCount++;
+      conditions.push(`c.created_at <= $${paramCount}`);
+      params.push(filters.created_to);
+    }
+
+    if (conditions.length > 0) {
+      queryStr += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    queryStr += ' GROUP BY c.id';
+
+    // Tri
+    if (filters.sort_by) {
+      const sortOrder = filters.sort_order || 'desc';
+      queryStr += ` ORDER BY c.${filters.sort_by} ${sortOrder.toUpperCase()}`;
+    } else {
+      queryStr += ' ORDER BY c.created_at DESC';
+    }
+
+    // Pagination
+    if (filters.limit) {
+      paramCount++;
+      queryStr += ` LIMIT $${paramCount}`;
+      params.push(filters.limit);
+    }
+
+    if (filters.page && filters.limit) {
+      paramCount++;
+      queryStr += ` OFFSET $${paramCount}`;
+      params.push((filters.page - 1) * filters.limit);
+    }
+
+    const result = await query(queryStr, params);
+    return { data: result.rows };
   }
 
-  static async createCompany(company: Company): Promise<Company> {
-    return await pool.query('INSERT INTO companies (name, email, phone) VALUES ($1, $2, $3) RETURNING *', [company.name, company.email, company.phone]);
+  static async createCompany(companyData: Partial<Company>): Promise<Company> {
+    const result = await query(`
+      INSERT INTO companies (name, email, phone, address_line1, address_line2, city, postal_code, country, vat_number, siret_number, vat_rate, tax_regime, subscription_plan, is_active)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      RETURNING *
+    `, [
+      companyData.name,
+      companyData.email,
+      companyData.phone || null,
+      companyData.address_line1 || null,
+      companyData.address_line2 || null,
+      companyData.city || null,
+      companyData.postal_code || null,
+      companyData.country || null,
+      companyData.vat_number || null,
+      companyData.siret_number || null,
+      companyData.vat_rate || null,
+      companyData.tax_regime || null,
+      companyData.subscription_plan || 'free',
+      companyData.is_active !== undefined ? companyData.is_active : true
+    ]);
+    
+    return result.rows[0];
   }
 
-  static async updateCompany(companyId: string, company: Company): Promise<Company> {
-    return await pool.query('UPDATE companies SET name = $1, email = $2, phone = $3 WHERE id = $4 RETURNING *', [company.name, company.email, company.phone, companyId]);
+  static async updateCompany(companyId: string, companyData: Partial<Company>): Promise<Company | null> {
+    const fields = [];
+    const params = [];
+    let paramCount = 0;
+
+    Object.entries(companyData).forEach(([key, value]) => {
+      if (value !== undefined && key !== 'id' && key !== 'created_at' && key !== 'user_count') {
+        paramCount++;
+        fields.push(`${key} = $${paramCount}`);
+        params.push(value);
+      }
+    });
+
+    if (fields.length === 0) {
+      return this.getCompany(companyId);
+    }
+
+    paramCount++;
+    fields.push(`updated_at = NOW()`);
+    params.push(companyId);
+
+    const result = await query(`
+      UPDATE companies 
+      SET ${fields.join(', ')}
+      WHERE id = $${paramCount}
+      RETURNING *
+    `, params);
+    
+    return result.rows[0] || null;
   }
 
   static async deleteCompany(companyId: string): Promise<boolean> {
-    const company = await pool.query('DELETE FROM companies WHERE id = $1 RETURNING *', [companyId]);
-    return company;
+    const result = await query('DELETE FROM companies WHERE id = $1', [companyId]);
+    return result.rowCount > 0;
   }
 
-  static async getCompanySettings(companyId: string): Promise<CompanySettings> {
-    const companySettings = await pool.query('SELECT * FROM company_settings WHERE company_id = $1', [companyId]);
-    return companySettings;
+  static async toggleCompanyStatus(companyId: string): Promise<Company | null> {
+    const result = await query(`
+      UPDATE companies 
+      SET is_active = NOT is_active, updated_at = NOW()
+      WHERE id = $1
+      RETURNING *
+    `, [companyId]);
+    
+    return result.rows[0] || null;
   }
 
-  static async updateCompanySettings(companyId: string, companySettings: CompanySettings): Promise<CompanySettings> {
-    return await pool.query('UPDATE company_settings SET name = $1, email = $2, phone = $3 WHERE company_id = $4 RETURNING *', [companySettings.name, companySettings.email, companySettings.phone, companyId]);
-    return companySettings;
+  static async getCompanySettings(companyId: string): Promise<CompanySettings | null> {
+    const result = await query('SELECT * FROM company_settings WHERE company_id = $1', [companyId]);
+    return result.rows[0] || null;
+  }
+
+  static async updateCompanySettings(companyId: string, companySettings: Partial<CompanySettings>): Promise<CompanySettings | null> {
+    const fields = [];
+    const params = [];
+    let paramCount = 0;
+
+    Object.entries(companySettings).forEach(([key, value]) => {
+      if (value !== undefined && key !== 'id') {
+        paramCount++;
+        fields.push(`${key} = $${paramCount}`);
+        params.push(value);
+      }
+    });
+
+    if (fields.length === 0) {
+      return this.getCompanySettings(companyId);
+    }
+
+    paramCount++;
+    fields.push(`updated_at = NOW()`);
+    params.push(companyId);
+
+    const result = await query(`
+      UPDATE company_settings 
+      SET ${fields.join(', ')}
+      WHERE company_id = $${paramCount}
+      RETURNING *
+    `, params);
+    
+    return result.rows[0] || null;
   }
 
   static async deleteCompanySettings(companyId: string): Promise<boolean> {
-    return await pool.query('DELETE FROM company_settings WHERE company_id = $1 RETURNING *', [companyId]);
+    const result = await query('DELETE FROM company_settings WHERE company_id = $1', [companyId]);
+    return result.rowCount > 0;
   }
 
   static async getCompanyUsers(companyId: string): Promise<CompanyUser[]> {
-    const companyUsers = await pool.query('SELECT * FROM company_users WHERE company_id = $1', [companyId]);
-    return companyUsers;
+    const result = await query(`
+      SELECT u.id, u.first_name || ' ' || u.last_name as name, u.email, u.telephone as phone
+      FROM users u
+      WHERE u.company_id = $1
+      ORDER BY u.created_at DESC
+    `, [companyId]);
+    return result.rows;
   }
-
 }
+
 export default CompanyService;

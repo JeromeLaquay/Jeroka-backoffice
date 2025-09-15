@@ -43,10 +43,29 @@ export const verifyToken = async (req: AuthRequest, res: Response, next: NextFun
       throw createError.unauthorized('Token d\'accès requis');
     }
 
+    // Debug: afficher le token reçu
+    logger.info('Token reçu dans middleware:', {
+      token: token.substring(0, 20) + '...',
+      url: req.url,
+      method: req.method
+    });
+
     // Verify token
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       throw createError.internal('Configuration JWT manquante');
+    }
+
+    try {
+      const decoded = jwt.verify(token, jwtSecret) as JWTPayload;
+      logger.info('Token décodé avec succès:', {
+        userId: decoded.id,
+        email: decoded.email,
+        role: decoded.role
+      });
+    } catch (jwtError) {
+      logger.error('Erreur de vérification du token:', jwtError);
+      throw createError.unauthorized('Token invalide');
     }
 
     const decoded = jwt.verify(token, jwtSecret) as JWTPayload;
@@ -110,6 +129,16 @@ export const requireRole = (roles: string | string[]) => {
     }
 
     const allowedRoles = Array.isArray(roles) ? roles : [roles];
+    
+    // Debug: afficher les informations de l'utilisateur
+    logger.info('Vérification des rôles', {
+      userId: req.user.id,
+      userEmail: req.user.email,
+      userRole: req.user.role,
+      requiredRoles: allowedRoles,
+      url: req.url,
+      method: req.method
+    });
     
     if (!allowedRoles.includes(req.user.role)) {
       logger.warn('Access denied', {

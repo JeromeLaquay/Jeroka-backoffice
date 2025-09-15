@@ -55,7 +55,7 @@ export interface User {
   firstName: string
   lastName: string
   phone?: string
-  avatarUrl?: string
+  avatar_url?: string
   role: string
   isActive: boolean
   emailVerified: boolean
@@ -86,7 +86,10 @@ class ApiService {
         const token = localStorage.getItem('auth_token')
         if (token) {
           config.headers.Authorization = `Bearer ${token}`
+          console.log('Token ajouté à la requête:', token)
         }
+        // S'assurer que les cookies sont envoyés
+        config.withCredentials = true
         return config
       },
       (error) => {
@@ -101,26 +104,7 @@ class ApiService {
       },
       async (error) => {
         if (error.response?.status === 401) {
-          // Éviter la boucle infinie
-          if (error.config?.url?.includes('/auth/refresh')) {
-            // Si c'est déjà une requête de refresh qui échoue, déconnecter
-            localStorage.removeItem('auth_token')
-            localStorage.removeItem('user')
-            window.location.href = '/login'
-            return Promise.reject(error)
-          }
-          
-          // Tenter de rafraîchir le token seulement si ce n'est pas déjà une requête de refresh
-          try {
-            await this.refreshToken()
-            // Retry la requête originale
-            return this.api.request(error.config)
-          } catch (refreshError) {
-            // Échec du refresh - déconnecter l'utilisateur
-            localStorage.removeItem('auth_token')
-            localStorage.removeItem('user')
-            window.location.href = '/login'
-          }
+          return Promise.reject(error)
         }
 
         // Standardiser les erreurs
@@ -176,6 +160,11 @@ class ApiService {
 
   async refreshToken(): Promise<ApiResponse<{ accessToken: string }>> {
     const response = await this.api.post<ApiResponse<{ accessToken: string }>>('/auth/refresh')
+    return response.data
+  }
+
+  async getCurrentUser(): Promise<ApiResponse<User>> {
+    const response = await this.api.get<ApiResponse<User>>('/auth/me')
     return response.data
   }
 
@@ -399,6 +388,11 @@ class ApiService {
 
   async getInvoiceStats(): Promise<ApiResponse<any>> {
     const response = await this.api.get<ApiResponse<any>>('/invoices/stats')
+    return response.data
+  }
+
+  async getNextInvoiceNumber(): Promise<ApiResponse<{ invoiceNumber: string }>> {
+    const response = await this.api.get<ApiResponse<{ invoiceNumber: string }>>('/invoices/next-number')
     return response.data
   }
 

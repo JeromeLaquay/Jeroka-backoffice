@@ -6,7 +6,7 @@ export interface User {
   firstName: string
   lastName: string
   phone?: string
-  avatarUrl?: string
+  avatar_url?: string
   role: string
   isActive: boolean
   emailVerified: boolean

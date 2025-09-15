@@ -8,7 +8,7 @@ export interface Order {
     id: string
     name: string
     email: string
-    avatar: string
+    avatar_url: string
     phone?: string
     address?: {
       line1?: string

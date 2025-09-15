@@ -6,7 +6,7 @@
         <div class="flex items-center">
           <div class="flex-shrink-0">
             <img 
-              :src="authStore.user?.avatar || '/default-avatar.png'" 
+              :src="authStore.user?.avatar_url || '/default-avatar.png'" 
               :alt="authStore.user?.name"
               class="h-16 w-16 rounded-full object-cover"
             />
@@ -227,7 +227,7 @@
           >
             <div class="flex items-center">
               <img 
-                :src="client.avatar || '/default-avatar.png'" 
+                :src="client.avatar_url || '/default-avatar.png'" 
                 :alt="client.name"
                 class="h-10 w-10 rounded-full object-cover"
               />
@@ -392,7 +392,7 @@ const recentClients = ref([
     company: 'Tech Solutions SARL',
     type: 'company',
     createdAt: 'Il y a 2 jours',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face'
+    avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face'
   },
   {
     id: '2',
@@ -400,7 +400,7 @@ const recentClients = ref([
     company: 'Design Studio',
     type: 'company',
     createdAt: 'Il y a 3 jours',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
   },
   {
     id: '3',
@@ -408,7 +408,7 @@ const recentClients = ref([
     company: '',
     type: 'individual',
     createdAt: 'Il y a 5 jours',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
+    avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
   }
 ])
 

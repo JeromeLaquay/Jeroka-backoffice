@@ -6,7 +6,7 @@ export interface UserProfile {
   lastName: string
   email: string
   phone?: string
-  avatar?: string
+  avatar_url?: string
   position?: string
   department?: string
   isActive: boolean
@@ -131,7 +131,7 @@ export interface UpdateProfileRequest {
   firstName?: string
   lastName?: string
   phone?: string
-  avatar?: string
+  avatar_url?: string
   position?: string
   department?: string
 }

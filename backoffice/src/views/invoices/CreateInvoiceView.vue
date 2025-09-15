@@ -14,7 +14,7 @@
             {{ isEdit ? 'Modifier la facture' : 'Nouvelle facture' }}
           </h1>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {{ isEdit ? `Modification de la facture ${invoice?.invoiceNumber}` : 'Créez une nouvelle facture pour un client' }}
+            {{ isEdit ? `Modification de la facture ${invoice?.invoice_number}` : 'Créez une nouvelle facture pour un client' }}
           </p>
         </div>
       </div>
@@ -115,6 +115,7 @@
             <ClientSelector
               v-model="form.clientId"
               :selected-client="selectedClient"
+              :clients="clients"
               @client-selected="onClientSelected"
               :required="true"
             />
@@ -268,6 +269,7 @@ import ClientSelector from '../../components/orders/ClientSelector.vue'
 import InvoiceItemRow from '../../components/invoices/InvoiceItemRow.vue'
 import InvoiceSummary from '../../components/invoices/InvoiceSummary.vue'
 import { invoiceService, type CreateInvoiceRequest, type Invoice } from '../../services/invoices'
+import { clientsService } from '../../services/clients'
 
 const route = useRoute()
 const router = useRouter()
@@ -277,6 +279,7 @@ const loading = ref(false)
 const invoice = ref<Invoice | null>(null)
 const selectedClient = ref<any>(null)
 const availableOrders = ref<any[]>([])
+const clients = ref<any[]>([])
 
 const isEdit = computed(() => !!route.params.id)
 
@@ -304,6 +307,21 @@ const isFormValid = computed(() => {
 })
 
 // Méthodes
+const loadClients = async () => {
+  try {
+    const response = await clientsService.getClients({ limit: 100 })
+    if (response.success && response.data) {
+      // Mapper les clients pour correspondre à l'interface attendue par ClientSelector
+      clients.value = response.data.clients.map((client: any) => ({
+        ...client,
+        avatar_url: client.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(client.name)}&background=a855f7&color=fff`
+      }))
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des clients:', error)
+  }
+}
+
 const loadInvoice = async () => {
   if (!isEdit.value) return
 
@@ -319,25 +337,25 @@ const loadInvoice = async () => {
     
     // Pré-remplir le formulaire
     Object.assign(form, {
-      invoiceNumber: invoice.value.invoiceNumber,
-      orderId: invoice.value.orderId || '',
-      clientId: invoice.value.clientId,
+      invoiceNumber: invoice.value.invoice_number,
+      orderId: '',
+      clientId: invoice.value.client_id,
       items: invoice.value.items.map(item => ({
         description: item.description,
         quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        discountPercent: item.discountPercent || 0,
-        vatRate: item.vatRate || 20
+        unitPrice: item.unit_price,
+        discountPercent: item.discount_percent || 0,
+        vatRate: item.vat_rate || 20
       })),
       status: invoice.value.status,
-      issueDate: invoice.value.issueDate.split('T')[0],
-      dueDate: invoice.value.dueDate.split('T')[0],
-      paymentTerms: invoice.value.paymentTerms || 30,
+      issueDate: invoice.value.issue_date.split('T')[0],
+      dueDate: invoice.value.due_date.split('T')[0],
+      paymentTerms: 30,
       notes: invoice.value.notes || '',
-      termsAndConditions: invoice.value.termsAndConditions || ''
+      termsAndConditions: ''
     })
 
-    selectedClient.value = { id: invoice.value.clientId, name: invoice.value.clientName }
+    selectedClient.value = { id: invoice.value.client_id, name: invoice.value.client_name }
   } catch (error) {
     console.error('Erreur lors du chargement de la facture:', error)
   } finally {
@@ -400,10 +418,24 @@ const handleSubmit = async () => {
   try {
     loading.value = true
 
+    const invoiceData = {
+      client_id: form.clientId,
+      items: form.items.map((item: any) => ({
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+        discount_percent: item.discountPercent,
+        vat_rate: item.vatRate
+      })),
+      due_date: form.dueDate,
+      notes: form.notes,
+      status: form.status || 'draft'
+    }
+
     if (isEdit.value) {
-      await invoiceService.updateInvoice(route.params.id as string, form)
+      await invoiceService.updateInvoice(route.params.id as string, invoiceData)
     } else {
-      await invoiceService.createInvoice(form)
+      await invoiceService.createInvoice(invoiceData)
     }
 
     router.push('/factures')
@@ -416,6 +448,7 @@ const handleSubmit = async () => {
 
 // Lifecycle
 onMounted(() => {
+  loadClients() // Charger les clients dans tous les cas
   if (isEdit.value) {
     loadInvoice()
   } else {

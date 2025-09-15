@@ -115,6 +115,7 @@
             <ClientSelector
               v-model="form.clientId"
               :selected-client="selectedClient"
+              :clients="clients"
               @client-selected="onClientSelected"
               :required="true"
             />
@@ -123,7 +124,7 @@
             <div v-if="selectedClient" class="mt-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
               <div class="flex items-center space-x-3">
                 <img
-                  :src="selectedClient.avatar"
+                  :src="selectedClient.avatar_url"
                   :alt="selectedClient.name"
                   class="h-10 w-10 rounded-full"
                 />
@@ -241,7 +242,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   ArrowLeftIcon,
@@ -252,6 +253,7 @@ import ClientSelector from '../../components/orders/ClientSelector.vue'
 import QuoteItemRow from '../../components/quotes/QuoteItemRow.vue'
 import QuoteSummary from '../../components/quotes/QuoteSummary.vue'
 import { quoteService, type CreateQuoteRequest, type Quote } from '../../services/quotes'
+import { clientsService } from '../../services/clients'
 
 const route = useRoute()
 const router = useRouter()
@@ -260,6 +262,7 @@ const router = useRouter()
 const loading = ref(false)
 const quote = ref<Quote | null>(null)
 const selectedClient = ref<any>(null)
+const clients = ref<any[]>([])
 
 const isEdit = computed(() => !!route.params.id)
 
@@ -270,7 +273,7 @@ const form = reactive<CreateQuoteRequest & any>({
   status: 'draft',
   issueDate: new Date().toISOString().split('T')[0],
   validityDays: 30,
-  validUntil: '',
+  validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
   discountAmount: 0,
   notes: '',
   termsAndConditions: ''
@@ -292,28 +295,30 @@ const loadQuote = async () => {
   try {
     loading.value = true
     const response = await quoteService.getQuote(route.params.id as string)
-    quote.value = response.data
+    quote.value = response.data || null
     
     // Pré-remplir le formulaire
-    Object.assign(form, {
-      quoteNumber: quote.value.quoteNumber,
-      clientId: quote.value.clientId,
-      items: quote.value.items.map(item => ({
-        description: item.description,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        discountPercent: item.discountPercent || 0,
-        vatRate: item.vatRate || 20
-      })),
-      status: quote.value.status,
-      issueDate: quote.value.issueDate.split('T')[0],
-      validityDays: quote.value.validityDays || 30,
-      validUntil: quote.value.validUntil.split('T')[0],
-      notes: quote.value.notes || '',
-      termsAndConditions: quote.value.termsAndConditions || ''
-    })
+    if (quote.value) {
+      Object.assign(form, {
+        quoteNumber: quote.value.quoteNumber,
+        clientId: quote.value.clientId,
+        items: quote.value.items.map((item: any) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          discountPercent: item.discountPercent || 0,
+          vatRate: item.vatRate || 20
+        })),
+        status: quote.value.status,
+        issueDate: quote.value.issueDate.split('T')[0],
+        validUntil: quote.value.validUntil.split('T')[0],
+        notes: quote.value.notes || ''
+      })
 
-    selectedClient.value = quote.value.client
+      // Trouver le client correspondant dans la liste
+      const client = clients.value.find(c => c.id === quote.value?.clientId)
+      selectedClient.value = client || null
+    }
   } catch (error) {
     console.error('Erreur lors du chargement du devis:', error)
   } finally {
@@ -323,8 +328,8 @@ const loadQuote = async () => {
 
 const generateQuoteNumber = async () => {
   try {
-    const response = await quoteService.getNextQuoteNumber()
-    form.quoteNumber = response.data.quoteNumber
+    const quoteNumber = await quoteService.generateQuoteNumber()
+    form.quoteNumber = quoteNumber
   } catch (error) {
     console.error('Erreur lors de la génération du numéro:', error)
     // Fallback
@@ -356,10 +361,12 @@ const removeQuoteItem = (index: number) => {
 }
 
 const updateValidUntil = () => {
-  if (form.issueDate && form.validityDays) {
+  if (form.issueDate && form.validityDays && !isNaN(form.validityDays)) {
     const issueDate = new Date(form.issueDate)
-    const validUntil = new Date(issueDate.getTime() + (form.validityDays * 24 * 60 * 60 * 1000))
-    form.validUntil = validUntil.toISOString().split('T')[0]
+    if (!isNaN(issueDate.getTime())) {
+      const validUntil = new Date(issueDate.getTime() + (form.validityDays * 24 * 60 * 60 * 1000))
+      form.validUntil = validUntil.toISOString().split('T')[0]
+    }
   }
 }
 
@@ -370,18 +377,55 @@ const handleSubmit = async () => {
     loading.value = true
 
     if (isEdit.value) {
-      await quoteService.updateQuote(route.params.id as string, form)
+      const response = await quoteService.updateQuote(route.params.id as string, {
+        clientId: form.clientId,
+        items: form.items.map((item: any) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          discountPercent: item.discountPercent || 0,
+          vatRate: item.vatRate || 20
+        })),
+        validUntil: form.validUntil,
+        notes: form.notes,
+        status: form.status
+      })
+      
+      if (response.success) {
+        router.push('/devis')
+      }
     } else {
-      await quoteService.createQuote(form)
+      const response = await quoteService.createQuote({
+        clientId: form.clientId,
+        items: form.items.map((item: any) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          discountPercent: item.discountPercent || 0,
+          vatRate: item.vatRate || 20
+        })),
+        validUntil: form.validUntil,
+        notes: form.notes
+      })
+      
+      if (response.success) {
+        router.push('/devis')
+      }
     }
-
-    router.push('/devis')
   } catch (error) {
     console.error('Erreur lors de la sauvegarde:', error)
   } finally {
     loading.value = false
   }
 }
+
+const loadClients = async () => {
+  const response = await clientsService.getClients()
+  clients.value = response.data
+}
+
+// Watchers
+watch([() => form.issueDate, () => form.validityDays], updateValidUntil)
 
 // Lifecycle
 onMounted(() => {
@@ -390,6 +434,7 @@ onMounted(() => {
   } else {
     generateQuoteNumber()
     updateValidUntil()
+    loadClients()
   }
 })
 </script>

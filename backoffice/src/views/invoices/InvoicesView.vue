@@ -133,7 +133,7 @@
           </div>
           <div class="ml-4">
             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">CA facturé</p>
-            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ formatCurrency(stats.totalAmount) }}</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ formatCurrency(stats.totalRevenue) }}</p>
           </div>
         </div>
       </div>
@@ -198,7 +198,7 @@
                       :to="`/factures/${invoice.id}`"
                       class="text-sm font-medium text-primary-600 hover:text-primary-500"
                     >
-                      {{ invoice.invoiceNumber }}
+                      {{ invoice.invoice_number }}
                     </router-link>
                     <div v-if="invoice.order" class="text-xs text-gray-500 dark:text-gray-400">
                       Commande: {{ invoice.order.orderNumber }}
@@ -206,30 +206,16 @@
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="h-8 w-8 flex-shrink-0">
-                      <img
-                        :src="invoice.client.avatar"
-                        :alt="invoice.client.name"
-                        class="h-8 w-8 rounded-full"
-                      />
-                    </div>
-                    <div class="ml-3">
-                      <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {{ invoice.client.name }}
-                      </div>
-                      <div class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ invoice.client.email }}
-                      </div>
-                    </div>
+                  <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {{ invoice.client_name }}
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {{ formatDate(invoice.issueDate) }}
+                  {{ formatDate(invoice.issue_date) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900 dark:text-gray-100">
-                    {{ formatDate(invoice.dueDate) }}
+                    {{ formatDate(invoice.due_date) }}
                   </div>
                   <div v-if="isOverdue(invoice)" class="text-xs text-red-600">
                     {{ getDaysOverdue(invoice) }} jours de retard
@@ -239,7 +225,7 @@
                   <InvoiceStatusBadge :status="invoice.status" />
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {{ formatCurrency(invoice.totalAmount) }}
+                  {{ formatCurrency(invoice.total) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div class="flex justify-end space-x-2">
@@ -355,30 +341,39 @@ import { debounce } from 'lodash-es'
 // Types
 interface Invoice {
   id: string
-  invoiceNumber: string
-  order?: {
-    id: string
-    orderNumber: string
-  }
-  client: {
-    id: string
-    name: string
-    email: string
-    avatar: string
-  }
+  invoice_number: string
+  client_id: string
+  client_name: string
   status: string
-  totalAmount: number
-  issueDate: string
-  dueDate: string
-  createdAt: string
-  updatedAt: string
+  total: number
+  tax: number
+  subtotal: number
+  issue_date: string
+  due_date: string
+  paid_date?: string
+  notes?: string
+  created_at: string
+  updated_at: string
+  items: Array<{
+    id: string
+    description: string
+    quantity: number
+    unit_price: number
+    total: number
+    discount_percent?: number
+    vat_rate?: number
+  }>
 }
 
 interface InvoiceStats {
   total: number
+  draft: number
+  sent: number
   paid: number
   overdue: number
-  totalAmount: number
+  cancelled: number
+  totalRevenue: number
+  averageInvoice: number
 }
 
 // État
@@ -386,15 +381,21 @@ const loading = ref(false)
 const invoices = ref<Invoice[]>([])
 const stats = ref<InvoiceStats>({
   total: 0,
+  draft: 0,
+  sent: 0,
   paid: 0,
   overdue: 0,
-  totalAmount: 0
+  cancelled: 0,
+  totalRevenue: 0,
+  averageInvoice: 0
 })
 
 const filters = reactive({
   search: '',
   status: '',
-  period: ''
+  clientId: '',
+  dateFrom: '',
+  dateTo: ''
 })
 
 const pagination = reactive({
@@ -408,7 +409,7 @@ const invoiceToDelete = ref<Invoice | null>(null)
 
 // Computed
 const hasFilters = computed(() => {
-  return filters.search || filters.status || filters.period
+  return filters.search || filters.status || filters.clientId || filters.dateFrom || filters.dateTo
 })
 
 // Méthodes
@@ -418,18 +419,23 @@ const loadInvoices = async () => {
     const params = {
       page: pagination.page,
       limit: pagination.limit,
-      search: filters.search || undefined,
       status: filters.status || undefined,
-      period: filters.period || undefined
+      clientId: filters.clientId || undefined,
+      dateFrom: filters.dateFrom || undefined,
+      dateTo: filters.dateTo || undefined
     }
 
     const response = await invoiceService.getInvoices(params)
-    invoices.value = response.data.invoices
-    pagination.total = response.data.total
+    if (response.success && response.data) {
+      invoices.value = response.data.invoices
+      pagination.total = response.data.total
+    }
 
     // Charger les statistiques
     const statsResponse = await invoiceService.getInvoiceStats()
-    stats.value = statsResponse.data
+    if (statsResponse.success && statsResponse.data) {
+      stats.value = statsResponse.data
+    }
   } catch (error) {
     console.error('Erreur lors du chargement des factures:', error)
   } finally {
@@ -516,12 +522,12 @@ const formatDate = (dateString: string) => {
 }
 
 const isOverdue = (invoice: Invoice) => {
-  return invoice.status !== 'paid' && new Date(invoice.dueDate) < new Date()
+  return invoice.status !== 'paid' && new Date(invoice.due_date) < new Date()
 }
 
 const getDaysOverdue = (invoice: Invoice) => {
   const today = new Date()
-  const dueDate = new Date(invoice.dueDate)
+  const dueDate = new Date(invoice.due_date)
   const diffTime = today.getTime() - dueDate.getTime()
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }

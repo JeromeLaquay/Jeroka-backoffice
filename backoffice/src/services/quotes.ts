@@ -11,9 +11,9 @@ export interface QuoteItem {
 }
 
 export interface Quote {
-  id: number
+  id: string
   quoteNumber: string
-  clientId: number
+  clientId: string
   clientName: string
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted'
   total: number
@@ -27,14 +27,14 @@ export interface Quote {
 }
 
 export interface CreateQuoteRequest {
-  clientId: number
+  clientId: string
   items: Omit<QuoteItem, 'id'>[]
   validUntil: string
   notes?: string
 }
 
 export interface UpdateQuoteRequest {
-  clientId?: number
+  clientId?: string
   items?: Omit<QuoteItem, 'id'>[]
   validUntil?: string
   notes?: string
@@ -71,10 +71,10 @@ class QuoteService {
     page?: number
     limit?: number
     status?: string
-    clientId?: number
+    clientId?: string
     dateFrom?: string
     dateTo?: string
-  }): Promise<ApiResponse<any>> {
+  }): Promise<ApiResponse<QuotesListResponse>> {
     return await apiService.getQuotes(params)
   }
 
@@ -151,42 +151,42 @@ class QuoteService {
   /**
    * Récupère les devis par statut
    */
-  async getQuotesByStatus(status: string): Promise<ApiResponse<any>> {
+  async getQuotesByStatus(status: string): Promise<ApiResponse<QuotesListResponse>> {
     return await this.getQuotes({ status, limit: 100 })
   }
 
   /**
    * Récupère les devis d'un client
    */
-  async getQuotesByClient(clientId: number): Promise<ApiResponse<any>> {
+  async getQuotesByClient(clientId: string): Promise<ApiResponse<QuotesListResponse>> {
     return await this.getQuotes({ clientId, limit: 100 })
   }
 
   /**
    * Récupère les devis expirés
    */
-  async getExpiredQuotes(): Promise<ApiResponse<any>> {
+  async getExpiredQuotes(): Promise<ApiResponse<QuotesListResponse>> {
     return await this.getQuotesByStatus('expired')
   }
 
   /**
    * Récupère les devis en attente
    */
-  async getPendingQuotes(): Promise<ApiResponse<any>> {
+  async getPendingQuotes(): Promise<ApiResponse<QuotesListResponse>> {
     return await this.getQuotesByStatus('sent')
   }
 
   /**
    * Récupère les devis acceptés
    */
-  async getAcceptedQuotes(): Promise<ApiResponse<any>> {
+  async getAcceptedQuotes(): Promise<ApiResponse<QuotesListResponse>> {
     return await this.getQuotesByStatus('accepted')
   }
 
   /**
    * Récupère les devis par période
    */
-  async getQuotesByDateRange(dateFrom: string, dateTo: string): Promise<ApiResponse<any>> {
+  async getQuotesByDateRange(dateFrom: string, dateTo: string): Promise<ApiResponse<QuotesListResponse>> {
     return await this.getQuotes({ dateFrom, dateTo, limit: 100 })
   }
 

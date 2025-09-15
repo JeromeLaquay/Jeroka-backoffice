@@ -34,7 +34,7 @@ export class SettingsService {
       last_name: user.last_name,
       role: user.role,
       telephone: user.telephone,
-      avatar: user.avatar_url,
+      avatar_url: user.avatar_url,
       last_login: user.last_login,
     }
   }

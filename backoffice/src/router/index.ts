@@ -173,6 +173,24 @@ const router = createRouter({
           path: '/calendrier',
           name: 'Calendrier',
           component: () => import('../views/calendar/CalendarView.vue')
+        },
+        {
+          path: '/admin',
+          name: 'AdminDashboard',
+          component: () => import('../views/admin/AdminDashboard.vue'),
+          meta: { requiresAdmin: true }
+        },
+        {
+          path: '/admin/companies',
+          name: 'AdminCompanies',
+          component: () => import('../views/admin/CompaniesView.vue'),
+          meta: { requiresAdmin: true }
+        },
+        {
+          path: '/admin/users',
+          name: 'AdminUsers',
+          component: () => import('../views/admin/UsersView.vue'),
+          meta: { requiresAdmin: true }
         }
       ]
     }
@@ -198,6 +216,14 @@ router.beforeEach(async (to, from, next) => {
     next('/login')
   } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
     next('/')
+  } else if (to.meta.requiresAdmin) {
+    if (!authStore.isAuthenticated) {
+      next('/login')
+    } else if (!authStore.isAdmin) {
+      next('/')
+    } else {
+      next()
+    }
   } else {
     next()
   }

@@ -57,7 +57,7 @@
           
           <div class="flex items-center space-x-4">
             <img
-              :src="order.client.avatar"
+              :src="order.client.avatar_url"
               :alt="order.client.name"
               class="h-12 w-12 rounded-full"
             />

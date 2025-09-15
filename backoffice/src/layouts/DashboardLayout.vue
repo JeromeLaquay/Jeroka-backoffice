@@ -89,7 +89,7 @@
                 @click="showProfileMenu = !showProfileMenu"
               >
                 <img
-                  :src="authStore.user?.avatar || '/default-avatar.png'"
+                  :src="authStore.user?.avatar_url|| '/default-avatar.png'"
                   :alt="authStore.user?.name"
                   class="h-8 w-8 rounded-full object-cover"
                 />
@@ -155,7 +155,8 @@ import {
   CurrencyDollarIcon,
   CogIcon,
   EnvelopeIcon,
-  CalendarIcon
+  CalendarIcon,
+  UserIcon
 } from '@heroicons/vue/24/outline'
 
 const route = useRoute()
@@ -166,25 +167,33 @@ const sidebarOpen = ref(false)
 const showProfileMenu = ref(false)
 const isDark = ref(false)
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: HomeIcon },
-  { name: 'Messages', href: '/messages', icon: BellIcon },
-  { name: 'Calendrier', href: '/calendrier', icon: CalendarIcon },
-  { name: 'Publications', href: '/publications', icon: DocumentTextIcon },
-  { name: 'Clients', href: '/clients', icon: UsersIcon },
-  { name: 'Factures', href: '/factures', icon: DocumentTextIcon },
-  { name: 'Devis', href: '/devis', icon: ClipboardDocumentListIcon },
-  { name: 'Produits', href: '/produits', icon: CubeIcon },
-  { name: 'Commandes', href: '/commandes', icon: ShoppingCartIcon },
-  { name: 'Emails', href: '/emails', icon: EnvelopeIcon },
+const navigation = computed(() => {
+  const baseNavigation = [
+    { name: 'Dashboard', href: '/', icon: HomeIcon },
+    { name: 'Messages', href: '/messages', icon: BellIcon },
+    { name: 'Calendrier', href: '/calendrier', icon: CalendarIcon },
+    { name: 'Publications', href: '/publications', icon: DocumentTextIcon },
+    { name: 'Clients', href: '/clients', icon: UsersIcon },
+    { name: 'Factures', href: '/factures', icon: DocumentTextIcon },
+    { name: 'Devis', href: '/devis', icon: ClipboardDocumentListIcon },
+    { name: 'Produits', href: '/produits', icon: CubeIcon },
+    { name: 'Commandes', href: '/commandes', icon: ShoppingCartIcon },
+    { name: 'Emails', href: '/emails', icon: EnvelopeIcon },
+    { name: 'Comptabilite', href: '/comptabilite', icon: CurrencyDollarIcon },
+    { name: 'Parametres', href: '/parametres', icon: CogIcon },
+    { name: 'Annonces', href: '/annonces', icon: DocumentTextIcon }
+  ]
 
-  { name: 'Comptabilite', href: '/comptabilite', icon: CurrencyDollarIcon },
-  { name: 'Parametres', href: '/parametres', icon: CogIcon },
-  { name: 'Annonces', href: '/annonces', icon: DocumentTextIcon }
-]
+  // Ajouter Admin seulement si l'utilisateur est admin
+  if (authStore.isAdmin) {
+    baseNavigation.push({ name: 'Admin', href: '/admin', icon: UserIcon })
+  }
+
+  return baseNavigation
+})
 
 const pageTitle = computed(() => {
-  const currentRoute = navigation.find(item => item.href === route.path)
+  const currentRoute = navigation.value.find(item => item.href === route.path)
   return currentRoute?.name || 'Dashboard'
 })
 

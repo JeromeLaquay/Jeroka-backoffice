@@ -68,7 +68,7 @@
               <div v-if="selectedClient" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                 <div class="flex items-center space-x-3">
                   <img
-                    :src="selectedClient.avatar"
+                    :src="selectedClient.avatar_url"
                     :alt="selectedClient.name"
                     class="h-10 w-10 rounded-full"
                   />

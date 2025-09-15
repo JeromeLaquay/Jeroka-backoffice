@@ -46,7 +46,7 @@
             ]">
               <div class="flex items-center">
                 <img
-                  :src="client.avatar"
+                  :src="client.avatar_url"
                   :alt="client.name"
                   class="h-6 w-6 flex-shrink-0 rounded-full"
                 />
@@ -108,7 +108,7 @@ interface Client {
   id: string
   name: string
   email: string
-  avatar: string
+  avatar_url: string
   phone?: string
   address?: any
 }
@@ -116,7 +116,8 @@ interface Client {
 interface Props {
   modelValue?: string
   selectedClient?: Client | null
-  required?: boolean
+  required?: boolean 
+  clients?: Client[]
 }
 
 const props = defineProps<Props>()
@@ -132,47 +133,13 @@ const query = ref('')
 const clients = ref<Client[]>([])
 const selectedClient = ref<Client | null>(props.selectedClient || null)
 
-// Clients mockés pour la démo
-const mockClients: Client[] = [
-  {
-    id: '1',
-    name: 'Jean Dupont',
-    email: 'jean.dupont@email.fr',
-    avatar: 'https://ui-avatars.com/api/?name=Jean+Dupont&background=a855f7&color=fff',
-    phone: '06 12 34 56 78',
-    address: {
-      line1: '123 Rue de la Paix',
-      city: 'Paris',
-      postalCode: '75001',
-      country: 'France'
-    }
-  },
-  {
-    id: '2',
-    name: 'Marie Martin',
-    email: 'marie.martin@entreprise.fr',
-    avatar: 'https://ui-avatars.com/api/?name=Marie+Martin&background=a855f7&color=fff',
-    phone: '06 98 76 54 32',
-    address: {
-      line1: '456 Avenue des Champs',
-      city: 'Lyon',
-      postalCode: '69000',
-      country: 'France'
-    }
-  },
-  {
-    id: '3',
-    name: 'Tech Solutions SARL',
-    email: 'contact@techsolutions.fr',
-    avatar: 'https://ui-avatars.com/api/?name=Tech+Solutions&background=a855f7&color=fff',
-    phone: '01 23 45 67 89'
-  }
-]
+
 
 const filteredClients = computed(() => {
+  const clientsList = props.clients || clients.value
   return query.value === ''
-    ? mockClients
-    : mockClients.filter((client) =>
+    ? clientsList
+    : clientsList.filter((client) =>
         client.name
           .toLowerCase()
           .replace(/\s+/g, '')
@@ -190,7 +157,6 @@ const displayValue = computed(() => {
 // Recherche avec debounce
 const debouncedSearch = debounce(async (searchQuery: string) => {
   if (!searchQuery) {
-    clients.value = mockClients
     return
   }
 
@@ -198,10 +164,7 @@ const debouncedSearch = debounce(async (searchQuery: string) => {
   try {
     // Simuler un appel API
     await new Promise(resolve => setTimeout(resolve, 300))
-    clients.value = mockClients.filter(client => 
-      client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    // La recherche se fait maintenant via le computed filteredClients
   } catch (error) {
     console.error('Erreur lors de la recherche de clients:', error)
   } finally {
@@ -220,6 +183,8 @@ const onClientSelected = (client: Client | null) => {
   }
 }
 
-// Initialisation
-clients.value = mockClients
+// Initialisation - utiliser les clients passés en props ou une liste vide
+if (props.clients) {
+  clients.value = props.clients
+}
 </script>

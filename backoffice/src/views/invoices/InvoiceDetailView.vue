@@ -65,7 +65,7 @@
           
           <div class="flex items-center space-x-4">
             <img
-              :src="invoice.client.avatar"
+              :src="invoice.client.avatar_url"
               :alt="invoice.client.name"
               class="h-12 w-12 rounded-full"
             />

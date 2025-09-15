@@ -74,7 +74,7 @@
           
           <div class="flex items-center space-x-4">
             <img
-              :src="quote.client.avatar"
+              :src="quote.client.avatar_url"
               :alt="quote.client.name"
               class="h-12 w-12 rounded-full"
             />

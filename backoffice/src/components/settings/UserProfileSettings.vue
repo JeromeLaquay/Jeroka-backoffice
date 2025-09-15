@@ -11,7 +11,7 @@
           <!-- Avatar -->
           <div class="shrink-0">
             <img
-              :src="form.avatar || defaultAvatar"
+              :src="form.avatar_url || defaultAvatar"
               :alt="form.firstName + ' ' + form.lastName"
               class="h-20 w-20 rounded-full object-cover"
             />
@@ -220,7 +220,7 @@ const form = reactive({
   phone: '',
   position: '',
   department: '',
-  avatar: ''
+  avatar_url: ''
 })
 
 const defaultAvatar = 'https://ui-avatars.com/api/?name=User&background=a855f7&color=fff'
@@ -234,7 +234,7 @@ watch(() => props.profile, (profile) => {
       phone: profile.phone || '',
       position: profile.position || '',
       department: profile.department || '',
-      avatar: profile.avatar || ''
+      avatar_url: profile.avatar_url || ''
     })
   }
 }, { immediate: true })
@@ -248,7 +248,7 @@ const handleAvatarChange = async (event: Event) => {
     try {
       loading.value = true
       const response = await settingsService.uploadAvatar(file)
-      form.avatar = response.data.avatar
+      form.avatar_url = response.data.avatar_url
       emit('updated')
     } catch (error) {
       console.error('Erreur lors du téléchargement de l\'avatar:', error)

@@ -207,7 +207,7 @@
                   <div class="flex items-center">
                     <div class="h-8 w-8 flex-shrink-0">
                       <img
-                        :src="order.client.avatar"
+                        :src="order.client.avatar_url"
                         :alt="order.client.name"
                         class="h-8 w-8 rounded-full"
                       />
@@ -337,7 +337,7 @@ interface Order {
     id: string
     name: string
     email: string
-    avatar: string
+    avatar_url: string
   }
   status: string
   totalAmount: number

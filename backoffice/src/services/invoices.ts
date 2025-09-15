@@ -1,54 +1,71 @@
 import { apiService, ApiResponse } from './api'
 
 export interface InvoiceItem {
-  id: number
+  id: string
   description: string
   quantity: number
-  unitPrice: number
+  unit_price: number
   total: number
-  discountPercent?: number
-  vatRate?: number
+  discount_percent?: number
+  vat_rate?: number
 }
 
 export interface Invoice {
-  id: number
-  invoiceNumber: string
-  clientId: number
-  clientName: string
+  id: string
+  invoice_number: string
+  client_id: string
+  client_name: string
   status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
   total: number
   tax: number
   subtotal: number
-  dueDate: string
-  issueDate: string
-  paidDate?: string
+  due_date: string
+  issue_date: string
+  paid_date?: string
   items: InvoiceItem[]
   notes?: string
-  termsAndConditions?: string
-  paymentTerms?: number
-  createdAt: string
+  created_at: string
+  updated_at: string
 }
 
 export interface CreateInvoiceRequest {
-  clientId: number
-  items: Omit<InvoiceItem, 'id'>[]
-  dueDate: string
+  client_id: string
+  items: Array<{
+    description: string
+    quantity: number
+    unit_price: number
+    discount_percent?: number
+    vat_rate?: number
+  }>
+  due_date: string
   notes?: string
+  status?: 'draft' | 'sent'
 }
 
 export interface UpdateInvoiceRequest {
-  clientId?: number
-  items?: Omit<InvoiceItem, 'id'>[]
-  dueDate?: string
+  client_id?: string
+  items?: Array<{
+    description: string
+    quantity: number
+    unit_price: number
+    discount_percent?: number
+    vat_rate?: number
+  }>
+  due_date?: string
   notes?: string
-  status?: string
+  status?: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+  subtotal?: number
+  tax?: number
+  total?: number
 }
 
 export interface InvoiceStats {
   total: number
+  draft: number
+  sent: number
   paid: number
-  pending: number
   overdue: number
+  cancelled: number
   totalRevenue: number
   averageInvoice: number
 }
@@ -69,10 +86,10 @@ class InvoiceService {
     page?: number
     limit?: number
     status?: string
-    clientId?: number
+    clientId?: string
     dateFrom?: string
     dateTo?: string
-  }): Promise<ApiResponse<any>> {
+  }): Promise<ApiResponse<InvoicesListResponse>> {
     return await apiService.getInvoices(params)
   }
 
@@ -142,42 +159,42 @@ class InvoiceService {
   /**
    * Récupère les factures par statut
    */
-  async getInvoicesByStatus(status: string): Promise<ApiResponse<any>> {
+  async getInvoicesByStatus(status: string): Promise<ApiResponse<InvoicesListResponse>> {
     return await this.getInvoices({ status, limit: 100 })
   }
 
   /**
    * Récupère les factures d'un client
    */
-  async getInvoicesByClient(clientId: number): Promise<ApiResponse<any>> {
+  async getInvoicesByClient(clientId: string): Promise<ApiResponse<InvoicesListResponse>> {
     return await this.getInvoices({ clientId, limit: 100 })
   }
 
   /**
    * Récupère les factures en retard
    */
-  async getOverdueInvoices(): Promise<ApiResponse<any>> {
+  async getOverdueInvoices(): Promise<ApiResponse<InvoicesListResponse>> {
     return await this.getInvoicesByStatus('overdue')
   }
 
   /**
    * Récupère les factures en attente
    */
-  async getPendingInvoices(): Promise<ApiResponse<any>> {
-    return await this.getInvoicesByStatus('pending')
+  async getPendingInvoices(): Promise<ApiResponse<InvoicesListResponse>> {
+    return await this.getInvoicesByStatus('sent')
   }
 
   /**
    * Récupère les factures payées
    */
-  async getPaidInvoices(): Promise<ApiResponse<any>> {
+  async getPaidInvoices(): Promise<ApiResponse<InvoicesListResponse>> {
     return await this.getInvoicesByStatus('paid')
   }
 
   /**
    * Récupère les factures par période
    */
-  async getInvoicesByDateRange(dateFrom: string, dateTo: string): Promise<ApiResponse<any>> {
+  async getInvoicesByDateRange(dateFrom: string, dateTo: string): Promise<ApiResponse<InvoicesListResponse>> {
     return await this.getInvoices({ dateFrom, dateTo, limit: 100 })
   }
 
@@ -191,12 +208,20 @@ class InvoiceService {
   /**
    * Calcule le total d'une facture
    */
-  calculateInvoiceTotal(items: Omit<InvoiceItem, 'id'>[], taxRate: number = 0.2): {
+  calculateInvoiceTotal(items: Array<{
+    quantity: number
+    unit_price: number
+    discount_percent?: number
+  }>, taxRate: number = 0.2): {
     subtotal: number
     tax: number
     total: number
   } {
-    const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
+    const subtotal = items.reduce((sum, item) => {
+      const itemTotal = item.quantity * item.unit_price
+      const discount = item.discount_percent ? (itemTotal * item.discount_percent / 100) : 0
+      return sum + (itemTotal - discount)
+    }, 0)
     const tax = subtotal * taxRate
     const total = subtotal + tax
 

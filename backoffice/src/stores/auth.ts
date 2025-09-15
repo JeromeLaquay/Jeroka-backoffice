@@ -9,7 +9,7 @@ export interface User {
   lastName: string
   name: string // Nom complet pour l'affichage
   role: 'admin' | 'user' | 'manager'
-  avatar?: string
+  avatar_url?: string
   phone?: string
   isActive: boolean
   emailVerified: boolean
@@ -24,6 +24,7 @@ export const useAuthStore = defineStore('auth', () => {
   const error = ref<string | null>(null)
   
   const isAuthenticated = computed(() => !!token.value && !!user.value)
+  const isAdmin = computed(() => user.value?.role === 'admin')
   
   // Convertir l'utilisateur API vers le format du store
   const transformApiUser = (apiUser: ApiUser): User => ({
@@ -33,7 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
     lastName: apiUser.lastName,
     name: `${apiUser.firstName} ${apiUser.lastName}`,
     role: apiUser.role as 'admin' | 'user' | 'manager',
-    avatar: apiUser.avatarUrl || `https://ui-avatars.com/api/?name=${apiUser.firstName}+${apiUser.lastName}&background=a855f7&color=fff`,
+    avatar_url: apiUser.avatar_url || `https://ui-avatars.com/api/?name=${apiUser.firstName}+${apiUser.lastName}&background=a855f7&color=fff`,
     phone: apiUser.phone,
     isActive: apiUser.isActive,
     emailVerified: apiUser.emailVerified,
@@ -56,7 +57,7 @@ export const useAuthStore = defineStore('auth', () => {
         const transformedUser = transformApiUser({
           ...apiUser,
           phone: '',
-          avatarUrl: '',
+          avatar_url: '',
           isActive: true,
           emailVerified: true,
           createdAt: new Date().toISOString()
@@ -100,7 +101,7 @@ export const useAuthStore = defineStore('auth', () => {
         const transformedUser = transformApiUser({
           ...apiUser,
           phone: userData.phone || '',
-          avatarUrl: '',
+          avatar_url: '',
           isActive: true,
           emailVerified: true,
           createdAt: new Date().toISOString()
@@ -156,10 +157,10 @@ export const useAuthStore = defineStore('auth', () => {
     if (!token.value) return
 
     try {
-      const response = await apiService.getProfile()
+      const response = await apiService.getCurrentUser()
       
       if (response.success && response.data) {
-        const transformedUser = transformApiUser(response.data.user)
+        const transformedUser = transformApiUser(response.data)
         user.value = transformedUser
         localStorage.setItem('user', JSON.stringify(transformedUser))
       }
@@ -263,12 +264,47 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // Charger l'utilisateur depuis le token stocké
+  const loadUserFromToken = async () => {
+    if (!token.value) {
+      return false
+    }
+
+    try {
+      loading.value = true
+      const response = await apiService.getCurrentUser()
+      
+      if (response.success && response.data) {
+        const transformedUser = transformApiUser(response.data)
+        user.value = transformedUser
+        localStorage.setItem('user', JSON.stringify(transformedUser))
+        return true
+      } else {
+        // Token invalide, le supprimer
+        token.value = null
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('user')
+        return false
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement de l\'utilisateur:', error)
+      // Token invalide, le supprimer
+      token.value = null
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('user')
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     user,
     token,
     loading,
     error,
     isAuthenticated,
+    isAdmin,
     login,
     register,
     logout,
@@ -276,6 +312,7 @@ export const useAuthStore = defineStore('auth', () => {
     updateProfile,
     changePassword,
     initializeAuth,
-    checkApiConnection
+    checkApiConnection,
+    loadUserFromToken
   }
 })

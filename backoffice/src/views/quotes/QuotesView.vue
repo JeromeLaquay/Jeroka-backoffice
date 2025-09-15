@@ -210,7 +210,7 @@
                       :to="`/devis/${quote.id}`"
                       class="text-sm font-medium text-primary-600 hover:text-primary-500"
                     >
-                      {{ quote.quoteNumber }}
+                      {{ quote.quoteNumber || quote.quote_number }}
                     </router-link>
                     <div v-if="quote.convertedToInvoice" class="text-xs text-green-600">
                       Converti en facture
@@ -221,27 +221,27 @@
                   <div class="flex items-center">
                     <div class="h-8 w-8 flex-shrink-0">
                       <img
-                        :src="quote.client.avatar"
-                        :alt="quote.client.name"
+                        :src="quote.client?.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(quote.client?.name || 'Client') + '&background=a855f7&color=fff'"
+                        :alt="quote.client?.name || 'Client'"
                         class="h-8 w-8 rounded-full"
                       />
                     </div>
                     <div class="ml-3">
                       <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {{ quote.client.name }}
+                        {{ quote.client?.name || quote.clientName || 'Client inconnu' }}
                       </div>
                       <div class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ quote.client.email }}
+                        {{ quote.client?.email || '' }}
                       </div>
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {{ formatDate(quote.issueDate) }}
+                  {{ formatDate(quote.issue_date || quote.issueDate) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900 dark:text-gray-100">
-                    {{ formatDate(quote.validUntil) }}
+                    {{ formatDate(quote.valid_until || quote.validUntil) }}
                   </div>
                   <div v-if="isExpired(quote)" class="text-xs text-red-600">
                     Expiré
@@ -254,7 +254,7 @@
                   <QuoteStatusBadge :status="quote.status" />
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {{ formatCurrency(quote.totalAmount) }}
+                  {{ formatCurrency(quote.total || quote.totalAmount || 0) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div class="flex justify-end space-x-2">
@@ -345,7 +345,7 @@
   <!-- Modal de suppression -->
   <DeleteConfirmModal
     :show="showDeleteConfirmation"
-    :title="`Supprimer le devis ${quoteToDelete?.quoteNumber}`"
+    :title="`Supprimer le devis ${quoteToDelete?.quoteNumber || quoteToDelete?.quote_number}`"
     :message="`Êtes-vous sûr de vouloir supprimer ce devis ? Cette action est irréversible.`"
     @confirm="deleteQuote"
     @cancel="cancelDelete"
@@ -380,26 +380,34 @@ import { debounce } from 'lodash-es'
 // Types
 interface Quote {
   id: string
-  quoteNumber: string
-  client: {
+  quoteNumber?: string
+  quote_number?: string
+  client?: {
     id: string
     name: string
     email: string
-    avatar: string
+    avatar_url: string
   }
+  clientName?: string
+  client_name?: string
   status: string
-  totalAmount: number
-  issueDate: string
-  validUntil: string
+  total?: number
+  totalAmount?: number
+  issueDate?: string
+  issue_date?: string
+  validUntil?: string
+  valid_until?: string
   convertedToInvoice?: boolean
-  createdAt: string
-  updatedAt: string
+  createdAt?: string
+  created_at?: string
+  updatedAt?: string
+  updated_at?: string
 }
 
 interface QuoteStats {
   total: number
   accepted: number
-  rejected: number
+  rejected?: number
   sent: number
   conversionRate: number
 }
@@ -442,18 +450,29 @@ const loadQuotes = async () => {
     const params = {
       page: pagination.page,
       limit: pagination.limit,
-      search: filters.search || undefined,
       status: filters.status || undefined,
-      period: filters.period || undefined
+      // Note: search et period ne sont pas encore supportés par le backend
+      // Ils seront ajoutés dans une version future
     }
 
     const response = await quoteService.getQuotes(params)
-    quotes.value = response.data.quotes
-    pagination.total = response.data.total
+    console.log('response', response);
+    if (response.success && response.data) {
+      quotes.value = response.data.quotes
+      pagination.total = response.data.total
+    }
 
     // Charger les statistiques
     const statsResponse = await quoteService.getQuoteStats()
-    stats.value = statsResponse.data
+    if (statsResponse.success && statsResponse.data) {
+      stats.value = {
+        total: statsResponse.data.total,
+        accepted: statsResponse.data.accepted,
+        rejected: (statsResponse.data as any).rejected || 0,
+        sent: statsResponse.data.sent,
+        conversionRate: statsResponse.data.total > 0 ? (statsResponse.data.accepted / statsResponse.data.total) * 100 : 0
+      }
+    }
   } catch (error) {
     console.error('Erreur lors du chargement des devis:', error)
   } finally {
@@ -545,19 +564,24 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
-const formatDate = (dateString: string) => {
+const formatDate = (dateString: string | undefined) => {
+  if (!dateString) return 'N/A'
   return new Date(dateString).toLocaleDateString('fr-FR')
 }
 
 const isExpired = (quote: Quote) => {
-  return quote.status !== 'accepted' && new Date(quote.validUntil) < new Date()
+  const validUntil = quote.valid_until || quote.validUntil
+  if (!validUntil) return false
+  return quote.status !== 'accepted' && new Date(validUntil) < new Date()
 }
 
 const isExpiringSoon = (quote: Quote) => {
   if (quote.status === 'accepted') return false
-  const validUntil = new Date(quote.validUntil)
+  const validUntil = quote.valid_until || quote.validUntil
+  if (!validUntil) return false
+  const validUntilDate = new Date(validUntil)
   const today = new Date()
-  const diffDays = Math.ceil((validUntil.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+  const diffDays = Math.ceil((validUntilDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
   return diffDays <= 7 && diffDays > 0
 }
 

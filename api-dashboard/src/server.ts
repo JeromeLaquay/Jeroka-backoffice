@@ -28,6 +28,7 @@ import emailsRoutes from './routes/emails';
 import announcementsRoutes from './routes/announcements';
 import calendarRoutes from './routes/calendar';
 import socialNetworksRoutes from './routes/socialNetworks';
+import adminRoutes from './routes/admin';
 
 // Load environment variables
 dotenv.config();
@@ -44,7 +45,7 @@ const globalLimiter = rateLimit({
   max: parseInt(
     process.env.RATE_LIMIT_MAX_REQUESTS || (process.env.NODE_ENV === 'development' ? '2000' : '600')
   ),
-  skip: (req) => req.path === '/health' || req.path.startsWith('/api/v1/auth/'),
+  skip: (req) => req.path === '/health' || req.path.startsWith('/api/v1/auth/') || req.path.startsWith('/api/v1/admin/'),
   message: {
     error: 'Trop de requêtes de cette IP, veuillez réessayer plus tard.'
   },
@@ -113,6 +114,7 @@ app.use(`${API_PREFIX}/emails`, emailsRoutes);
 app.use(`${API_PREFIX}/announcements`, announcementsRoutes);
 app.use(`${API_PREFIX}/calendar`, calendarRoutes);
 app.use(`${API_PREFIX}/social-networks`, socialNetworksRoutes);
+app.use(`${API_PREFIX}`, adminRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

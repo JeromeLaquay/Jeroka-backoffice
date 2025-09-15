@@ -60,6 +60,13 @@ router.post('/refresh', authController.refreshToken);
 router.post('/logout', verifyToken, authController.logout);
 
 /**
+ * @route GET /api/v1/auth/me
+ * @desc Get current user info
+ * @access Private
+ */
+router.get('/me', verifyToken, authController.getCurrentUser);
+
+/**
  * @route GET /api/v1/auth/profile
  * @desc Get current user profile
  * @access Private

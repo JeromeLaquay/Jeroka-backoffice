@@ -472,7 +472,7 @@ CREATE INDEX idx_publication_platforms_status ON publication_platforms(status);
 CREATE TABLE company_social_credentials (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-    platform VARCHAR(20) NOT NULL CHECK (platform IN ('facebook', 'linkedin', 'twitter', 'site web')),
+    platform VARCHAR(20) NOT NULL CHECK (platform IN ('meta', 'linkedin', 'twitter', 'site web', 'google')),
     
     -- Champs chiffrés (AES-256)
     encrypted_credentials JSONB NOT NULL,

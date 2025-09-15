@@ -29,7 +29,7 @@ export interface RecentActivity {
     company?: string
     type: 'individual' | 'company'
     createdAt: string
-    avatar?: string
+    avatar_url?: string
   }>
   recentMessages: Array<{
     id: string
@@ -116,7 +116,7 @@ class DashboardService {
           company: 'Tech Solutions SARL',
           type: 'company',
           createdAt: 'Il y a 2 jours',
-          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face'
+          avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face'
         },
         {
           id: '2',
@@ -124,7 +124,7 @@ class DashboardService {
           company: 'Design Studio',
           type: 'company',
           createdAt: 'Il y a 3 jours',
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+          avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
         }
       ],
       recentMessages: [

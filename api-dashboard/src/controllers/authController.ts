@@ -349,13 +349,51 @@ export const getProfile = asyncHandler(async (req: AuthRequest, res: Response, n
         firstName: user.first_name,
         lastName: user.last_name,
         phone: user.phone,
-        avatarUrl: user.avatar_url,
+        avatar_url: user.avatar_url,
         role: user.role,
         isActive: user.is_active,
         emailVerified: user.email_verified,
         lastLogin: user.last_login,
         createdAt: user.created_at
       }
+    }
+  });
+});
+
+// Get current user info (simplified version for auth check)
+export const getCurrentUser = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    throw createError.unauthorized('Utilisateur non authentifié');
+  }
+
+  // Get user info
+  const userResult = await query(
+    `SELECT id, email, first_name, last_name, phone, avatar_url, role, 
+            is_active, email_verified, last_login, created_at
+     FROM users WHERE id = $1`,
+    [req.user.id]
+  );
+
+  if (userResult.rows.length === 0) {
+    throw createError.notFound('Utilisateur non trouvé');
+  }
+
+  const user = userResult.rows[0];
+
+  res.json({
+    success: true,
+    data: {
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      phone: user.phone,
+      avatar_url: user.avatar_url,
+      role: user.role,
+      isActive: user.is_active,
+      emailVerified: user.email_verified,
+      lastLogin: user.last_login,
+      createdAt: user.created_at
     }
   });
 });
@@ -400,7 +438,7 @@ export const updateProfile = asyncHandler(async (req: AuthRequest, res: Response
         firstName: user.first_name,
         lastName: user.last_name,
         phone: user.phone,
-        avatarUrl: user.avatar_url,
+        avatar_url: user.avatar_url,
         role: user.role
       }
     }
@@ -472,6 +510,7 @@ export default {
   login,
   refreshToken,
   logout,
+  getCurrentUser,
   getProfile,
   updateProfile,
   changePassword
