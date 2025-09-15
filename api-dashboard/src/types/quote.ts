@@ -23,7 +23,7 @@ export interface QuoteItem {
   unit_price: number;
   total: number;
   discount_percent?: number;
-  vat_rate?: number;
+  vat_number?: number;
   created_at: Date;
 }
 
@@ -66,7 +66,7 @@ export interface CreateQuoteItemData {
   total: number;
   discount_percent?: number;
   discountPercent?: number; // Support camelCase
-  vat_rate?: number;
+  vat_number?: number;
   vatRate?: number; // Support camelCase
 }
 
@@ -80,7 +80,7 @@ export interface CreateQuoteRequest {
     unitPrice?: number; // Support camelCase
     discount_percent?: number;
     discountPercent?: number; // Support camelCase
-    vat_rate?: number;
+    vat_number?: number;
     vatRate?: number; // Support camelCase
   }>;
   valid_until: string;
@@ -99,7 +99,7 @@ export interface UpdateQuoteRequest {
     unitPrice?: number; // Support camelCase
     discount_percent?: number;
     discountPercent?: number; // Support camelCase
-    vat_rate?: number;
+    vat_number?: number;
     vatRate?: number; // Support camelCase
   }>;
   valid_until?: string;

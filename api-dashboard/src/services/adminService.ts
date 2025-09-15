@@ -216,9 +216,10 @@ export class AdminService {
 
     static async createCompany(userId: string, companyData: CreateCompanyData): Promise<AdminCompany> {
         this.isAdmin(userId);
+        console.log(companyData);
         const result = await query(`
-            INSERT INTO companies (name, email, phone, address_line1, address_line2, city, postal_code, country, vat_number, siret_number, vat_rate, tax_regime, subscription_plan, status)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            INSERT INTO companies (name, email, phone, address_line1, address_line2, city, postal_code, country, vat_number, siret, subscription_plan)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
             RETURNING *
         `, [
             companyData.name,
@@ -230,13 +231,10 @@ export class AdminService {
             companyData.postal_code || null,
             companyData.country || null,
             companyData.vat_number || null,
-            companyData.siret_number || null,
-            companyData.vat_rate || null,
-            companyData.tax_regime || null,
-            companyData.subscription_plan || 'free',
-            true
+            companyData.siret || null,
+            companyData.subscription_plan || 'free'
         ]);
-        
+        console.log(result.rows[0]);
         return result.rows[0];
     }
 

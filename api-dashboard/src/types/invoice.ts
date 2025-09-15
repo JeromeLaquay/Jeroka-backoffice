@@ -6,7 +6,7 @@ export interface InvoiceItem {
   unit_price: number;
   total: number;
   discount_percent?: number;
-  vat_rate?: number;
+  vat_number?: number;
   created_at: Date;
 }
 
@@ -60,7 +60,7 @@ export interface CreateInvoiceItemData {
   unit_price: number;
   total: number;
   discount_percent?: number;
-  vat_rate?: number;
+  vat_number?: number;
 }
 
 export interface InvoiceStats {
@@ -89,7 +89,7 @@ export interface CreateInvoiceRequest {
     quantity: number;
     unit_price: number;
     discount_percent?: number;
-    vat_rate?: number;
+    vat_number?: number;
   }>;
   due_date: string;
   notes?: string;
@@ -103,7 +103,7 @@ export interface UpdateInvoiceRequest {
     quantity: number;
     unit_price: number;
     discount_percent?: number;
-    vat_rate?: number;
+    vat_number?: number;
   }>;
   due_date?: string;
   notes?: string;

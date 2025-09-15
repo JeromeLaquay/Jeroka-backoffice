@@ -24,7 +24,7 @@ export interface InvoiceWithItems {
     unit_price: number;
     total: number;
     discount_percent?: number;
-    vat_rate?: number;
+    vat_number?: number;
   }>;
 }
 
@@ -35,7 +35,7 @@ export interface CreateInvoiceRequest {
     quantity: number;
     unit_price: number;
     discount_percent?: number;
-    vat_rate?: number;
+    vat_number?: number;
   }>;
   due_date: string;
   notes?: string;
@@ -49,7 +49,7 @@ export interface UpdateInvoiceRequest {
     quantity: number;
     unit_price: number;
     discount_percent?: number;
-    vat_rate?: number;
+    vat_number?: number;
   }>;
   due_date?: string;
   notes?: string;
@@ -176,7 +176,7 @@ export class InvoiceService {
         unit_price: itemData.unit_price,
         total: itemTotal - discount,
         discount_percent: itemData.discount_percent,
-        vat_rate: itemData.vat_rate || 20
+        vat_number: itemData.vat_number || 20
       };
 
       const item = await InvoiceRepository.createInvoiceItem(invoiceItemData);
@@ -246,7 +246,7 @@ export class InvoiceService {
           unit_price: itemData.unit_price,
           total: itemTotal - discount,
           discount_percent: itemData.discount_percent,
-          vat_rate: itemData.vat_rate || 20
+          vat_number: itemData.vat_number || 20
         };
 
         await InvoiceRepository.createInvoiceItem(invoiceItemData);

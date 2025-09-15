@@ -24,7 +24,7 @@ export interface QuoteWithItems {
     unit_price: number;
     total: number;
     discount_percent?: number;
-    vat_rate?: number;
+    vat_number?: number;
   }>;
 }
 
@@ -35,7 +35,7 @@ export interface CreateQuoteRequest {
     quantity: number;
     unit_price: number;
     discount_percent?: number;
-    vat_rate?: number;
+    vat_number?: number;
   }>;
   valid_until: string;
   notes?: string;
@@ -49,7 +49,7 @@ export interface UpdateQuoteRequest {
     quantity: number;
     unit_price: number;
     discount_percent?: number;
-    vat_rate?: number;
+    vat_number?: number;
   }>;
   valid_until?: string;
   notes?: string;
@@ -158,7 +158,7 @@ export class QuoteService {
     for (const itemData of data.items) {
       const unitPrice = itemData.unitPrice || itemData.unit_price;
       const discountPercent = itemData.discountPercent || itemData.discount_percent;
-      const vatRate = itemData.vatRate || itemData.vat_rate;
+      const vatRate = itemData.vatRate || itemData.vat_number;
       
       const itemTotal = itemData.quantity * unitPrice;
       const discount = discountPercent ? (itemTotal * discountPercent / 100) : 0;
@@ -170,7 +170,7 @@ export class QuoteService {
         unit_price: unitPrice,
         total: itemTotal - discount,
         discount_percent: discountPercent,
-        vat_rate: vatRate || 20
+        vat_number: vatRate || 20
       };
 
       const item = await QuoteRepository.createQuoteItem(quoteItemData);
@@ -242,7 +242,7 @@ export class QuoteService {
           unit_price: itemData.unit_price,
           total: itemTotal - discount,
           discount_percent: itemData.discount_percent,
-          vat_rate: itemData.vat_rate || 20
+          vat_number: itemData.vat_number || 20
         };
 
         await QuoteRepository.createQuoteItem(quoteItemData);

@@ -361,7 +361,7 @@ interface Invoice {
     unit_price: number
     total: number
     discount_percent?: number
-    vat_rate?: number
+    vat_number?: number
   }>
 }
 

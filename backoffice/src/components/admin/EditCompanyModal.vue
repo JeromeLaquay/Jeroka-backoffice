@@ -152,7 +152,7 @@
                   Numéro SIRET
                 </label>
                 <input
-                  v-model="form.siret_number"
+                  v-model="form.siret"
                   type="text"
                   class="form-input"
                   data-cy="siret-number-input"
@@ -166,7 +166,7 @@
                   Taux de TVA (%)
                 </label>
                 <input
-                  v-model.number="form.vat_rate"
+                  v-model.number="form.vat_number"
                   type="number"
                   min="0"
                   max="100"
@@ -257,8 +257,8 @@ const form = reactive<UpdateCompanyData>({
   postal_code: '',
   country: '',
   vat_number: '',
-  siret_number: '',
-  vat_rate: 20,
+  siret: '',
+  vat_number: 20,
   tax_regime: 'standard',
   subscription_plan: 'free',
   is_active: true
@@ -274,8 +274,8 @@ const initializeForm = () => {
   form.postal_code = props.company.postal_code || '';
   form.country = props.company.country || '';
   form.vat_number = props.company.vat_number || '';
-  form.siret_number = props.company.siret_number || '';
-  form.vat_rate = props.company.vat_rate || 20;
+  form.siret = props.company.siret || '';
+  form.vat_number = props.company.vat_number || 20;
   form.tax_regime = props.company.tax_regime || 'standard';
   form.subscription_plan = props.company.subscription_plan || 'free';
   form.is_active = props.company.is_active;

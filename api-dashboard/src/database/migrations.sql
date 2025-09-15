@@ -199,8 +199,8 @@ CREATE TABLE products (
     category VARCHAR(100),
     subcategory VARCHAR(100),
     price_ht DECIMAL(10,2) NOT NULL DEFAULT 0,
-    vat_rate DECIMAL(5,2) DEFAULT 20.00,
-    price_ttc DECIMAL(10,2) GENERATED ALWAYS AS (price_ht * (1 + vat_rate/100)) STORED,
+    vat_number DECIMAL(5,2) DEFAULT 20.00,
+    price_ttc DECIMAL(10,2) GENERATED ALWAYS AS (price_ht * (1 + vat_number/100)) STORED,
     cost_price DECIMAL(10,2),
     stock_quantity INTEGER DEFAULT 0,
     min_stock_level INTEGER DEFAULT 0,
@@ -279,10 +279,10 @@ CREATE TABLE quote_items (
     unit VARCHAR(20) DEFAULT 'pièce',
     unit_price_ht DECIMAL(10,2) NOT NULL,
     discount_percent DECIMAL(5,2) DEFAULT 0,
-    vat_rate DECIMAL(5,2) DEFAULT 20.00,
+    vat_number DECIMAL(5,2) DEFAULT 20.00,
     total_ht DECIMAL(10,2) GENERATED ALWAYS AS (quantity * unit_price_ht * (1 - discount_percent/100)) STORED,
-    total_vat DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * vat_rate/100) STORED,
-    total_ttc DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * (1 + vat_rate/100)) STORED,
+    total_vat DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * vat_number/100) STORED,
+    total_ttc DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * (1 + vat_number/100)) STORED,
     sort_order INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -345,10 +345,10 @@ CREATE TABLE invoice_items (
     unit VARCHAR(20) DEFAULT 'pièce',
     unit_price_ht DECIMAL(10,2) NOT NULL,
     discount_percent DECIMAL(5,2) DEFAULT 0,
-    vat_rate DECIMAL(5,2) DEFAULT 20.00,
+    vat_number DECIMAL(5,2) DEFAULT 20.00,
     total_ht DECIMAL(10,2) GENERATED ALWAYS AS (quantity * unit_price_ht * (1 - discount_percent/100)) STORED,
-    total_vat DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * vat_rate/100) STORED,
-    total_ttc DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * (1 + vat_rate/100)) STORED,
+    total_vat DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * vat_number/100) STORED,
+    total_ttc DECIMAL(10,2) GENERATED ALWAYS AS ((quantity * unit_price_ht * (1 - discount_percent/100)) * (1 + vat_number/100)) STORED,
     sort_order INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

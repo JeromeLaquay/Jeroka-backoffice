@@ -345,7 +345,7 @@ const loadInvoice = async () => {
         quantity: item.quantity,
         unitPrice: item.unit_price,
         discountPercent: item.discount_percent || 0,
-        vatRate: item.vat_rate || 20
+        vatRate: item.vat_number || 20
       })),
       status: invoice.value.status,
       issueDate: invoice.value.issue_date.split('T')[0],
@@ -430,7 +430,7 @@ const handleSubmit = async () => {
         quantity: item.quantity,
         unit_price: item.unitPrice,
         discount_percent: item.discountPercent,
-        vat_rate: item.vatRate
+        vat_number: item.vatRate
       })),
       due_date: form.dueDate,
       notes: form.notes,

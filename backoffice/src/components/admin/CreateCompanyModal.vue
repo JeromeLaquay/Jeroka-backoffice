@@ -146,7 +146,7 @@
                   Numéro SIRET
                 </label>
                 <input
-                  v-model="form.siret_number"
+                  v-model="form.siret"
                   type="text"
                   class="form-input"
                   data-cy="siret-number-input"
@@ -202,8 +202,8 @@ const form = reactive<CreateCompanyData>({
   postal_code: '',
   country: '',
   vat_number: '',
-  siret_number: '',
-  vat_rate: 20,
+  siret: '',
+  vat_number: 20,
   tax_regime: 'standard',
   subscription_plan: 'free',
 });
@@ -215,6 +215,7 @@ const closeModal = () => {
 const handleSubmit = async () => {
   try {
     loading.value = true;
+    console.log(form);
     const response = await adminService.createCompany(form);
     if (response.success) {
       emit('created');

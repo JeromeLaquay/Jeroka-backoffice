@@ -66,7 +66,7 @@
           </div>
 
           <!-- Informations fiscales -->
-          <div v-if="company.vat_number || company.siret_number" class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+          <div v-if="company.vat_number || company.siret" class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
             <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4 flex items-center">
               <DocumentTextIcon class="h-5 w-5 mr-2" />
               Informations fiscales
@@ -76,13 +76,13 @@
                 <label class="form-label">Numéro TVA</label>
                 <p class="text-sm text-gray-900 dark:text-white">{{ company.vat_number }}</p>
               </div>
-              <div v-if="company.siret_number">
+              <div v-if="company.siret">
                 <label class="form-label">Numéro SIRET</label>
-                <p class="text-sm text-gray-900 dark:text-white">{{ company.siret_number }}</p>
+                <p class="text-sm text-gray-900 dark:text-white">{{ company.siret }}</p>
               </div>
-              <div v-if="company.vat_rate">
+              <div v-if="company.vat_number">
                 <label class="form-label">Taux de TVA</label>
-                <p class="text-sm text-gray-900 dark:text-white">{{ company.vat_rate }}%</p>
+                <p class="text-sm text-gray-900 dark:text-white">{{ company.vat_number }}%</p>
               </div>
               <div v-if="company.tax_regime">
                 <label class="form-label">Régime fiscal</label>

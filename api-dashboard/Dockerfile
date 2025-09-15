@@ -24,8 +24,8 @@ RUN npm install
 # Copier le code source
 COPY src/ ./src/
 
-# Construire l'application TypeScript
-RUN npm run build
+# Construire l'application TypeScript avec plus de mémoire
+RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
 # Étape de production
 FROM base AS production

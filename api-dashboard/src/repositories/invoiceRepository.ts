@@ -25,7 +25,7 @@ export interface InvoiceItem {
   unit_price: number;
   total: number;
   discount_percent?: number;
-  vat_rate?: number;
+  vat_number?: number;
   created_at: Date;
 }
 
@@ -61,7 +61,7 @@ export interface CreateInvoiceItemData {
   unit_price: number;
   total: number;
   discount_percent?: number;
-  vat_rate?: number;
+  vat_number?: number;
 }
 
 export class InvoiceRepository {
@@ -374,7 +374,7 @@ export class InvoiceRepository {
   static async createInvoiceItem(data: CreateInvoiceItemData): Promise<InvoiceItem> {
     const result = await query(`
       INSERT INTO invoice_items (
-        invoice_id, description, quantity, unit_price_ht, discount_percent, vat_rate
+        invoice_id, description, quantity, unit_price_ht, discount_percent, vat_number
       ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `, [
@@ -383,7 +383,7 @@ export class InvoiceRepository {
       data.quantity,
       data.unit_price,
       data.discount_percent,
-      data.vat_rate
+      data.vat_number
     ]);
 
     return result.rows[0];

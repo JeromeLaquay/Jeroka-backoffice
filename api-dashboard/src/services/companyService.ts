@@ -11,8 +11,8 @@ export interface Company {
   postal_code?: string;
   country?: string;
   vat_number?: string;
-  siret_number?: string;
-  vat_rate?: number;
+  siret?: string;
+  vat_number?: number;
   tax_regime?: string;
   banking_info?: any;
   invoice_settings?: any;
@@ -152,7 +152,7 @@ export class CompanyService {
 
   static async createCompany(companyData: Partial<Company>): Promise<Company> {
     const result = await query(`
-      INSERT INTO companies (name, email, phone, address_line1, address_line2, city, postal_code, country, vat_number, siret_number, vat_rate, tax_regime, subscription_plan, is_active)
+      INSERT INTO companies (name, email, phone, address_line1, address_line2, city, postal_code, country, vat_number, siret, vat_number, tax_regime, subscription_plan, is_active)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
       RETURNING *
     `, [
@@ -165,8 +165,8 @@ export class CompanyService {
       companyData.postal_code || null,
       companyData.country || null,
       companyData.vat_number || null,
-      companyData.siret_number || null,
-      companyData.vat_rate || null,
+      companyData.siret || null,
+      companyData.vat_number || null,
       companyData.tax_regime || null,
       companyData.subscription_plan || 'free',
       companyData.is_active !== undefined ? companyData.is_active : true
