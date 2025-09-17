@@ -1,6 +1,6 @@
 import { MessageRepository, Message, MessageFilters, PaginatedResult } from '../repositories/messageRepository';
 import { MessageValidation } from '../validations/messageValidation';
-import { ClientService } from './clientService';
+import { ClientService } from './personService';
 
 export class MessageService {
   static async getMessages(companyId: string, filters: MessageFilters = {}): Promise<PaginatedResult<Message>> {

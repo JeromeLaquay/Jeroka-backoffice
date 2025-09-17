@@ -109,7 +109,7 @@ export class CompanySocialNetworkService {
   /**
    * Désactive les identifiants d'une entreprise
    */
-  static async deactivateCredentials(companyId: string, platform: string): Promise<void> {
-    await SocialCredentialsRepository.deactivate(companyId, platform);
+  static async deactivateCredentials(companyId: string, userId: string, platform: string): Promise<void> {
+    await SocialCredentialsRepository.deactivate(companyId, userId, platform);
   }
 }

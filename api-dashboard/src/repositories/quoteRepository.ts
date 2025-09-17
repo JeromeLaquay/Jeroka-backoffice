@@ -3,8 +3,8 @@ import { query } from '../database/connection';
 export interface Quote {
   id: string;
   quote_number: string;
-  client_id: string;
-   client_name?: string;
+  person_id: string;
+  person_name?: string;
   company_id: string;
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted';
   total: number;
@@ -15,7 +15,7 @@ export interface Quote {
   notes?: string;
   created_at: Date;
   updated_at: Date;
-  client?: {
+  person?: {
     id: string;
     name: string;
     email: string;
@@ -37,7 +37,7 @@ export interface QuoteItem {
 
 export interface CreateQuoteData {
   quote_number?: string;
-  client_id: string;
+  person_id: string;
   company_id: string;
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted';
   total: number;
@@ -49,7 +49,7 @@ export interface CreateQuoteData {
 }
 
 export interface UpdateQuoteData {
-  client_id?: string;
+  person_id?: string;
   status?: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted';
   total?: number;
   tax?: number;
@@ -75,7 +75,7 @@ export class QuoteRepository {
    */
   static async findByCompanyId(companyId: string, filters?: {
     status?: string;
-    clientId?: string;
+    personId?: string;
     dateFrom?: string;
     dateTo?: string;
     limit?: number;
@@ -85,7 +85,7 @@ export class QuoteRepository {
       SELECT 
         q.id,
         q.quote_number,
-        q.client_id,
+        q.person_id,
         q.company_id,
         q.status,
         q.total_ttc as total,
@@ -96,13 +96,13 @@ export class QuoteRepository {
         q.notes,
         q.created_at,
         q.updated_at,
-        c.company_name as client_name,
+        c.company_name as person_name,
         c.first_name,
         c.last_name,
         c.email,
         c.avatar_url
       FROM quotes q
-      LEFT JOIN clients c ON q.client_id = c.id
+      LEFT JOIN persons c ON q.person_id = c.id
       WHERE q.company_id = $1
     `;
     
@@ -115,10 +115,10 @@ export class QuoteRepository {
       params.push(filters.status);
     }
 
-    if (filters?.clientId) {
+    if (filters?.personId) {
       paramCount++;
-      queryStr += ` AND q.client_id = $${paramCount}`;
-      params.push(filters.clientId);
+      queryStr += ` AND q.person_id = $${paramCount}`;
+      params.push(filters.personId);
     }
 
     if (filters?.dateFrom) {
@@ -164,10 +164,10 @@ export class QuoteRepository {
       countParams.push(filters.status);
     }
 
-    if (filters?.clientId) {
+    if (filters?.personId) {
       countParamCount++;
-      countQuery += ` AND q.client_id = $${countParamCount}`;
-      countParams.push(filters.clientId);
+      countQuery += ` AND q.person_id = $${countParamCount}`;
+      countParams.push(filters.personId);
     }
 
     if (filters?.dateFrom) {
@@ -189,9 +189,9 @@ export class QuoteRepository {
       quotes: result.rows.map((row: any) => ({
         id: row.id,
         quote_number: row.quote_number,
-        client_id: row.client_id,
+        person_id: row.person_id,
         company_id: row.company_id,
-        client_name: row.client_name,
+        person_name: row.person_name,
         status: row.status,
         total: parseFloat(row.total),
         tax: parseFloat(row.tax),
@@ -201,9 +201,9 @@ export class QuoteRepository {
         notes: row.notes,
         created_at: row.created_at,
         updated_at: row.updated_at,
-        client: {
-          id: row.client_id,
-          name: row.client_name || `${row.first_name || ''} ${row.last_name || ''}`.trim() || 'Client inconnu',
+        person: {
+          id: row.person_id,
+          name: row.person_name || `${row.first_name || ''} ${row.last_name || ''}`.trim() || 'Client inconnu',
           email: row.email || '',
           avatar_url: row.avatar_url || ''
         }
@@ -220,7 +220,7 @@ export class QuoteRepository {
       SELECT 
         q.id,
         q.quote_number,
-        q.client_id,
+        q.person_id,
         q.company_id,
         q.status,
         q.total_ttc as total,
@@ -231,13 +231,13 @@ export class QuoteRepository {
         q.notes,
         q.created_at,
         q.updated_at,
-        c.company_name as client_name,
+        c.company_name as person_name,
         c.first_name,
         c.last_name,
         c.email,
         c.avatar_url
       FROM quotes q
-      LEFT JOIN clients c ON q.client_id = c.id
+      LEFT JOIN persons c ON q.person_id = c.id
       WHERE q.id = $1 AND q.company_id = $2
     `, [id, companyId]);
 
@@ -249,9 +249,9 @@ export class QuoteRepository {
     return {
       id: row.id,
       quote_number: row.quote_number,
-      client_id: row.client_id,
+      person_id: row.person_id,
       company_id: row.company_id,
-      client_name: row.client_name,
+      person_name: row.person_name,
       status: row.status,
       total: parseFloat(row.total),
       tax: parseFloat(row.tax),
@@ -261,9 +261,9 @@ export class QuoteRepository {
       notes: row.notes,
       created_at: row.created_at,
       updated_at: row.updated_at,
-      client: {
-        id: row.client_id,
-        name: row.client_name || `${row.first_name || ''} ${row.last_name || ''}`.trim() || 'Client inconnu',
+      person: {
+        id: row.person_id,
+        name: row.person_name || `${row.first_name || ''} ${row.last_name || ''}`.trim() || 'Client inconnu',
         email: row.email || '',
         avatar_url: row.avatar_url || ''
       }
@@ -276,13 +276,13 @@ export class QuoteRepository {
   static async create(data: CreateQuoteData): Promise<Quote> {
     const result = await query(`
       INSERT INTO quotes (
-        quote_number, client_id, company_id, status, total_ttc, total_vat, subtotal_ht,
+        quote_number, person_id, company_id, status, total_ttc, total_vat, subtotal_ht,
         valid_until, notes
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
     `, [
       data.quote_number || `QUO-${Date.now()}`,
-      data.client_id,
+      data.person_id,
       data.company_id,
       data.status,
       data.total,
@@ -369,8 +369,9 @@ export class QuoteRepository {
     return result.rows[0] || null;
   }
 
+
   /**
-   * Récupère les statistiques des devis d'une entreprise
+   * créer une vue sql pour les statistiques des devis et l'appeler dans la route directement
    */
   static async getStats(companyId: string): Promise<{
     total: number;

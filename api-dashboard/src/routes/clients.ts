@@ -1,15 +1,15 @@
 import { Router, Response } from 'express';
 import { verifyToken, AuthRequest } from '../middleware/auth';
 import { query, body, validationResult } from 'express-validator';
-import { ClientService } from '../services/clientService';
+import { personService } from '../services/personService';
 
 const router = Router();
 
 router.use(verifyToken);
 
 /**
- * @route GET /api/v1/clients
- * @desc Get all clients for the user's company with pagination and filters
+ * @route GET /api/v1/persons
+ * @desc Get all persons for the user's company with pagination and filters
  * @access Private
  */
 router.get('/', [
@@ -43,13 +43,13 @@ router.get('/', [
         ? tags.split(',').map((t: string) => t.trim()).filter(Boolean)
         : undefined;
 
-    console.log('getClients', req.query);
-    const dataResult = await ClientService.getClients(companyId, {
+    console.log('getpersons', req.query);
+    const dataResult = await personService.getpersons(companyId, {
       page: Number(page),
       limit: Number(limit),
       search: search as string,
       status: status as any,
-      type: type as any,
+      type: 'client' as any,
       source: source as string,
       tags: normalizedTags,
       sortBy: sortBy as string,
@@ -67,13 +67,13 @@ router.get('/', [
       }
     });
   } catch (error) {
-    console.error('Erreur lors de la récupération des clients:', error);
+    console.error('Erreur lors de la récupération des persons:', error);
     return res.status(500).json({
       success: false,
-      message: 'Erreur lors de la récupération des clients',
+      message: 'Erreur lors de la récupération des persons',
       error: {
         message: error instanceof Error ? error.message : 'Erreur inconnue',
-        code: 'FETCH_CLIENTS_ERROR',
+        code: 'FETCH_personS_ERROR',
         statusCode: 500
       }
     });
@@ -81,8 +81,8 @@ router.get('/', [
 });
 
 /**
- * @route POST /api/v1/clients
- * @desc Create a new client for the user's company
+ * @route POST /api/v1/persons
+ * @desc Create a new person for the user's company
  * @access Private
  */
 router.post('/', [
@@ -150,17 +150,17 @@ router.post('/', [
     delete payload.lastName;
     delete payload.address;
     
-    const newClient = await ClientService.createClient(payload);
+    const newperson = await personService.createperson(payload);
 
-    return res.status(201).json({ success: true, message: 'Client créé avec succès', data: newClient });
+    return res.status(201).json({ success: true, message: 'person créé avec succès', data: newperson });
   } catch (error) {
-    console.error('Erreur lors de la création du client:', error);
+    console.error('Erreur lors de la création du person:', error);
     return res.status(500).json({
       success: false,
-      message: 'Erreur lors de la création du client',
+      message: 'Erreur lors de la création du person',
       error: {
         message: error instanceof Error ? error.message : 'Erreur inconnue',
-        code: 'CREATE_CLIENT_ERROR',
+        code: 'CREATE_person_ERROR',
         statusCode: 500
       }
     });
@@ -168,14 +168,14 @@ router.post('/', [
 });
 
 /**
- * @route GET /api/v1/clients/stats
- * @desc Get client statistics for the user's company
+ * @route GET /api/v1/persons/stats
+ * @desc Get person statistics for the user's company
  * @access Private
  */
 router.get('/stats', async (req: AuthRequest, res: Response) => {
   try {
     const companyId = req.user!.company_id;
-    const stats = await ClientService.getClientStats(companyId);
+    const stats = await personService.getpersonStats(companyId);
     // Conserver la même structure de réponse qu'avant
     return res.json({ success: true, data: {
       total: Number(stats.total),
@@ -203,27 +203,27 @@ router.get('/stats', async (req: AuthRequest, res: Response) => {
 });
 
 /**
- * @route GET /api/v1/clients/:id
- * @desc Get a specific client (only if it belongs to the user's company)
+ * @route GET /api/v1/persons/:id
+ * @desc Get a specific person (only if it belongs to the user's company)
  * @access Private
  */
 router.get('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const companyId = req.user!.company_id;
-    const client = await ClientService.getClientById(id, companyId);
-    if (!client) {
-      return res.status(404).json({ success: false, message: 'Client non trouvé ou vous n\'avez pas accès à ce client' });
+    const person = await personService.getpersonById(id, companyId);
+    if (!person) {
+      return res.status(404).json({ success: false, message: 'person non trouvé ou vous n\'avez pas accès à ce person' });
     }
-    return res.json({ success: true, data: client });
+    return res.json({ success: true, data: person });
   } catch (error) {
-    console.error('Erreur lors de la récupération du client:', error);
+    console.error('Erreur lors de la récupération du person:', error);
     return res.status(500).json({
       success: false,
-      message: 'Erreur lors de la récupération du client',
+      message: 'Erreur lors de la récupération du person',
       error: {
         message: error instanceof Error ? error.message : 'Erreur inconnue',
-        code: 'FETCH_CLIENT_ERROR',
+        code: 'FETCH_person_ERROR',
         statusCode: 500
       }
     });
@@ -231,8 +231,8 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
 });
 
 /**
- * @route PUT /api/v1/clients/:id
- * @desc Update a client (only if it belongs to the user's company)
+ * @route PUT /api/v1/persons/:id
+ * @desc Update a person (only if it belongs to the user's company)
  * @access Private
  */
 router.put('/:id', [
@@ -278,19 +278,19 @@ router.put('/:id', [
     delete updatePayload.lastName;
     delete updatePayload.address;
     
-    const updated = await ClientService.updateClient(id, companyId, updatePayload);
+    const updated = await personService.updateperson(id, companyId, updatePayload);
     if (!updated) {
-      return res.status(404).json({ success: false, message: 'Client non trouvé ou vous n\'avez pas accès à ce client' });
+      return res.status(404).json({ success: false, message: 'person non trouvé ou vous n\'avez pas accès à ce person' });
     }
-    return res.json({ success: true, message: 'Client mis à jour avec succès', data: updated });
+    return res.json({ success: true, message: 'person mis à jour avec succès', data: updated });
   } catch (error) {
-    console.error('Erreur lors de la mise à jour du client:', error);
+    console.error('Erreur lors de la mise à jour du person:', error);
     return res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour',
       error: {
         message: error instanceof Error ? error.message : 'Erreur inconnue',
-        code: 'UPDATE_CLIENT_ERROR',
+        code: 'UPDATE_person_ERROR',
         statusCode: 500
       }
     });
@@ -298,27 +298,27 @@ router.put('/:id', [
 });
 
 /**
- * @route DELETE /api/v1/clients/:id
- * @desc Delete a client (only if it belongs to the user's company)
+ * @route DELETE /api/v1/persons/:id
+ * @desc Delete a person (only if it belongs to the user's company)
  * @access Private
  */
 router.delete('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const companyId = req.user!.company_id;
-    const ok = await ClientService.deleteClient(id, companyId);
+    const ok = await personService.deleteperson(id, companyId);
     if (!ok) {
-      return res.status(404).json({ success: false, message: 'Client non trouvé ou vous n\'avez pas accès à ce client' });
+      return res.status(404).json({ success: false, message: 'person non trouvé ou vous n\'avez pas accès à ce person' });
     }
-    return res.json({ success: true, message: 'Client supprimé avec succès' });
+    return res.json({ success: true, message: 'person supprimé avec succès' });
   } catch (error) {
-    console.error('Erreur lors de la suppression du client:', error);
+    console.error('Erreur lors de la suppression du person:', error);
     return res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression',
       error: {
         message: error instanceof Error ? error.message : 'Erreur inconnue',
-        code: 'DELETE_CLIENT_ERROR',
+        code: 'DELETE_person_ERROR',
         statusCode: 500
       }
     });

@@ -3,7 +3,7 @@ import { query } from '../database/connection';
 export interface Invoice {
   id: string;
   invoice_number: string;
-  client_id: string;
+  person_id: string;
   company_id: string;
   status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
   total: number;
@@ -31,7 +31,7 @@ export interface InvoiceItem {
 
 export interface CreateInvoiceData {
   invoice_number?: string;
-  client_id: string;
+  person_id: string;
   company_id: string;
   status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
   total: number;
@@ -43,7 +43,7 @@ export interface CreateInvoiceData {
 }
 
 export interface UpdateInvoiceData {
-  client_id?: string;
+  person_id?: string;
   status?: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
   total?: number;
   tax?: number;
@@ -70,7 +70,7 @@ export class InvoiceRepository {
    */
   static async findByCompanyId(companyId: string, filters?: {
     status?: string;
-    clientId?: string;
+    personId?: string;
     dateFrom?: string;
     dateTo?: string;
     limit?: number;
@@ -80,7 +80,7 @@ export class InvoiceRepository {
       SELECT 
         i.id,
         i.invoice_number,
-        i.client_id,
+        i.person_id,
         i.company_id,
         i.status,
         i.total_ttc as total,
@@ -92,9 +92,9 @@ export class InvoiceRepository {
         i.notes,
         i.created_at,
         i.updated_at,
-        c.company_name as client_name
+        c.company_name as person_name
       FROM invoices i
-      LEFT JOIN clients c ON i.client_id = c.id
+      LEFT JOIN persons c ON i.person_id = c.id
       WHERE i.company_id = $1
     `;
     
@@ -107,10 +107,10 @@ export class InvoiceRepository {
       params.push(filters.status);
     }
 
-    if (filters?.clientId) {
+    if (filters?.personId) {
       paramCount++;
-      queryStr += ` AND i.client_id = $${paramCount}`;
-      params.push(filters.clientId);
+      queryStr += ` AND i.person_id = $${paramCount}`;
+      params.push(filters.personId);
     }
 
     if (filters?.dateFrom) {
@@ -156,10 +156,10 @@ export class InvoiceRepository {
       countParams.push(filters.status);
     }
 
-    if (filters?.clientId) {
+    if (filters?.personId) {
       countParamCount++;
-      countQuery += ` AND i.client_id = $${countParamCount}`;
-      countParams.push(filters.clientId);
+      countQuery += ` AND i.person_id = $${countParamCount}`;
+      countParams.push(filters.personId);
     }
 
     if (filters?.dateFrom) {
@@ -191,7 +191,7 @@ export class InvoiceRepository {
       SELECT 
         i.id,
         i.invoice_number,
-        i.client_id,
+        i.person_id,
         i.company_id,
         i.status,
         i.total_ttc as total,
@@ -203,9 +203,9 @@ export class InvoiceRepository {
         i.notes,
         i.created_at,
         i.updated_at,
-        c.company_name as client_name
+        c.company_name as person_name
       FROM invoices i
-      LEFT JOIN clients c ON i.client_id = c.id
+      LEFT JOIN persons c ON i.person_id = c.id
       WHERE i.id = $1 AND i.company_id = $2
     `, [id, companyId]);
 
@@ -218,13 +218,13 @@ export class InvoiceRepository {
   static async create(data: CreateInvoiceData): Promise<Invoice> {
     const result = await query(`
       INSERT INTO invoices (
-        invoice_number, client_id, company_id, status, total_ttc, total_vat, subtotal_ht,
+        invoice_number, person_id, company_id, status, total_ttc, total_vat, subtotal_ht,
         due_date, issue_date, notes
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *
     `, [
       data.invoice_number || `INV-${Date.now()}`,
-      data.client_id,
+      data.person_id,
       data.company_id,
       data.status,
       data.total,

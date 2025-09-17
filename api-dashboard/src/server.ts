@@ -26,8 +26,12 @@ import quotesRoutes from './routes/quotes';
 import dashboardRoutes from './routes/dashboard';
 import emailsRoutes from './routes/emails';
 import announcementsRoutes from './routes/announcements';
-import calendarRoutes from './routes/calendar';
+import appointmentsRoutes from './routes/appointments';
+import availabilityRulesRoutes from './routes/availabilityRules';
+import messageSiteRoutes from './routes/site/messageSite';
+import credentialsRoutes from './routes/credentials';
 import socialNetworksRoutes from './routes/credentials';
+import settingsRoutes from './routes/settings';
 import adminRoutes from './routes/admin';
 
 // Load environment variables
@@ -112,8 +116,12 @@ app.use(`${API_PREFIX}/quotes`, quotesRoutes);
 app.use(`${API_PREFIX}/dashboard`, dashboardRoutes);
 app.use(`${API_PREFIX}/emails`, emailsRoutes);
 app.use(`${API_PREFIX}/announcements`, announcementsRoutes);
-app.use(`${API_PREFIX}/calendar`, calendarRoutes);
+app.use(`${API_PREFIX}/appointments`, appointmentsRoutes);
+app.use(`${API_PREFIX}/availability-rules`, availabilityRulesRoutes);
 app.use(`${API_PREFIX}/social-networks`, socialNetworksRoutes);
+app.use(`${API_PREFIX}/credentials`, credentialsRoutes);
+app.use(`${API_PREFIX}/settings`, settingsRoutes);
+app.use(`${API_PREFIX}/site/message`, messageSiteRoutes);
 app.use(`${API_PREFIX}`, adminRoutes);
 
 // 404 handler

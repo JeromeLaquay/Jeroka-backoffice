@@ -138,7 +138,7 @@ router.delete('/:platform/deactivate', [
     const { platform } = req.params;
     const companyId = req.user!.company_id;
 
-    await CompanySocialNetworkService.deactivateCredentials(companyId, platform);
+    await CompanySocialNetworkService.deactivateCredentials(companyId, req.user!.id, platform);
 
     res.json({
       success: true,

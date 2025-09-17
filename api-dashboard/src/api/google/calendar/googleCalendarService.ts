@@ -1,6 +1,6 @@
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../utils/logger';
 
 export type CalendarEvent = {
   id: string;
@@ -113,6 +113,40 @@ export const deleteEvent = async (credentials: any, calendarId = 'primary', even
   }
 };
 
-export default { listEvents, createEvent, updateEvent, deleteEvent };
+const testConnection = async (credentials: any): Promise<boolean> => {
+  const auth = createOAuthClient(credentials);
+  const calendar = google.calendar({ version: 'v3', auth });
+  try {
+    await calendar.events.list({ calendarId: 'primary' });
+    return true;
+  } catch (error) {
+    logger.error('Calendar testConnection error', { error: error instanceof Error ? error.message : error });
+    return false;
+  }
+};
+
+export class GoogleCalendarService {
+  static async listEvents(credentials: any, calendarId = 'primary', timeMin?: string, timeMax?: string, maxResults = 50): Promise<CalendarEvent[]> {
+    return listEvents(credentials, calendarId, timeMin, timeMax, maxResults);
+  }
+
+  static async createEvent(credentials: any, calendarId = 'primary', event: Partial<CalendarEvent>): Promise<CalendarEvent | null> {
+    return createEvent(credentials, calendarId, event);
+  }
+
+  static async updateEvent(credentials: any, calendarId = 'primary', eventId: string, updates: Partial<CalendarEvent>): Promise<CalendarEvent | null> {
+    return updateEvent(credentials, calendarId, eventId, updates);
+  }
+
+  static async deleteEvent(credentials: any, calendarId = 'primary', eventId: string): Promise<boolean> {
+    return deleteEvent(credentials, calendarId, eventId);
+  }
+
+  static async testConnection(credentials: any): Promise<boolean> {
+    return testConnection(credentials);
+  }
+}
+
+export default GoogleCalendarService;
 
 

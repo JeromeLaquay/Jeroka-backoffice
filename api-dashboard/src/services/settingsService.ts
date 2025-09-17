@@ -1,4 +1,4 @@
-import userService, { User } from './userService';
+import userService from './userService';
 import companyService from './companyService';
 export class SettingsService {
   static async getSettings(userId: string) {
@@ -25,7 +25,7 @@ export class SettingsService {
     }
   }
 
-  static async setUserSettings(user: User) {
+  static async setUserSettings(user: any) {
     //préparer les données pour le front 
     return {
       id: user.id,
@@ -53,7 +53,6 @@ export class SettingsService {
       country: company.country,
       vat_number: company.vat_number,
       siret: company.siret,
-      vat_number: company.vat_number,
       tax_regime: company.tax_regime,
       banking_info: company.banking_info,
       invoice_settings: company.invoice_settings,
@@ -61,6 +60,28 @@ export class SettingsService {
       email_settings: company.email_settings,
       theme: company.theme,
     }
+  }
+
+  // Google OAuth settings per company (AES encrypted at rest)
+  static async saveGoogleSettings(userId: string, payload: any, repo: any) {
+    const masked = {
+      calendarId: payload.calendarId || null,
+      hasOAuth: !!(payload.oauthClientId && payload.refreshToken),
+      hasServiceAccount: !!payload.serviceAccountJson
+    }
+    await repo.upsert(  userId, 'google', payload);
+    return masked;
+  }
+
+  static async getGoogleSettings(companyId: string, repo: any) {
+    const cred = await repo.getByCompanyAndPlatform(companyId, 'google');
+    if (!cred) return { hasOAuth: false, hasServiceAccount: false };
+    const c = cred.credentials || {};
+    return {
+      calendarId: c.calendarId || null,
+      hasOAuth: !!(c.oauthClientId && c.refreshToken),
+      hasServiceAccount: !!c.serviceAccountJson
+    };
   }
 }
 export default SettingsService;

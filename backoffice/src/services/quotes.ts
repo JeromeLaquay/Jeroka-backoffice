@@ -1,42 +1,42 @@
 import { apiService, ApiResponse } from './api'
 
 export interface QuoteItem {
-  id: number
+  id: string
   description: string
   quantity: number
-  unitPrice: number
+  unit_price: number
   total: number
-  discountPercent?: number
-  vatRate?: number
+  discount_percent?: number
+  vat_number?: number
 }
 
 export interface Quote {
   id: string
-  quoteNumber: string
-  clientId: string
-  clientName: string
+  quote_number: string
+  client_id: string
+  client_name?: string
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted'
   total: number
   tax: number
   subtotal: number
-  validUntil: string
-  issueDate: string
+  valid_until: string
+  issue_date: string
   items: QuoteItem[]
   notes?: string
-  createdAt: string
+  created_at: string
 }
 
 export interface CreateQuoteRequest {
-  clientId: string
+  client_id: string
   items: Omit<QuoteItem, 'id'>[]
-  validUntil: string
+  valid_until: string
   notes?: string
 }
 
 export interface UpdateQuoteRequest {
-  clientId?: string
+  client_id?: string
   items?: Omit<QuoteItem, 'id'>[]
-  validUntil?: string
+  valid_until?: string
   notes?: string
   status?: string
 }
@@ -215,7 +215,7 @@ class QuoteService {
     tax: number
     total: number
   } {
-    const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
+    const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0)
     const tax = subtotal * taxRate
     const total = subtotal + tax
 
@@ -236,7 +236,7 @@ class QuoteService {
    * Convertit un devis en facture
    */
   async convertToInvoice(id: string): Promise<ApiResponse> {
-    return await apiService.axiosInstance.post(`/quotes/${id}/convert-to-invoice`)
+    return await apiService.axiosInstance.post(`/quotes/${id}/convert`)
   }
 
   /**

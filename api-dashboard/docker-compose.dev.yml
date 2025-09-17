@@ -12,6 +12,7 @@ services:
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
       - ./src/database/migrations.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./src/database/createViews.sql:/docker-entrypoint-initdb.d/02-createViews.sql:ro
     ports:
       - "5432:5432"
     networks:
@@ -51,6 +52,10 @@ services:
       # CORS
       FRONTEND_URL: http://localhost:3000
       BACKOFFICE_URL: http://localhost:3001
+
+      GOOGLE_CLIENT_ID: 970287844414-rfc4io1lije03bqge9liidn2nh8l7v7i.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: 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
+      GOOGLE_REDIRECT_URI: http://localhost:3002/api/v1/settings/google/callback
       
       # Upload
       UPLOAD_DIR: /app/uploads

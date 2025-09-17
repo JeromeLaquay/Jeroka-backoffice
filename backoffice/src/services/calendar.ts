@@ -3,93 +3,65 @@ import { apiService as api } from './api'
 // Types
 export interface AvailabilityRule {
   id: string
-  dayOfWeek: number
-  startTime: string
-  endTime: string
-  isActive: boolean
-  createdAt: Date
-  updatedAt: Date
+  user_id: string
+  day: string
+  start_time: string
+  end_time: string
+  status: string
+  created_at: Date,
+  google_event_id: string,
+  updated_at: Date
 }
 
-export interface TimeSlot {
-  id: string
-  date: string
+export interface AvailabilityRuleCreate {
+  day: string
   startTime: string
-  endTime: string
-  isAvailable: boolean
-  isBooked: boolean
-  clientName?: string
-  clientEmail?: string
-  clientPhone?: string
-  notes?: string
-  createdAt: Date
-  updatedAt: Date
+  endTime: string,
+  appointmentTime: number,
 }
 
 export interface Appointment {
   id: string
-  date: string
-  startTime: string
-  endTime: string
-  clientName: string
-  clientEmail: string
-  clientPhone?: string
+  day: string
+  start_time: string
+  end_time: string
+  availability_rule_id: string
+  client_first_name: string
+  client_last_name: string
+  client_email: string
+  client_phone?: string
   notes?: string
-  createdAt: Date
-  updatedAt: Date
-}
-
-// API Response types
-interface ApiResponse<T> {
-  success: boolean
-  data: T
-  message?: string
+  created_at: Date
+  updated_at: Date
 }
 
 // Availability Rules API
 export const availabilityApi = {
   // Get all availability rules
   getAll: async (): Promise<AvailabilityRule[]> => {
-    const response = await api.get<AvailabilityRule[]>('/calendar/availability')
+    const response = await api.get<AvailabilityRule[]>('/availability-rules')
     return response.data || [] || []
   },
 
   // Create new availability rule
-  create: async (rule: Omit<AvailabilityRule, 'id' | 'createdAt' | 'updatedAt'>): Promise<AvailabilityRule> => {
-    const response = await api.post<AvailabilityRule>('/calendar/availability', rule)
+  create: async (rule: Omit<AvailabilityRuleCreate, 'id' | 'createdAt' | 'updatedAt'>): Promise<AvailabilityRule> => {
+    const response = await api.post<AvailabilityRule>('/availability-rules', rule)
     return response.data || {} as AvailabilityRule
   },
 
   // Update availability rule
   update: async (id: string, rule: Partial<AvailabilityRule>): Promise<AvailabilityRule> => {
-    const response = await api.put<AvailabilityRule>(`/calendar/availability/${id}`, rule)
+    const response = await api.put<AvailabilityRule>(`/availability-rules/${id}`, rule)
     return response.data || {} as AvailabilityRule
   },
 
   // Delete availability rule
   delete: async (id: string): Promise<void> => {
-    await api.delete(`/calendar/availability/${id}`)
+    await api.delete(`/availability-rules/${id}`)
   }
 }
 
-// Time Slots API
-export const timeSlotsApi = {
-  // Get available time slots for a date range
-  getAvailable: async (startDate: string, endDate: string): Promise<TimeSlot[]> => {
-    const response = await api.get<TimeSlot[]>('/calendar/slots', {
-      params: { startDate, endDate }
-    })
-    return response.data || [] || []
-  },
 
-  // Get available time slots for a specific date
-  getAvailableForDate: async (date: string): Promise<TimeSlot[]> => {
-    const response = await api.get<TimeSlot[]>('/calendar/slots', {
-      params: { startDate: date, endDate: date }
-    })
-    return response.data || [] || []
-  }
-}
 
 // Appointments API
 export const appointmentsApi = {
@@ -99,48 +71,35 @@ export const appointmentsApi = {
     if (startDate) params.startDate = startDate
     if (endDate) params.endDate = endDate
 
-    const response = await api.get<Appointment[]>('/calendar/appointments', { params })
+    const response = await api.get<Appointment[]>('/appointments', { params })
     return response.data || [] || []
   },
 
   // Get appointment by ID
   getById: async (id: string): Promise<Appointment> => {
-    const response = await api.get<Appointment>(`/calendar/appointments/${id}`)
+    const response = await api.get<Appointment>(`/appointments/${id}`)
     return response.data || {} as Appointment
   },
 
   // Create new appointment
   create: async (appointment: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt'>): Promise<Appointment> => {
-    const response = await api.post<Appointment>('/calendar/appointments', appointment)
+    const response = await api.post<Appointment>('/appointments', appointment)
     return response.data || {} as Appointment
   },
 
   // Update appointment
   update: async (id: string, appointment: Partial<Appointment>): Promise<Appointment> => {
-    const response = await api.put<Appointment>(`/calendar/appointments/${id}`, appointment)
+    const response = await api.put<Appointment>(`/appointments/${id}`, appointment)
     return response.data || {} as Appointment
   },
 
   // Delete appointment
   delete: async (id: string): Promise<void> => {
-    await api.delete(`/calendar/appointments/${id}`)
+    await api.delete(`/appointments/${id}`)
   }
 }
 
-// Google Calendar Integration API
-export const googleCalendarApi = {
-  // Sync with Google Calendar
-  sync: async (): Promise<{ success: boolean; message: string }> => {
-    const response = await api.post<ApiResponse<{ success: boolean; message: string }>>('/calendar/google/sync')
-    return response.data?.data || { success: false, message: 'Erreur de synchronisation' }
-  },
 
-  // Get sync status
-  getSyncStatus: async (): Promise<{ lastSync: string; isConnected: boolean }> => {
-    const response = await api.get<ApiResponse<{ lastSync: string; isConnected: boolean }>>('/calendar/google/status')
-    return response.data?.data || { lastSync: '', isConnected: false }
-  }
-}
 
 // Utility functions
 export const calendarUtils = {
@@ -193,35 +152,12 @@ export const calendarUtils = {
     return slots
   },
 
-  // Check if a time slot is available
-  isSlotAvailable: (slot: TimeSlot): boolean => {
-    return slot.isAvailable && !slot.isBooked
-  },
-
-  // Filter available slots
-  filterAvailableSlots: (slots: TimeSlot[]): TimeSlot[] => {
-    return slots.filter(slot => calendarUtils.isSlotAvailable(slot))
-  },
-
-  // Group slots by date
-  groupSlotsByDate: (slots: TimeSlot[]): Record<string, TimeSlot[]> => {
-    return slots.reduce((groups, slot) => {
-      const date = slot.date
-      if (!groups[date]) {
-        groups[date] = []
-      }
-      groups[date].push(slot)
-      return groups
-    }, {} as Record<string, TimeSlot[]>)
-  }
 }
 
 // Export all APIs as a single object
 export const calendarApi = {
   availability: availabilityApi,
-  timeSlots: timeSlotsApi,
   appointments: appointmentsApi,
-  googleCalendar: googleCalendarApi,
   utils: calendarUtils
 }
 

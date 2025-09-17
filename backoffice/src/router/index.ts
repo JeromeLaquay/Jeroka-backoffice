@@ -140,6 +140,26 @@ const router = createRouter({
           component: () => import('../views/products/CreateProductView.vue')
         },
         {
+          path: '/fournisseurs',
+          name: 'Fournisseurs',
+          component: () => import('../views/suppliers/SuppliersView.vue')
+        },
+        {
+          path: '/fournisseurs/create',
+          name: 'CreateSupplier',
+          component: () => import('../views/suppliers/CreateSupplierView.vue')
+        },
+        {
+          path: '/fournisseurs/:id',
+          name: 'SupplierDetail',
+          component: () => import('../views/suppliers/SupplierDetailView.vue')
+        },
+        {
+          path: '/fournisseurs/:id/edit',
+          name: 'EditSupplier',
+          component: () => import('../views/suppliers/EditSupplierView.vue')
+        },
+        {
           path: '/comptabilite',
           name: 'Comptabilite',
           component: () => import('../views/accounting/AccountingView.vue')

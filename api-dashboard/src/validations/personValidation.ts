@@ -1,8 +1,8 @@
 import Joi from 'joi';
 
-// Schémas de validation pour les clients
-export const clientSchemas = {
-  // Validation pour la création d'un client
+// Schémas de validation pour les persons
+export const personSchemas = {
+  // Validation pour la création d'un person
   create: Joi.object({
     company_id: Joi.string().uuid().required(),
     first_name: Joi.string().min(2).max(50).required(),
@@ -16,13 +16,13 @@ export const clientSchemas = {
     postal_code: Joi.string().max(20).optional(),
     country: Joi.string().max(100).optional(),
     status: Joi.string().valid('active', 'inactive', 'prospect', 'lead').default('prospect'),
-    type: Joi.string().valid('individual', 'company').required(),
+    type: Joi.string().valid('client', 'supplier').required(),
     source: Joi.string().max(100).optional(),
     tags: Joi.array().items(Joi.string().max(50)).optional(),
     notes: Joi.string().max(1000).optional()
   }),
 
-  // Validation pour la mise à jour d'un client
+  // Validation pour la mise à jour d'un person
   update: Joi.object({
     first_name: Joi.string().min(2).max(50).optional(),
     last_name: Joi.string().min(2).max(50).optional(),
@@ -35,7 +35,7 @@ export const clientSchemas = {
     postal_code: Joi.string().max(20).optional(),
     country: Joi.string().max(100).optional(),
     status: Joi.string().valid('active', 'inactive', 'prospect', 'lead').optional(),
-    type: Joi.string().valid('individual', 'company').optional(),
+    type: Joi.string().valid('client', 'supplier').optional(),
     source: Joi.string().max(100).optional(),
     tags: Joi.array().items(Joi.string().max(50)).optional(),
     notes: Joi.string().max(1000).optional()
@@ -45,7 +45,7 @@ export const clientSchemas = {
   filters: Joi.object({
     search: Joi.string().max(100).optional(),
     status: Joi.string().valid('active', 'inactive', 'prospect', 'lead').optional(),
-    type: Joi.string().valid('individual', 'company').optional(),
+    type: Joi.string().valid('client', 'supplier').optional(),
     source: Joi.string().max(100).optional(),
     tags: Joi.array().items(Joi.string().max(50)).optional(),
     sortBy: Joi.string().valid('created_at', 'updated_at', 'first_name', 'last_name', 'email', 'status').default('created_at'),
@@ -54,20 +54,20 @@ export const clientSchemas = {
     limit: Joi.number().integer().min(1).max(1000).default(10)
   }),
 
-  // Validation pour l'ID client
-  clientId: Joi.string().uuid().required(),
+  // Validation pour l'ID person
+  personId: Joi.string().uuid().required(),
 
   // Validation pour l'ID entreprise
   companyId: Joi.string().uuid().required()
 };
 
 // Fonctions de validation
-export class ClientValidation {
+export class PersonValidation {
   /**
-   * Valide les données de création d'un client
+   * Valide les données de création d'un person
    */
   static validateCreate(data: any): { error?: string; value?: any } {
-    const { error, value } = clientSchemas.create.validate(data, {
+    const { error, value } = personSchemas.create.validate(data, {
       abortEarly: false,
       stripUnknown: true
     });
@@ -81,10 +81,10 @@ export class ClientValidation {
   }
 
   /**
-   * Valide les données de mise à jour d'un client
+   * Valide les données de mise à jour d'un person
    */
   static validateUpdate(data: any): { error?: string; value?: any } {
-    const { error, value } = clientSchemas.update.validate(data, {
+    const { error, value } = personSchemas.update.validate(data, {
       abortEarly: false,
       stripUnknown: true
     });
@@ -101,7 +101,7 @@ export class ClientValidation {
    * Valide les filtres de recherche
    */
   static validateFilters(filters: any): { error?: string; value?: any } {
-    const { error, value } = clientSchemas.filters.validate(filters, {
+    const { error, value } = personSchemas.filters.validate(filters, {
       abortEarly: false,
       stripUnknown: true
     });
@@ -115,13 +115,13 @@ export class ClientValidation {
   }
 
   /**
-   * Valide un ID client
+   * Valide un ID person
    */
-  static validateClientId(clientId: string): { error?: string; value?: string } {
-    const { error, value } = clientSchemas.clientId.validate(clientId);
+  static validatepersonId(personId: string): { error?: string; value?: string } {
+    const { error, value } = personSchemas.personId.validate(personId);
     
     if (error) {
-      return { error: 'ID client invalide' };
+      return { error: 'ID person invalide' };
     }
 
     return { value };
@@ -131,7 +131,7 @@ export class ClientValidation {
    * Valide un ID entreprise
    */
   static validateCompanyId(companyId: string): { error?: string; value?: string } {
-    const { error, value } = clientSchemas.companyId.validate(companyId);
+    const { error, value } = personSchemas.companyId.validate(companyId);
     
     if (error) {
       return { error: 'ID entreprise invalide' };
@@ -154,11 +154,11 @@ export class ClientValidation {
 
     // Règles métier spécifiques
     if (value.type === 'company' && !value.company_name) {
-      return { error: 'Le nom de l\'entreprise est requis pour un client de type "company"' };
+      return { error: 'Le nom de l\'entreprise est requis pour un person de type "company"' };
     }
 
     if (value.type === 'individual' && value.company_name) {
-      return { error: 'Le nom de l\'entreprise ne peut pas être renseigné pour un client de type "individual"' };
+      return { error: 'Le nom de l\'entreprise ne peut pas être renseigné pour un person de type "individual"' };
     }
 
     // Validation de l'email unique (sera vérifié en base)
@@ -183,11 +183,11 @@ export class ClientValidation {
 
     // Règles métier spécifiques
     if (value.type === 'company' && !value.company_name) {
-      return { error: 'Le nom de l\'entreprise est requis pour un client de type "company"' };
+      return { error: 'Le nom de l\'entreprise est requis pour un person de type "company"' };
     }
 
     if (value.type === 'individual' && value.company_name) {
-      return { error: 'Le nom de l\'entreprise ne peut pas être renseigné pour un client de type "individual"' };
+      return { error: 'Le nom de l\'entreprise ne peut pas être renseigné pour un person de type "individual"' };
     }
 
     // Validation de l'email si fourni

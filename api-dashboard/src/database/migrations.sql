@@ -5,6 +5,7 @@
 -- Suppression des tables existantes (ordre inverse des dépendances)
 DROP TABLE IF EXISTS appointments CASCADE;
 DROP TABLE IF EXISTS availability_rules CASCADE;
+DROP TABLE IF EXISTS clients CASCADE;
 DROP TABLE IF EXISTS publication_platforms CASCADE;
 DROP TABLE IF EXISTS publications CASCADE;
 DROP TABLE IF EXISTS invoice_items CASCADE;
@@ -15,7 +16,7 @@ DROP TABLE IF EXISTS order_items CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS contact_messages CASCADE;
-DROP TABLE IF EXISTS clients CASCADE;
+DROP TABLE IF EXISTS persons CASCADE;
 DROP TABLE IF EXISTS message_replies CASCADE;
 DROP TABLE IF EXISTS messages CASCADE;
 DROP TABLE IF EXISTS refresh_tokens CASCADE;
@@ -51,7 +52,7 @@ CREATE TABLE companies (
     subscription_plan VARCHAR(50) DEFAULT 'free' CHECK (subscription_plan IN ('free', 'basic', 'premium', 'enterprise')),
     subscription_expires_at TIMESTAMP WITH TIME ZONE,
     max_users INTEGER DEFAULT 5,
-    max_clients INTEGER DEFAULT 100,
+    max_persons INTEGER DEFAULT 100,
     max_storage_mb INTEGER DEFAULT 1000,
     settings JSONB DEFAULT '{}', -- Configuration spécifique à l'entreprise
     billing_info JSONB DEFAULT '{}', -- Informations de facturation
@@ -114,12 +115,13 @@ CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens(user_id);
 CREATE INDEX idx_refresh_tokens_expires_at ON refresh_tokens(expires_at);
 
 -- =============================================
--- TABLE: clients (Clients liés aux entreprises)
+-- TABLE: persons (persons liés aux entreprises)
 -- =============================================
-CREATE TABLE clients (
+CREATE TABLE persons (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-    type VARCHAR(20) DEFAULT 'individual' CHECK (type IN ('individual', 'company')),
+    type VARCHAR(20) DEFAULT 'client' CHECK (type IN ('client','supplier')),
+    type_client VARCHAR(20) DEFAULT 'individual' CHECK (type_client IN ('individual', 'company')),
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     company_name VARCHAR(200),
@@ -147,44 +149,12 @@ CREATE TABLE clients (
     UNIQUE(company_id, email)
 );
 
-CREATE INDEX idx_clients_company_id ON clients(company_id);
-CREATE INDEX idx_clients_email ON clients(email);
-CREATE INDEX idx_clients_type ON clients(type);
-CREATE INDEX idx_clients_status ON clients(status);
-CREATE INDEX idx_clients_company_name ON clients(company_name);
-CREATE INDEX idx_clients_created_at ON clients(created_at);
-
--- =============================================
--- TABLE: contact_messages (Messages liés aux entreprises)
--- =============================================
-CREATE TABLE contact_messages (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-    name VARCHAR(200) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    phone VARCHAR(20),
-    company VARCHAR(200),
-    subject VARCHAR(500) NOT NULL,
-    message TEXT NOT NULL,
-    type VARCHAR(50) DEFAULT 'other' CHECK (type IN ('devis', 'information', 'partnership', 'support', 'other')),
-    status VARCHAR(20) DEFAULT 'unread' CHECK (status IN ('unread', 'read', 'replied', 'archived')),
-    priority VARCHAR(20) DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
-    client_id UUID REFERENCES clients(id), -- Lien vers client si existant
-    ip_address INET,
-    user_agent TEXT,
-    source VARCHAR(100), -- Page/formulaire d'origine
-    tags TEXT[],
-    replied_at TIMESTAMP WITH TIME ZONE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE INDEX idx_contact_messages_company_id ON contact_messages(company_id);
-CREATE INDEX idx_contact_messages_email ON contact_messages(email);
-CREATE INDEX idx_contact_messages_type ON contact_messages(type);
-CREATE INDEX idx_contact_messages_status ON contact_messages(status);
-CREATE INDEX idx_contact_messages_created_at ON contact_messages(created_at);
-CREATE INDEX idx_contact_messages_priority ON contact_messages(priority);
+CREATE INDEX idx_persons_company_id ON persons(company_id);
+CREATE INDEX idx_persons_email ON persons(email);
+CREATE INDEX idx_persons_type ON persons(type);
+CREATE INDEX idx_persons_status ON persons(status);
+CREATE INDEX idx_persons_company_name ON persons(company_name);
+CREATE INDEX idx_persons_created_at ON persons(created_at);
 
 -- =============================================
 -- TABLE: products (Produits liés aux entreprises)
@@ -236,7 +206,7 @@ CREATE TABLE quotes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     quote_number VARCHAR(50) NOT NULL,
-    client_id UUID NOT NULL REFERENCES clients(id),
+    person_id UUID NOT NULL REFERENCES persons(id),
     status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'accepted', 'rejected', 'expired')),
     title VARCHAR(255),
     description TEXT,
@@ -249,6 +219,7 @@ CREATE TABLE quotes (
     valid_until DATE,
     notes TEXT,
     terms_conditions TEXT,
+    google_doc_id VARCHAR(255),
     payment_terms VARCHAR(255),
     delivery_delay VARCHAR(255),
     sent_at TIMESTAMP WITH TIME ZONE,
@@ -263,7 +234,7 @@ CREATE TABLE quotes (
 
 CREATE INDEX idx_quotes_company_id ON quotes(company_id);
 CREATE INDEX idx_quotes_quote_number ON quotes(quote_number);
-CREATE INDEX idx_quotes_client_id ON quotes(client_id);
+CREATE INDEX idx_quotes_person_id ON quotes(person_id);
 CREATE INDEX idx_quotes_status ON quotes(status);
 CREATE INDEX idx_quotes_created_at ON quotes(created_at);
 
@@ -298,9 +269,8 @@ CREATE TABLE invoices (
     company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     invoice_number VARCHAR(50) NOT NULL,
     quote_id UUID REFERENCES quotes(id),
-    client_id UUID NOT NULL REFERENCES clients(id),
+    person_id UUID NOT NULL REFERENCES persons(id),
     status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'paid', 'overdue', 'cancelled')),
-    type VARCHAR(20) DEFAULT 'invoice' CHECK (type IN ('invoice', 'credit_note', 'proforma')),
     title VARCHAR(255),
     description TEXT,
     subtotal_ht DECIMAL(10,2) DEFAULT 0,
@@ -317,18 +287,19 @@ CREATE TABLE invoices (
     payment_method VARCHAR(50),
     bank_details TEXT,
     notes TEXT,
+    google_doc_id VARCHAR(255),
     sent_at TIMESTAMP WITH TIME ZONE,
     paid_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     
     -- Contrainte unique numéro de facture par entreprise
-    UNIQUE(company_id, invoice_number)
+    UNIQUE(invoice_number)
 );
 
 CREATE INDEX idx_invoices_company_id ON invoices(company_id);
 CREATE INDEX idx_invoices_invoice_number ON invoices(invoice_number);
-CREATE INDEX idx_invoices_client_id ON invoices(client_id);
+CREATE INDEX idx_invoices_person_id ON invoices(person_id);
 CREATE INDEX idx_invoices_status ON invoices(status);
 CREATE INDEX idx_invoices_due_date ON invoices(due_date);
 CREATE INDEX idx_invoices_created_at ON invoices(created_at);
@@ -378,7 +349,7 @@ CREATE TABLE messages (
     ip_address INET,
     user_agent TEXT,
     referrer TEXT,
-    client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
+    person_id UUID REFERENCES persons(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     read_at TIMESTAMP,
@@ -391,9 +362,7 @@ CREATE INDEX idx_messages_priority ON messages(priority);
 CREATE INDEX idx_messages_created_at ON messages(created_at);
 CREATE INDEX idx_messages_email ON messages(email);
 
--- =============================================
--- TABLE: message_replies
--- =============================================
+
 CREATE TABLE message_replies (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     message_id UUID NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
@@ -406,9 +375,6 @@ CREATE TABLE message_replies (
 
 CREATE INDEX idx_message_replies_message_id ON message_replies(message_id);
 
--- =============================================
--- TABLE: publications (Publications liées aux entreprises)
--- =============================================
 CREATE TABLE publications (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
@@ -471,9 +437,9 @@ CREATE INDEX idx_publication_platforms_status ON publication_platforms(status);
 -- Table pour stocker les identifiants de réseaux sociaux par entreprise
 CREATE TABLE company_social_credentials (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     platform VARCHAR(20) NOT NULL CHECK (platform IN ('meta', 'linkedin', 'twitter', 'site web', 'google')),
-    
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     -- Champs chiffrés (AES-256)
     encrypted_credentials JSONB NOT NULL,
     
@@ -482,66 +448,59 @@ CREATE TABLE company_social_credentials (
     expires_at TIMESTAMP,
     last_used_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    UNIQUE(company_id, platform)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_company_social_credentials_company_id ON company_social_credentials(company_id);
+CREATE INDEX idx_company_social_credentials_user_id ON company_social_credentials(user_id);
 CREATE INDEX idx_company_social_credentials_platform ON company_social_credentials(platform);
 CREATE INDEX idx_company_social_credentials_is_active ON company_social_credentials(is_active);
 
 -- =============================================
--- TABLE: availability_rules (Règles de disponibilité liées aux entreprises)
+-- TABLE: availability_rules (Règles de disponibilité liées aux utilisateurs)
 -- =============================================
 CREATE TABLE availability_rules (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-    day_of_week INTEGER NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6), -- 0=dimanche, 6=samedi
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    day DATE NOT NULL, -- jour disponible
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
-    is_active BOOLEAN DEFAULT true,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'reserved', 'cancelled')),
+    google_event_id VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     
-    -- Contrainte pour éviter les doublons de jour par entreprise
-    UNIQUE(company_id, day_of_week)
+    -- Contrainte pour éviter les doublons de jour par utilisateur
+    UNIQUE(user_id, day, start_time, end_time)
 );
 
-CREATE INDEX idx_availability_rules_company_id ON availability_rules(company_id);
-CREATE INDEX idx_availability_rules_day_of_week ON availability_rules(day_of_week);
-CREATE INDEX idx_availability_rules_is_active ON availability_rules(is_active);
+CREATE INDEX idx_availability_rules_user_id ON availability_rules(user_id);
+CREATE INDEX idx_availability_rules_day ON availability_rules(day);
+CREATE INDEX idx_availability_rules_start_time ON availability_rules(start_time);
+CREATE INDEX idx_availability_rules_end_time ON availability_rules(end_time);
+CREATE INDEX idx_availability_rules_status ON availability_rules(status);
+CREATE INDEX idx_availability_rules_google_event_id ON availability_rules(google_event_id);
 
 -- =============================================
 -- TABLE: appointments (Rendez-vous liés aux entreprises)
 -- =============================================
 CREATE TABLE appointments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-    date DATE NOT NULL,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    client_name VARCHAR(200) NOT NULL,
-    client_email VARCHAR(255) NOT NULL,
-    client_phone VARCHAR(20),
+    availability_rule_id UUID NOT NULL REFERENCES availability_rules(id) ON DELETE CASCADE,
+    first_name VARCHAR(200) NOT NULL,
+    last_name VARCHAR(200) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
     notes TEXT,
-    status VARCHAR(20) DEFAULT 'confirmed' CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed', 'no_show')),
-    google_event_id VARCHAR(255), -- ID de l'événement Google Calendar
-    reminder_sent BOOLEAN DEFAULT false,
-    reminder_sent_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     
-    -- Contrainte pour éviter les créneaux en double par entreprise
-    UNIQUE(company_id, date, start_time)
+    -- Contrainte pour éviter les créneaux en double par user_id
+    UNIQUE( availability_rule_id)
 );
 
-CREATE INDEX idx_appointments_company_id ON appointments(company_id);
-CREATE INDEX idx_appointments_date ON appointments(date);
-CREATE INDEX idx_appointments_status ON appointments(status);
-CREATE INDEX idx_appointments_client_email ON appointments(client_email);
+CREATE INDEX idx_appointments_availability_rule_id ON appointments(availability_rule_id);
+CREATE INDEX idx_appointments_person_email ON appointments(person_email);
 CREATE INDEX idx_appointments_created_at ON appointments(created_at);
-CREATE INDEX idx_appointments_google_event_id ON appointments(google_event_id);
 
 -- =============================================
 -- TRIGGERS pour updated_at automatique
@@ -557,8 +516,7 @@ $$ language 'plpgsql';
 -- Appliquer le trigger à toutes les tables avec updated_at
 CREATE TRIGGER update_companies_updated_at BEFORE UPDATE ON companies FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_clients_updated_at BEFORE UPDATE ON clients FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_contact_messages_updated_at BEFORE UPDATE ON contact_messages FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_persons_updated_at BEFORE UPDATE ON persons FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON products FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_quotes_updated_at BEFORE UPDATE ON quotes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_invoices_updated_at BEFORE UPDATE ON invoices FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -615,78 +573,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- =============================================
--- VUES UTILES
--- =============================================
 
--- Vue des statistiques dashboard par entreprise
-CREATE OR REPLACE VIEW dashboard_stats AS
-SELECT 
-    c.id as company_id,
-    (SELECT COUNT(*) FROM clients WHERE company_id = c.id AND status = 'active') as active_clients,
-    (SELECT COUNT(*) FROM clients WHERE company_id = c.id AND created_at >= CURRENT_DATE - INTERVAL '30 days') as new_clients_month,
-    (SELECT COUNT(*) FROM contact_messages WHERE company_id = c.id AND status = 'unread') as unread_messages,
-    (SELECT COUNT(*) FROM quotes WHERE company_id = c.id AND status = 'sent') as pending_quotes,
-    (SELECT COUNT(*) FROM invoices WHERE company_id = c.id AND status = 'overdue') as overdue_invoices,
-    (SELECT COALESCE(SUM(total_ttc), 0) FROM invoices WHERE company_id = c.id AND status = 'paid' AND EXTRACT(MONTH FROM paid_at) = EXTRACT(MONTH FROM CURRENT_DATE)) as revenue_month,
-    (SELECT COUNT(*) FROM publications WHERE company_id = c.id AND status = 'published') as published_publications
-FROM companies c;
 
--- =============================================
--- DONNÉES INITIALES
--- =============================================
 
--- Entreprise de démonstration
-INSERT INTO companies (id, name, legal_name, siret, email, phone, address_line1, city, postal_code, country, subscription_plan, max_users, max_clients) 
-VALUES (
-    '11111111-1111-1111-1111-111111111111',
-    'Jeroka Demo',
-    'Jeroka Demo SARL',
-    '12345678901234',
-    'contact@jeroka-demo.com',
-    '+33123456789',
-    '123 Rue de la Démo',
-    'Paris',
-    '75001',
-    'France',
-    'premium',
-    50,
-    1000
-) ON CONFLICT (id) DO NOTHING;
-
--- Utilisateur admin par défaut (password: admin123)
-INSERT INTO users (id, company_id, email, password_hash, first_name, last_name, role, is_active, is_company_admin, email_verified) 
-VALUES (
-    '22222222-2222-2222-2222-222222222222',
-    '11111111-1111-1111-1111-111111111111',
-    'admin@jeroka-demo.com', 
-    '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdhXmzdZk2bEW3u',
-    'Admin', 
-    'Jeroka', 
-    'admin', 
-    true,
-    true,
-    true
-) ON CONFLICT (id) DO NOTHING;
-
--- Utilisateur manager de test (password: manager123)
-INSERT INTO users (id, company_id, email, password_hash, first_name, last_name, role, is_active, is_company_admin, email_verified) 
-VALUES (
-    '33333333-3333-3333-3333-333333333333',
-    '11111111-1111-1111-1111-111111111111',
-    'manager@jeroka-demo.com', 
-    '$2a$12$8K9LxQrBg.xQ9QJzxK8rLeJ2TQJpQzCzK9Y.MgQJpL8XqZrK8Y.ZS',
-    'Manager', 
-    'Jeroka', 
-    'manager', 
-    true,
-    false,
-    true
-) ON CONFLICT (id) DO NOTHING;
-
--- Insert sample messages for testing
-INSERT INTO messages (id, company_id, first_name, last_name, email, phone, company, subject, message, status, priority, source, created_at) VALUES
-  ('44444444-4444-4444-4444-444444444444', '11111111-1111-1111-1111-111111111111', 'Jean', 'Dupont', 'jean.dupont@email.com', '+33123456789', 'Entreprise ABC', 'Demande de devis site web', 'Bonjour, je souhaiterais avoir un devis pour la création d''un site web e-commerce. Merci.', 'new', 'high', 'website', NOW() - INTERVAL '2 hours'),
-  ('55555555-5555-5555-5555-555555555555', '11111111-1111-1111-1111-111111111111', 'Marie', 'Martin', 'marie.martin@email.com', '+33987654321', 'StartupXYZ', 'Question sur vos services', 'Bonjour, pouvez-vous me dire si vous proposez de l''hébergement web ? Cordialement.', 'read', 'medium', 'website', NOW() - INTERVAL '1 day'),
-  ('66666666-6666-6666-6666-666666666666', '11111111-1111-1111-1111-111111111111', 'Pierre', 'Bernard', 'pierre.bernard@email.com', null, null, 'Problème technique', 'Mon site web ne fonctionne plus depuis ce matin. Pouvez-vous m''aider ?', 'replied', 'high', 'email', NOW() - INTERVAL '3 days')
-ON CONFLICT (id) DO NOTHING;

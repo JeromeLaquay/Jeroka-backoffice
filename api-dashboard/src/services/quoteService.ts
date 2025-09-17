@@ -1,5 +1,6 @@
 import { QuoteRepository, CreateQuoteData, UpdateQuoteData, CreateQuoteItemData } from '../repositories/quoteRepository';
 import UserRepository from '../repositories/userRepository';
+import { QuoteValidation } from '../validations/quoteValidation';
 
 
 export interface QuoteWithItems {
@@ -71,6 +72,14 @@ export class QuoteService {
     dateFrom?: string;
     dateTo?: string;
   }): Promise<{ quotes: QuoteWithItems[], total: number, page: number, limit: number, totalPages: number }> {
+    // Validation des filtres
+    if (filters) {
+      const validation = QuoteValidation.validateFilters(filters);
+      if (validation.error) {
+        throw new Error(`Filtres invalides: ${validation.error}`);
+      }
+    }
+
     const page = filters?.page || 1;
     const limit = filters?.limit || 10;
     const offset = (page - 1) * limit;
@@ -104,6 +113,12 @@ export class QuoteService {
    * Récupère un devis par ID
    */
   static async getQuote(user: any, quoteId: string): Promise<QuoteWithItems | null> {
+    // Validation de l'ID devis
+    const idValidation = QuoteValidation.validateQuoteId(quoteId);
+    if (idValidation.error) {
+      throw new Error(idValidation.error);
+    }
+
     const quote = await QuoteRepository.findById(quoteId, user.company_id);
     if (!quote) {
       return null;
@@ -124,12 +139,18 @@ export class QuoteService {
       throw new Error('Utilisateur non trouvé');
     }
 
+    // Validation des données avec règles métier
+    const validation = QuoteValidation.validateCreateWithBusinessRules(data);
+    if (validation.error) {
+      throw new Error(`Données invalides: ${validation.error}`);
+    }
+
+    const validatedData = validation.value!;
+
     // Calculer les totaux
-    const subtotal = data.items.reduce((sum: number, item: any) => {
-      const unitPrice = item.unitPrice || item.unit_price;
-      const discountPercent = item.discountPercent || item.discount_percent;
-      const itemTotal = item.quantity * unitPrice;
-      const discount = discountPercent ? (itemTotal * discountPercent / 100) : 0;
+    const subtotal = validatedData.items.reduce((sum: number, item: any) => {
+      const itemTotal = item.quantity * item.unit_price;
+      const discount = item.discount_percent ? (itemTotal * item.discount_percent / 100) : 0;
       return sum + (itemTotal - discount);
     }, 0);
 
@@ -140,37 +161,33 @@ export class QuoteService {
     const quoteNumber = await QuoteRepository.generateQuoteNumber(user.company_id);
 
     const quoteData: CreateQuoteData = {
-      client_id: data.clientId || data.client_id,
+      client_id: validatedData.client_id,
       company_id: user.company_id,
-      status: data.status || 'draft',
+      status: validatedData.status || 'draft',
       total,
       tax,
       subtotal,
-      valid_until: new Date(data.validUntil || data.valid_until),
+      valid_until: new Date(validatedData.valid_until),
       issue_date: new Date(),
-      notes: data.notes
+      notes: validatedData.notes
     };
 
     const quote = await QuoteRepository.create(quoteData);
 
     // Créer les éléments du devis
     const items = [];
-    for (const itemData of data.items) {
-      const unitPrice = itemData.unitPrice || itemData.unit_price;
-      const discountPercent = itemData.discountPercent || itemData.discount_percent;
-      const vatRate = itemData.vatRate || itemData.vat_number;
-      
-      const itemTotal = itemData.quantity * unitPrice;
-      const discount = discountPercent ? (itemTotal * discountPercent / 100) : 0;
+    for (const itemData of validatedData.items) {
+      const itemTotal = itemData.quantity * itemData.unit_price;
+      const discount = itemData.discount_percent ? (itemTotal * itemData.discount_percent / 100) : 0;
       
       const quoteItemData: CreateQuoteItemData = {
         quote_id: quote.id,
         description: itemData.description,
         quantity: itemData.quantity,
-        unit_price: unitPrice,
+        unit_price: itemData.unit_price,
         total: itemTotal - discount,
-        discount_percent: discountPercent,
-        vat_number: vatRate || 20
+        discount_percent: itemData.discount_percent,
+        vat_number: itemData.vat_number || 20
       };
 
       const item = await QuoteRepository.createQuoteItem(quoteItemData);
@@ -192,32 +209,44 @@ export class QuoteService {
       throw new Error('Utilisateur non trouvé');
     }
 
+    // Validation de l'ID devis
+    const idValidation = QuoteValidation.validateQuoteId(quoteId);
+    if (idValidation.error) {
+      throw new Error(idValidation.error);
+    }
+
+    // Validation des données avec règles métier
+    const validation = QuoteValidation.validateUpdateWithBusinessRules(data);
+    if (validation.error) {
+      throw new Error(`Données invalides: ${validation.error}`);
+    }
+
+    const validatedData = validation.value!;
+
     // Si des éléments sont fournis, recalculer les totaux
-    if (data.items) {
-      const subtotal = data.items.reduce((sum: number, item: any) => {
-        const unitPrice = item.unitPrice || item.unit_price;
-        const discountPercent = item.discountPercent || item.discount_percent;
-        const itemTotal = item.quantity * unitPrice;
-        const discount = discountPercent ? (itemTotal * discountPercent / 100) : 0;
+    if (validatedData.items) {
+      const subtotal = validatedData.items.reduce((sum: number, item: any) => {
+        const itemTotal = item.quantity * item.unit_price;
+        const discount = item.discount_percent ? (itemTotal * item.discount_percent / 100) : 0;
         return sum + (itemTotal - discount);
       }, 0);
 
       const tax = subtotal * 0.2; // 20% TVA par défaut
       const total = subtotal + tax;
 
-      data.subtotal = subtotal;
-      data.tax = tax;
-      data.total = total;
+      validatedData.subtotal = subtotal;
+      validatedData.tax = tax;
+      validatedData.total = total;
     }
 
     const updateData: UpdateQuoteData = {
-      client_id: data.clientId || data.client_id,
-      status: data.status,
-      total: data.total,
-      tax: data.tax,
-      subtotal: data.subtotal,
-      valid_until: (data.validUntil || data.valid_until) ? new Date(data.validUntil || data.valid_until) : undefined,
-      notes: data.notes
+      client_id: validatedData.client_id,
+      status: validatedData.status,
+      total: validatedData.total,
+      tax: validatedData.tax,
+      subtotal: validatedData.subtotal,
+      valid_until: validatedData.valid_until ? new Date(validatedData.valid_until) : undefined,
+      notes: validatedData.notes
     };
 
     const quote = await QuoteRepository.update(quoteId, updateData, user.company_id);
@@ -226,12 +255,12 @@ export class QuoteService {
     }
 
     // Si des éléments sont fournis, les mettre à jour
-    if (data.items) {
+    if (validatedData.items) {
       // Supprimer les anciens éléments
       await QuoteRepository.deleteQuoteItems(quote.id);
 
       // Créer les nouveaux éléments
-      for (const itemData of data.items) {
+      for (const itemData of validatedData.items) {
         const itemTotal = itemData.quantity * itemData.unit_price;
         const discount = itemData.discount_percent ? (itemTotal * itemData.discount_percent / 100) : 0;
         
@@ -275,6 +304,18 @@ export class QuoteService {
     const user = await UserRepository.findById(userId);
     if (!user) {
       throw new Error('Utilisateur non trouvé');
+    }
+
+    // Validation de l'ID devis
+    const idValidation = QuoteValidation.validateQuoteId(quoteId);
+    if (idValidation.error) {
+      throw new Error(idValidation.error);
+    }
+
+    // Validation du statut
+    const statusValidation = QuoteValidation.validateStatus(status);
+    if (statusValidation.error) {
+      throw new Error(statusValidation.error);
     }
 
     const quote = await QuoteRepository.updateStatus(quoteId, status, user.company_id);

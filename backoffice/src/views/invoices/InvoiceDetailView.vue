@@ -11,10 +11,10 @@
         </router-link>
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Facture {{ invoice?.invoiceNumber }}
+            Facture {{ invoice?.invoice_number }}
           </h1>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Émise le {{ formatDate(invoice?.issueDate) }}
+            Émise le {{ formatDate(invoice?.issue_date) }}
           </p>
         </div>
       </div>
@@ -65,19 +65,16 @@
           
           <div class="flex items-center space-x-4">
             <img
-              :src="invoice.client.avatar_url"
-              :alt="invoice.client.name"
+              :src="`https://ui-avatars.com/api/?name=${encodeURIComponent(invoice.client_name || 'Client')}&background=a855f7&color=fff`"
+              :alt="invoice.client_name || 'Client'"
               class="h-12 w-12 rounded-full"
             />
             <div>
               <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                {{ invoice.client.name }}
+                {{ invoice.client_name || 'Client inconnu' }}
               </h4>
               <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ invoice.client.email }}
-              </p>
-              <p v-if="invoice.client.phone" class="text-sm text-gray-500 dark:text-gray-400">
-                {{ invoice.client.phone }}
+                ID Client: {{ invoice.client_id }}
               </p>
             </div>
           </div>
@@ -102,31 +99,37 @@
                     Quantité
                   </th>
                   <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Prix unitaire
+                    Prix unitaire HT
+                  </th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    TVA
                   </th>
                   <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Total
+                    Total HT
                   </th>
                 </tr>
               </thead>
               <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                <tr v-for="item in invoice.items" :key="item.id">
+                <tr v-for="item in (invoice.items as any[])" :key="item.id">
                   <td class="px-6 py-4">
                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                       {{ item.description }}
                     </div>
-                    <div v-if="item.discountPercent > 0" class="text-sm text-red-600">
-                      Remise: {{ item.discountPercent }}%
+                    <div v-if="item.discount_percent && parseFloat(item.discount_percent) > 0" class="text-sm text-red-600">
+                      Remise: {{ item.discount_percent }}%
                     </div>
                   </td>
                   <td class="px-6 py-4 text-center text-sm text-gray-900 dark:text-gray-100">
                     {{ item.quantity }}
                   </td>
                   <td class="px-6 py-4 text-right text-sm text-gray-900 dark:text-gray-100">
-                    {{ formatCurrency(item.unitPrice) }}
+                    {{ formatCurrency(parseFloat(item.unit_price_ht)) }}
+                  </td>
+                  <td class="px-6 py-4 text-center text-sm text-gray-900 dark:text-gray-100">
+                    {{ item.vat_rate }}%
                   </td>
                   <td class="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {{ formatCurrency(item.totalHt) }}
+                    {{ formatCurrency(parseFloat(item.total_ht)) }}
                   </td>
                 </tr>
               </tbody>
@@ -146,23 +149,18 @@
           <div class="space-y-3">
             <div class="flex justify-between text-sm">
               <span class="text-gray-600 dark:text-gray-400">Sous-total HT</span>
-              <span class="text-gray-900 dark:text-gray-100">{{ formatCurrency(invoice.subtotalHt) }}</span>
-            </div>
-            
-            <div v-if="invoice.discountAmount > 0" class="flex justify-between text-sm">
-              <span class="text-gray-600 dark:text-gray-400">Remise</span>
-              <span class="text-red-600">-{{ formatCurrency(invoice.discountAmount) }}</span>
+              <span class="text-gray-900 dark:text-gray-100">{{ formatCurrency(parseFloat((invoice as any).subtotal)) }}</span>
             </div>
             
             <div class="flex justify-between text-sm">
               <span class="text-gray-600 dark:text-gray-400">TVA</span>
-              <span class="text-gray-900 dark:text-gray-100">{{ formatCurrency(invoice.taxAmount) }}</span>
+              <span class="text-gray-900 dark:text-gray-100">{{ formatCurrency(parseFloat((invoice as any).tax)) }}</span>
             </div>
             
             <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
               <div class="flex justify-between">
                 <span class="text-base font-medium text-gray-900 dark:text-gray-100">Total TTC</span>
-                <span class="text-base font-medium text-gray-900 dark:text-gray-100">{{ formatCurrency(invoice.totalAmount) }}</span>
+                <span class="text-base font-medium text-gray-900 dark:text-gray-100">{{ formatCurrency(parseFloat((invoice as any).total)) }}</span>
               </div>
             </div>
           </div>
@@ -172,20 +170,15 @@
         <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-4">
           <div>
             <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Date d'échéance</h4>
-            <p class="text-sm text-gray-900 dark:text-gray-100">{{ formatDate(invoice.dueDate) }}</p>
+            <p class="text-sm text-gray-900 dark:text-gray-100">{{ formatDate(invoice.due_date) }}</p>
             <p v-if="isOverdue" class="text-xs text-red-600">
               {{ getDaysOverdue() }} jours de retard
             </p>
           </div>
 
-          <div v-if="invoice.paymentMethod">
-            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Méthode de paiement</h4>
-            <p class="text-sm text-gray-900 dark:text-gray-100">{{ getPaymentMethodLabel(invoice.paymentMethod) }}</p>
-          </div>
-
-          <div v-if="invoice.paidDate">
+          <div v-if="invoice.paid_date">
             <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Date de paiement</h4>
-            <p class="text-sm text-gray-900 dark:text-gray-100">{{ formatDate(invoice.paidDate) }}</p>
+            <p class="text-sm text-gray-900 dark:text-gray-100">{{ formatDate(invoice.paid_date) }}</p>
           </div>
         </div>
 
@@ -241,8 +234,8 @@ const invoice = ref<Invoice | null>(null)
 
 // Computed
 const isOverdue = computed(() => {
-  if (!invoice.value || invoice.value.status === 'paid') return false
-  return new Date(invoice.value.dueDate) < new Date()
+  if (!invoice.value || invoice.value.status === 'paid' || !invoice.value.due_date) return false
+  return new Date(invoice.value.due_date) < new Date()
 })
 
 // Méthodes
@@ -250,7 +243,11 @@ const loadInvoice = async () => {
   try {
     loading.value = true
     const response = await invoiceService.getInvoice(route.params.id as string)
-    invoice.value = response.data
+    if (response.success && response.data) {
+      invoice.value = response.data
+    } else {
+      router.push('/factures')
+    }
   } catch (error) {
     console.error('Erreur lors du chargement de la facture:', error)
     router.push('/factures')
@@ -262,13 +259,8 @@ const loadInvoice = async () => {
 const downloadPdf = async () => {
   if (!invoice.value) return
   try {
-    const blob = await invoiceService.downloadInvoicePdf(invoice.value.id)
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `facture-${invoice.value.invoiceNumber}.pdf`
-    link.click()
-    window.URL.revokeObjectURL(url)
+    // TODO: Implémenter le téléchargement PDF
+    console.log('Téléchargement PDF non implémenté')
   } catch (error) {
     console.error('Erreur lors du téléchargement:', error)
   }
@@ -277,7 +269,7 @@ const downloadPdf = async () => {
 const sendInvoice = async () => {
   if (!invoice.value) return
   try {
-    await invoiceService.sendInvoice(invoice.value.id)
+    await invoiceService.updateInvoiceStatus(invoice.value.id, 'sent')
     loadInvoice() // Recharger pour mettre à jour le statut
   } catch (error) {
     console.error('Erreur lors de l\'envoi:', error)
@@ -287,7 +279,7 @@ const sendInvoice = async () => {
 const markAsPaid = async () => {
   if (!invoice.value) return
   try {
-    await invoiceService.markInvoiceAsPaid(invoice.value.id)
+    await invoiceService.updateInvoiceStatus(invoice.value.id, 'paid')
     loadInvoice() // Recharger pour mettre à jour
   } catch (error) {
     console.error('Erreur lors du marquage:', error)
@@ -297,8 +289,8 @@ const markAsPaid = async () => {
 const sendReminder = async () => {
   if (!invoice.value) return
   try {
-    await invoiceService.sendPaymentReminder(invoice.value.id)
-    // Afficher un message de succès
+    // TODO: Implémenter l'envoi de rappel
+    console.log('Envoi de rappel non implémenté')
   } catch (error) {
     console.error('Erreur lors de l\'envoi du rappel:', error)
   }
@@ -318,23 +310,13 @@ const formatDate = (dateString?: string) => {
 }
 
 const getDaysOverdue = () => {
-  if (!invoice.value) return 0
+  if (!invoice.value || !invoice.value.due_date) return 0
   const today = new Date()
-  const dueDate = new Date(invoice.value.dueDate)
+  const dueDate = new Date(invoice.value.due_date)
   const diffTime = today.getTime() - dueDate.getTime()
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }
 
-const getPaymentMethodLabel = (method: string) => {
-  const labels: Record<string, string> = {
-    credit_card: 'Carte bancaire',
-    bank_transfer: 'Virement bancaire',
-    paypal: 'PayPal',
-    cash: 'Espèces',
-    check: 'Chèque'
-  }
-  return labels[method] || method
-}
 
 // Lifecycle
 onMounted(() => {

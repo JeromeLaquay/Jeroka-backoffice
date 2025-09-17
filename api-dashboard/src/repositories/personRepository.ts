@@ -1,6 +1,6 @@
 import { query } from '../database/connection';
 
-export interface Client {
+export interface Person {
   id: string;
   company_id: string;
   first_name: string;
@@ -22,7 +22,7 @@ export interface Client {
   updated_at: Date;
 }
 
-export interface ClientFilters {
+export interface PersonFilters {
   search?: string;
   status?: string;
   type?: string;
@@ -42,14 +42,11 @@ export interface PaginatedResult<T> {
   limit: number;
 }
 
-export class ClientRepository {
+export class PersonRepository {
   /**
-   * Récupère tous les clients d'une entreprise avec filtres et pagination
+   * Récupère tous les Persons d'une entreprise avec filtres et pagination
    */
-  static async getClients(
-    companyId: string, 
-    filters: ClientFilters = {}
-  ): Promise<PaginatedResult<Client>> {
+  static async getPersons(companyId: string, filters: PersonFilters = {}): Promise<PaginatedResult<Person>> {
     const {
       search,
       status,
@@ -78,13 +75,13 @@ export class ClientRepository {
     const offset = (page - 1) * limit;
 
     // Requête de comptage
-    const countQuery = `SELECT COUNT(*) as total FROM clients WHERE ${whereClause}`;
+    const countQuery = `SELECT COUNT(*) as total FROM persons WHERE ${whereClause}`;
     const countResult = await query(countQuery, queryParams);
     const total = parseInt(countResult.rows[0].total);
 
     // Requête des données
     const dataQuery = `
-      SELECT * FROM clients 
+      SELECT * FROM persons 
       WHERE ${whereClause}
       ORDER BY ${sortField} ${order}
       LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}
@@ -105,91 +102,91 @@ export class ClientRepository {
   }
 
   /**
-   * Récupère un client par ID
+   * Récupère un person par ID
    */
-  static async getClientById(clientId: string, companyId: string): Promise<Client | null> {
+  static async getPersonById(personId: string, companyId: string): Promise<Person | null> {
     const result = await query(
-      'SELECT * FROM clients WHERE id = $1 AND company_id = $2',
-      [clientId, companyId]
+      'SELECT * FROM persons WHERE id = $1 AND company_id = $2',
+      [personId, companyId]
     );
     return result.rows[0] || null;
   }
 
   /**
-   * Crée un nouveau client
+   * Crée un nouveau person
    */
-  static async createClient(clientData: Omit<Client, 'id' | 'created_at' | 'updated_at'>): Promise<Client> {
+  static async createPerson(personData: Omit<Person, 'id' | 'created_at' | 'updated_at'>): Promise<Person> {
     const result = await query(
-      `INSERT INTO clients (
+      `INSERT INTO persons (
         company_id, first_name, last_name, email, phone, company_name,
         address_line1, address_line2, city, postal_code, country, status, type, source, tags, notes
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
       RETURNING *`,
       [
-        clientData.company_id,
-        clientData.first_name,
-        clientData.last_name,
-        clientData.email,
-        clientData.phone,
-        clientData.company_name,
-        clientData.address_line1,
-        clientData.address_line2,
-        clientData.city,
-        clientData.postal_code,
-        clientData.country,
-        clientData.status,
-        clientData.type,
-        clientData.source,
-        clientData.tags,
-        clientData.notes
+        personData.company_id,
+        personData.first_name,
+        personData.last_name,
+        personData.email,
+        personData.phone,
+        personData.company_name,
+        personData.address_line1,
+        personData.address_line2,
+        personData.city,
+        personData.postal_code,
+        personData.country,
+        personData.status,
+        personData.type,
+        personData.source,
+        personData.tags,
+        personData.notes
       ]
     );
     return result.rows[0];
   }
 
   /**
-   * Met à jour un client
+   * Met à jour un person
    */
-  static async updateClient(
-    clientId: string, 
+  static async updatePerson(
+    personId: string, 
     companyId: string, 
-    updateData: Partial<Omit<Client, 'id' | 'company_id' | 'created_at' | 'updated_at'>>
-  ): Promise<Client | null> {
+    updateData: Partial<Omit<Person, 'id' | 'company_id' | 'created_at' | 'updated_at'>>
+  ): Promise<Person | null> {
     const fields = Object.keys(updateData);
     const values = Object.values(updateData);
     
     if (fields.length === 0) {
-      return this.getClientById(clientId, companyId);
+      return this.getPersonById(personId, companyId);
     }
 
     const setClause = fields.map((field, index) => `${field} = $${index + 3}`).join(', ');
     
     const result = await query(
-      `UPDATE clients 
+      `UPDATE persons 
        SET ${setClause}, updated_at = NOW()
        WHERE id = $1 AND company_id = $2
        RETURNING *`,
-      [clientId, companyId, ...values]
+      [personId, companyId, ...values]
     );
     
     return result.rows[0] || null;
   }
 
   /**
-   * Supprime un client
+   * Supprime un person
    */
-  static async deleteClient(clientId: string, companyId: string): Promise<boolean> {
+  static async deletePerson(personId: string, companyId: string): Promise<boolean> {
     const result = await query(
-      'DELETE FROM clients WHERE id = $1 AND company_id = $2',
-      [clientId, companyId]
+      'DELETE FROM persons WHERE id = $1 AND company_id = $2',
+      [personId, companyId]
     );
     return result.rowCount > 0;
   }
 
   /**
-   * Récupère les statistiques des clients
+   * créer une vue sql pour les statistiques des persons et l'appeler dans la route directement
    */
-  static async getClientStats(companyId: string): Promise<{
+  static async getPersonStats(companyId: string): Promise<{
     total: number;
     active: number;
     inactive: number;
@@ -207,7 +204,7 @@ export class ClientRepository {
         COUNT(*) FILTER (WHERE status = 'lead') as leads,
         COUNT(*) FILTER (WHERE type = 'individual') as individuals,
         COUNT(*) FILTER (WHERE type = 'company') as companies
-      FROM clients 
+      FROM persons 
       WHERE company_id = $1`,
       [companyId]
     );
@@ -220,7 +217,7 @@ export class ClientRepository {
    */
   private static buildWhereClause(
     companyId: string, 
-    filters: Pick<ClientFilters, 'search' | 'status' | 'type' | 'source' | 'tags'>
+    filters: Pick<PersonFilters, 'search' | 'status' | 'type' | 'source' | 'tags'>
   ): { whereClause: string; queryParams: any[] } {
     let whereConditions = ['company_id = $1'];
     let queryParams: any[] = [companyId];
@@ -283,11 +280,13 @@ export class ClientRepository {
     return { sortField, order };
   }
 
-  static async getClientByEmail(email: string, companyId: string): Promise<Client | null> {
+  static async getPersonByEmail(email: string, companyId: string): Promise<Person | null> {
     const result = await query(
-      'SELECT * FROM clients WHERE email = $1 AND company_id = $2',
+      'SELECT * FROM persons WHERE email = $1 AND company_id = $2',
       [email, companyId]
     );
     return result.rows[0] || null;
   }
 }
+
+export default PersonRepository;

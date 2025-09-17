@@ -25,7 +25,6 @@ export interface AdminCompany {
   country?: string;
   vat_number?: string;
   siret?: string;
-  vat_number?: number;
   tax_regime?: string;
   banking_info?: any;
   invoice_settings?: any;
@@ -67,7 +66,6 @@ export interface CreateCompanyData {
   country?: string;
   vat_number?: string;
   siret?: string;
-  vat_number?: number;
   tax_regime?: string;
   subscription_plan?: 'free' | 'basic' | 'premium' | 'enterprise';
   admin_user: {
@@ -89,7 +87,6 @@ export interface UpdateCompanyData {
   country?: string;
   vat_number?: string;
   siret?: string;
-  vat_number?: number;
   tax_regime?: string;
   is_active?: boolean;
   subscription_plan?: 'free' | 'basic' | 'premium' | 'enterprise';

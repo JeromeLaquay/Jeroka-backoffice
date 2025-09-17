@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { verifyToken } from '../middleware/auth';
+import { verifyToken, AuthRequest } from '../middleware/auth';
 import { query } from '../database/connection';
 import { asyncHandler } from '../middleware/errorHandler';
 
@@ -13,54 +13,55 @@ router.use(verifyToken);
  * @desc Get dashboard statistics
  * @access Private
  */
-router.get('/stats', asyncHandler(async (req: Request, res: Response) => {
-  // Get dashboard statistics from the view
-  const statsResult = await query('SELECT * FROM dashboard_stats');
-  const stats = statsResult.rows[0] || {};
-
-  res.json({
-    success: true,
-    data: {
-      clients: {
-        total: parseInt(stats.active_clients) || 0,
-        newThisMonth: parseInt(stats.new_clients_month) || 0
-      },
-      messages: {
-        unread: parseInt(stats.unread_messages) || 0
-      },
-      quotes: {
-        pending: parseInt(stats.pending_quotes) || 0
-      },
-      invoices: {
-        overdue: parseInt(stats.overdue_invoices) || 0
-      },
-      revenue: {
-        thisMonth: parseFloat(stats.revenue_month) || 0
-      },
-      publications: {
-        published: parseInt(stats.published_publications) || 0
+router.get('/stats', verifyToken, asyncHandler(async (req: AuthRequest, res: Response) => {
+  try {
+    const rows = await query('SELECT * FROM dashboard_stats WHERE company_id = $1', [req.user!.company_id]);
+    const stats: DashboardStats | null = rows?.[0] || null;
+    return res.json({ success: true, data: stats });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des statistiques:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la récupération des statistiques',
+      error: {
+        message: error instanceof Error ? error.message : 'Erreur inconnue',
+        code: 'FETCH_STATS_ERROR',
+        statusCode: 500
       }
-    }
-  });
+    });
+  }
 }));
 
-/**
- * @route GET /api/v1/dashboard/recent-activity
- * @desc Get recent activity for dashboard
- * @access Private
- */
-router.get('/recent-activity', asyncHandler(async (req: Request, res: Response) => {
-  // TODO: Implement recent activity aggregation
+export interface DashboardStats {
+  company_id: string
+  total_clients: number
+  total_messages: number
+  total_invoices: number
+  total_quotes: number
+
+  new_clients_month: number
+  new_messages_week: number
+  new_invoices_month: number
+  new_quotes_month: number
+
+  total_clients_percentage: number
+  total_messages_percentage: number
+  total_invoices_percentage: number
+  total_quotes_percentage: number
+
+  revenue_6_months: any
+  sales_distribution: any
+  financial_evolution: any
+  vat_due: any
+  revenue_evolution: any
+  expenses_evolution: any 
   
-  res.json({
-    success: true,
-    data: {
-      recentClients: [],
-      recentMessages: [],
-      recentInvoices: []
-    }
-  });
-}));
+  recent_clients: any
+  recent_messages: any
+  recent_invoices: any
+  recent_quotes: any
+}
+
 
 export default router;
 

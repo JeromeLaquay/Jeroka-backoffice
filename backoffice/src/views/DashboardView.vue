@@ -24,19 +24,19 @@
     </div>
 
     <!-- Statistiques -->
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4" data-cy="dashboard-stats">
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4" data-cy="dashboard-stats" v-if="topStats.length">
       <div 
-        v-for="stat in stats" 
+        v-for="stat in topStats" 
         :key="stat.name"
-        :data-cy="`stat-${stat.name.toLowerCase().replace(/\s+/g, '-')}`"
+        :data-cy="`stat-${stat.name}`"
         class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg"
       >
         <div class="p-5">
           <div class="flex items-center">
             <div class="flex-shrink-0">
               <component 
-                :is="stat.icon" 
-                :class="['h-6 w-6', stat.iconColor]" 
+                :is="getIcon(stat.icon)" 
+                :class="['h-6 w-6', getIconColor(stat.iconColor)]" 
               />
             </div>
             <div class="ml-5 w-0 flex-1">
@@ -103,19 +103,19 @@
         </div>
         <div class="space-y-3">
           <div 
-            v-for="message in recentMessages" 
+            v-for="message in stats?.recent_messages" 
             :key="message.id"
             class="p-3 bg-gray-50 dark:bg-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer"
-            @click="openMessage(message)"
+            
           >
             <div class="flex items-start justify-between">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center">
                   <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                    {{ message.name }}
+                    {{ `${message.first_name} ${message.last_name}` }}
                   </p>
                   <span 
-                    v-if="!message.read"
+                    v-if="message.status === 'unread'"
                     class="ml-2 inline-block w-2 h-2 bg-primary-600 rounded-full"
                   ></span>
                 </div>
@@ -128,7 +128,7 @@
               </div>
               <div class="text-right">
                 <p class="text-xs text-gray-500 dark:text-gray-400">
-                  {{ message.date }}
+                  {{ formatDate(message.created_at) }}
                 </p>
                 <span 
                   :class="[
@@ -144,7 +144,7 @@
             </div>
           </div>
         </div>
-        <div v-if="recentMessages.length === 0" class="text-center py-4">
+        <div v-if="stats?.recent_messages?.length === 0" class="text-center py-4">
           <p class="text-sm text-gray-500 dark:text-gray-400">Aucun nouveau message</p>
         </div>
       </div>
@@ -165,21 +165,21 @@
         </div>
         <div class="space-y-3">
           <div 
-            v-for="invoice in recentInvoices" 
+            v-for="invoice in stats?.recent_invoices" 
             :key="invoice.id"
             class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md"
           >
             <div>
               <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                {{ invoice.number }}
+                {{ invoice.invoice_number }}
               </p>
               <p class="text-xs text-gray-500 dark:text-gray-400">
-                {{ invoice.client }}
+                Client: {{ invoice.client_id }}
               </p>
             </div>
             <div class="text-right">
               <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                {{ invoice.amount }}
+                {{ formatCurrency(parseFloat(String(invoice.total_ttc))) }}
               </p>
               <span 
                 :class="[
@@ -188,7 +188,7 @@
                   invoice.status === 'pending' ? 'badge-warning' : 'badge-danger'
                 ]"
               >
-                {{ invoice.statusText }}
+                {{ invoice.status }}
               </span>
             </div>
           </div>
@@ -220,37 +220,32 @@
         </div>
         <div class="space-y-3">
           <div 
-            v-for="client in recentClients" 
+            v-for="client in stats?.recent_clients" 
             :key="client.id"
             class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer"
             @click="goToClient(client.id)"
           >
             <div class="flex items-center">
               <img 
-                :src="client.avatar_url || '/default-avatar.png'" 
-                :alt="client.name"
+                :src="'/default-avatar.png'" 
+                :alt="`${client.first_name} ${client.last_name}`"
                 class="h-10 w-10 rounded-full object-cover"
               />
               <div class="ml-3">
                 <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {{ client.name }}
-                </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                  {{ client.company || 'Particulier' }}
+                  {{ `${client.first_name} ${client.last_name}` }}
                 </p>
               </div>
             </div>
             <div class="text-right">
               <p class="text-xs text-gray-500 dark:text-gray-400">
-                {{ client.createdAt }}
+                {{ formatDate(client.created_at) }}
               </p>
-              <span class="badge badge-info text-xs">
-                {{ client.type === 'company' ? 'Entreprise' : 'Particulier' }}
-              </span>
+              
             </div>
           </div>
         </div>
-        <div v-if="recentClients.length === 0" class="text-center py-4">
+        <div v-if="stats?.recent_clients?.length === 0" class="text-center py-4">
           <p class="text-sm text-gray-500 dark:text-gray-400">Aucun nouveau client</p>
         </div>
       </div>
@@ -259,158 +254,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { dashboardService, DashboardStats } from '../services/dashboard'
 import {
   UsersIcon,
   DocumentTextIcon,
-  CurrencyDollarIcon,
-  ShoppingCartIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  ClipboardDocumentListIcon
 } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-// Interface pour les messages de contact
-interface ContactMessage {
-  id: string
+const stats = ref<DashboardStats | null>(null)
+const topStats = ref<TopStat[]>([])
+interface TopStat {
   name: string
-  email: string
-  subject: string
-  message: string
-  type: 'devis' | 'information' | 'partnership' | 'other'
-  date: string
-  read: boolean
-  createdAt: string
+  value: number
+  change: string
+  icon: string
+  iconColor: string
+  changeColor: string
 }
-
-const stats = ref([
-  {
-    name: 'Total Clients',
-    value: '1,247',
-    change: '+12%',
-    changeColor: 'text-success-600',
-    icon: UsersIcon,
-    iconColor: 'text-primary-600'
-  },
-  {
-    name: 'Factures ce mois',
-    value: '89',
-    change: '+5%',
-    changeColor: 'text-success-600',
-    icon: DocumentTextIcon,
-    iconColor: 'text-secondary-600'
-  },
-  {
-    name: 'Chiffre d\'affaires',
-    value: '47 832 €',
-    change: '+23%',
-    changeColor: 'text-success-600',
-    icon: CurrencyDollarIcon,
-    iconColor: 'text-success-600'
-  },
-  {
-    name: 'Commandes en cours',
-    value: '24',
-    change: '-2%',
-    changeColor: 'text-danger-600',
-    icon: ShoppingCartIcon,
-    iconColor: 'text-warning-600'
-  }
-])
-
-const recentInvoices = ref([
-  {
-    id: '1',
-    number: 'F-2024-001',
-    client: 'Société ABC',
-    amount: '1 250 €',
-    status: 'paid',
-    statusText: 'Payée'
-  },
-  {
-    id: '2',
-    number: 'F-2024-002',
-    client: 'Entreprise XYZ',
-    amount: '950 €',
-    status: 'pending',
-    statusText: 'En attente'
-  },
-  {
-    id: '3',
-    number: 'F-2024-003',
-    client: 'SARL Martin',
-    amount: '750 €',
-    status: 'overdue',
-    statusText: 'En retard'
-  }
-])
-
-// Messages de contact récents
-const recentMessages = ref<ContactMessage[]>([
-  {
-    id: '1',
-    name: 'Alice Moreau',
-    email: 'alice.moreau@exemple.fr',
-    subject: 'Demande de devis pour site web',
-    message: 'Bonjour, je souhaiterais obtenir un devis pour la création d\'un site vitrine pour mon entreprise...',
-    type: 'devis',
-    date: 'Il y a 2h',
-    read: false,
-    createdAt: '2024-01-20T10:30:00Z'
-  },
-  {
-    id: '2',
-    name: 'Thomas Dupont',
-    email: 'thomas.dupont@tech.fr',
-    subject: 'Information sur l\'automatisation',
-    message: 'Nous aimerions en savoir plus sur vos solutions d\'automatisation...',
-    type: 'information',
-    date: 'Il y a 4h',
-    read: false,
-    createdAt: '2024-01-20T08:15:00Z'
-  },
-  {
-    id: '3',
-    name: 'Sarah Johnson',
-    email: 'sarah@agency.com',
-    subject: 'Proposition de partenariat',
-    message: 'Nous sommes une agence de marketing et souhaiterions explorer des opportunités...',
-    type: 'partnership',
-    date: 'Hier',
-    read: true,
-    createdAt: '2024-01-19T14:20:00Z'
-  }
-])
-
-const recentClients = ref([
-  {
-    id: '1',
-    name: 'Marie Dubois',
-    company: 'Tech Solutions SARL',
-    type: 'company',
-    createdAt: 'Il y a 2 jours',
-    avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face'
-  },
-  {
-    id: '2',
-    name: 'Pierre Martin',
-    company: 'Design Studio',
-    type: 'company',
-    createdAt: 'Il y a 3 jours',
-    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-  },
-  {
-    id: '3',
-    name: 'Sophie Bernard',
-    company: '',
-    type: 'individual',
-    createdAt: 'Il y a 5 jours',
-    avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
-  }
-])
 
 // Fonctions pour la gestion des messages
 const getMessageTypeLabel = (type: string) => {
@@ -423,20 +290,58 @@ const getMessageTypeLabel = (type: string) => {
   return labels[type as keyof typeof labels] || 'Autre'
 }
 
-const openMessage = (message: ContactMessage) => {
-  // TODO: Ouvrir une modal ou rediriger vers la vue détaillée du message
-  console.log('Ouverture du message:', message)
-  // Marquer comme lu
-  message.read = true
-  // Ici on pourrait faire un appel API pour mettre à jour le statut
-}
-
 const goToClient = (clientId: string) => {
   router.push(`/clients/${clientId}`)
 }
 
+const loadStats = async () => {
+  const response = await dashboardService.getStats()
+  console.log('response', response)
+  stats.value = response
+  
+  // Utiliser directement les données de l'ancien format
+  if (response.stats && Array.isArray(response.stats)) {
+    topStats.value = response.stats
+  }
+}
+
+
+
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount)
+}
+
+// Mappers pour icônes/couleurs envoyées par l'API
+const getIcon = (iconName: string) => {
+  const map: Record<string, any> = {
+    UsersIcon,
+    DocumentTextIcon,
+    EnvelopeIcon,
+    ClipboardDocumentListIcon
+  }
+  return map[iconName] || DocumentTextIcon
+}
+
+const getIconColor = (color: string) => {
+  const map: Record<string, string> = {
+    blue: 'text-blue-600',
+    green: 'text-green-600',
+    red: 'text-red-600',
+    yellow: 'text-yellow-600'
+  }
+  return map[color] || 'text-gray-600'
+}
+
 onMounted(() => {
-  // Initialiser l'authentification si nécessaire
-  authStore.initializeAuth()
+  loadStats()
 })
 </script>

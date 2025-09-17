@@ -1,107 +1,70 @@
 # Jeroka Xperience - Planning MVP pour Démarrer les Ventes
-## Équipe : 1 personne temps partiel (soir/week-end) + 1 personne 10h/semaine + IA
+## Équipe : 1 personne  10h/jour
 
-## Phase 1 - Infrastructure MVP (Septembre-Octobre 2025)
-2025-09-15 / 2025-10-01: Configuration Docker
-- Docker containers 
-- Docker Compose 
-- Environnement test 
-- cypress sur environnement test 
-- gérer environnement dev suite aux changements
-- backup bdd
-*Estimation : 6h/semaine × 3 semaines = 18h*
+## Phase 1 - Infrastructure MVP (Septembre 2025)
+2025-09-09 / 2025-09-15: Configuration Docker
+- Docker containers (6h)
+- Docker Compose (6h)
+- Environnement test (3h)
+- cypress sur environnement test (3h)
+- gérer environnement dev suite aux changements (3h)
+- backup bdd (3h)
+*Estimation totale : 18h*
 
-## Phase 2 - Premier module: Gestion administrateurs (Octobre-Novembre 2025)
-2025-10-15 / 2025-11-01: Gestion administrateurs
-- backoffice et api: crud création de compte et affectation de rôles
-- modification de compte et de rôles
-- suppression de compte
-- toggle en haut à droite USER/ADMIN pour changer de rôle 
-- tests cypress sur environnement test
-*Estimation : 6h/semaine × 3 semaines = 18h*
+## Phase 2 - Premier module: Gestion administrateurs (Septembre 2025)
+2025-09-15 / 2025-09-17: Gestion administrateurs
+- backoffice et api: crud création de compte et affectation de rôles (6h)
+- modification de compte et de rôles (6h)
+- suppression de compte (1h)
+- toggle en haut à droite USER/ADMIN pour changer de rôle  (1h)
+- tests cypress sur environnement test (3h)
+*Estimation totale : 17h*
 
 
-## Phase 3 - Gestion clients et messages (Novembre-Décembre 2025)
-2025-11-15 / 2025-12-31: gestion clients et messages
-- clients : exporter ou importer en csv
-- lors de l'import, vérifier si client existe déjà, si oui, mettre à jour, sinon créer
-- messages: réception des messages du site web
+## Phase 3 - Gestion clients et messages (Septembre 2025)
+2025-09-18 / 2025-09-20: gestion clients et messages
+- clients : exporter ou importer en csv (6h)
+- lors de l'import, vérifier si client existe déjà, si oui, mettre à jour, sinon créer (1h)
+- messages: réception des messages du site web (1h)
 - réponse en brouillon par IA
-    - connexion à l'api de chatGpt -> aiservice.ts
-    - alimenter les données de l'entreprise pour la génération du prompt ->
-    - générer un prompt
-    - appeler l'api de chatGpt
-    - récupérer la réponse
-    - afficher la réponse
-- marquer comme lu lors du clic sur le message
-- tests cypress sur environnement test
+    - connexion à l'api de chatGpt -> aiservice.ts (1h)
+    - alimenter les données de l'entreprise pour la génération du prompt -> (1h)
+    - générer un prompt (1h)
+    - appeler l'api de chatGpt (1h)
+    - récupérer la réponse (1h)
+    - afficher la réponse (1h)
+- marquer comme lu lors du clic sur le message (1h)
+- tests cypress sur environnement test (3h)
+*Estimation totale : 17h*
 
-## Phase 4 - Gestion publications (Novembre-Décembre 2025)
-2025-11-15 / 2025-12-31: gestion publications
-- publications : créer, modifier, supprimer dans l'application 
-- générer le contenu de la publication avec l'IA:
-    - connexion à l'api de chatGpt -> aiservice.ts
-    - alimenter les données de l'entreprise pour la génération du prompt ->
-    - générer un prompt avec les données du formulaire et de l'entreprise
-    - appeler l'api de chatGpt
-    - récupérer la réponse
-    - afficher la réponse
-- publier sur les réseaux sociaux:
-    - Facebook
-    - Instagram
-    - LinkedIn
-    - Site web
-    - générer une ligne publication_platform pour chaque réseaux sociaux
-- tests cypress sur environnement test
 
-## Phase 5 - Gestion calendrier (Novembre-Décembre 2025)
-2025-11-15 / 2025-12-31: gestion publications
-- publications : créer, modifier, supprimer dans l'application 
+## Phase 4 - Gestion publications (Septembre 2025)
+2025-09-21 / 2025-09-23: gestion publications
+- publications : créer, modifier, supprimer dans l'application (6h)
 - générer le contenu de la publication avec l'IA:
-    - connexion à l'api de chatGpt -> aiservice.ts
-    - alimenter les données de l'entreprise pour la génération du prompt ->
-    - générer un prompt avec les données du formulaire et de l'entreprise
-    - appeler l'api de chatGpt
-    - récupérer la réponse
-    - afficher la réponse
-- publier sur les réseaux sociaux:
-    - Facebook
+    - connexion à l'api de chatGpt -> aiservice.ts (1h)
+    - alimenter les données de l'entreprise pour la génération du prompt -> (1h)
+    - générer un prompt avec les données du formulaire et de l'entreprise (1h)
+    - appeler l'api de chatGpt (1h)
+    - récupérer la réponse (1h)
+    - afficher la réponse (1h)
+- publier sur les réseaux sociaux: (1h)
+    - Facebook (1h)
     - Instagram
-    - LinkedIn
-    - Site web
-    - générer une ligne publication_platform pour chaque réseaux sociaux
-- tests cypress sur environnement test
+    - LinkedIn (1h)
+    - Site web (1h)
+    - générer une ligne publication_platform pour chaque réseaux sociaux (1h)
+- tests cypress sur environnement test (3h)
+*Estimation totale : 17h*
+
+
+## Phase 5 - Gestion calendrier (Septembre 2025)
+2025-09-24 / 2025-09-26: gestion calendrier
+- tests cypress sur environnement test (2)
+*Estimation totale : 2h*
 
 ## Phase 12 - Déploiement production (janvier-février 2026)
 2026-01-15 / 2026-02-28: déploiement production
-- 
 
-## Réalisation business plan (Novembre-Décembre 2025)
-2025-11-15 / 2025-12-31: partie
-- sommaire et différentes parties
-- premiere partie: vision
-- deuxieme partie: marché
-- troisieme partie: produits
-- quatrieme partie: finance
-- cinquieme partie: equipe
-- sixieme partie: contact
 
-## Modules Supprimés (Phase 2)
-- Module Comptabilité avancé
-- Module Calendrier
-- Module Emails avancé
-- Module Messages
-- Module Publications
-- Module Annonces
-- Module Paramètres avancé
-- Profil client détaillé
-- Gestion stock avancée
-- Tests E2E complets
-- Documentation complète
 
-## Objectif : Démarrer les Ventes en Janvier 2026
-- **Backoffice fonctionnel** pour gérer clients, produits, factures, devis
-- **E-boutique basique** pour vendre en ligne
-- **Site web** pour la visibilité
-- **Système de paiement** opérationnel
-- **Tests essentiels** pour la stabilité

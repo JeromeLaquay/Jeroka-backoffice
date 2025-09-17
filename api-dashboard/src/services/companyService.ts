@@ -1,276 +1,149 @@
-import { query } from '../database/connection';
-
-export interface Company {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  address_line1?: string;
-  address_line2?: string;
-  city?: string;
-  postal_code?: string;
-  country?: string;
-  vat_number?: string;
-  siret?: string;
-  vat_number?: number;
-  tax_regime?: string;
-  banking_info?: any;
-  invoice_settings?: any;
-  quote_settings?: any;
-  email_settings?: any;
-  theme?: string;
-  is_active: boolean;
-  subscription_plan?: 'free' | 'basic' | 'premium' | 'enterprise';
-  subscription_status?: 'active' | 'suspended' | 'cancelled';
-  subscription_expires_at?: Date;
-  created_at: Date;
-  updated_at: Date;
-  user_count?: number;
-}
-
-export interface CompanyFilters {
-  search?: string;
-  status?: 'active' | 'inactive';
-  subscription_plan?: 'free' | 'basic' | 'premium' | 'enterprise';
-  subscription_status?: 'active' | 'suspended' | 'cancelled';
-  created_from?: string;
-  created_to?: string;
-  page?: number;
-  limit?: number;
-  sort_by?: 'name' | 'created_at' | 'subscription_plan';
-  sort_order?: 'asc' | 'desc';
-}
-
-export interface CompanySettings {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-}
-
-export interface CompanyUser {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-}
+import { 
+  CompanyRepository, 
+  Company, 
+  CompanyFilters, 
+  CompanySettings, 
+  CompanyUser,
+  CreateCompanyData,
+  UpdateCompanyData
+} from '../repositories/companyRepository';
+import { CompanyValidation } from '../validations/companyValidation';
 
 export class CompanyService {
 
+  /**
+   * Récupère une entreprise par son ID
+   */
   static async getCompany(companyId: string): Promise<Company | null> {
-    const result = await query(`
-      SELECT 
-        c.*,
-        COUNT(u.id) as user_count
-      FROM companies c
-      LEFT JOIN users u ON c.id = u.company_id
-      WHERE c.id = $1
-      GROUP BY c.id
-    `, [companyId]);
-    return result.rows[0] || null;
+    // Validation de l'ID entreprise
+    const idValidation = CompanyValidation.validateCompanyId(companyId);
+    if (idValidation.error) {
+      throw new Error(idValidation.error);
+    }
+
+    return await CompanyRepository.findById(companyId);
   }
 
-  static async getCompanies(filters: CompanyFilters): Promise<{ data: Company[], pagination?: any }> {
-    let queryStr = `
-      SELECT 
-        c.*,
-        COUNT(u.id) as user_count
-      FROM companies c
-      LEFT JOIN users u ON c.id = u.company_id
-    `;
+  /**
+   * Récupère toutes les entreprises avec filtres et pagination
+   */
+  static async getCompanies(filters: CompanyFilters): Promise<{ data: Company[], total: number, pagination?: any }> {
+    // Validation des filtres
+    const validation = CompanyValidation.validateFilters(filters);
+    if (validation.error) {
+      throw new Error(`Filtres invalides: ${validation.error}`);
+    }
+
+    const validatedFilters = validation.value!;
+    const result = await CompanyRepository.findAll(validatedFilters);
     
-    const conditions = [];
-    const params = [];
-    let paramCount = 0;
+    const pagination = validatedFilters.page && validatedFilters.limit ? {
+      page: validatedFilters.page,
+      limit: validatedFilters.limit,
+      total: result.total,
+      totalPages: Math.ceil(result.total / validatedFilters.limit)
+    } : undefined;
 
-    if (filters.search) {
-      paramCount++;
-      conditions.push(`(c.name ILIKE $${paramCount} OR c.email ILIKE $${paramCount})`);
-      params.push(`%${filters.search}%`);
-    }
-
-    if (filters.status) {
-      paramCount++;
-      conditions.push(`c.is_active = $${paramCount}`);
-      params.push(filters.status === 'active');
-    }
-
-    if (filters.subscription_plan) {
-      paramCount++;
-      conditions.push(`c.subscription_plan = $${paramCount}`);
-      params.push(filters.subscription_plan);
-    }
-
-    if (filters.subscription_status) {
-      paramCount++;
-      conditions.push(`c.subscription_status = $${paramCount}`);
-      params.push(filters.subscription_status);
-    }
-
-    if (filters.created_from) {
-      paramCount++;
-      conditions.push(`c.created_at >= $${paramCount}`);
-      params.push(filters.created_from);
-    }
-
-    if (filters.created_to) {
-      paramCount++;
-      conditions.push(`c.created_at <= $${paramCount}`);
-      params.push(filters.created_to);
-    }
-
-    if (conditions.length > 0) {
-      queryStr += ' WHERE ' + conditions.join(' AND ');
-    }
-
-    queryStr += ' GROUP BY c.id';
-
-    // Tri
-    if (filters.sort_by) {
-      const sortOrder = filters.sort_order || 'desc';
-      queryStr += ` ORDER BY c.${filters.sort_by} ${sortOrder.toUpperCase()}`;
-    } else {
-      queryStr += ' ORDER BY c.created_at DESC';
-    }
-
-    // Pagination
-    if (filters.limit) {
-      paramCount++;
-      queryStr += ` LIMIT $${paramCount}`;
-      params.push(filters.limit);
-    }
-
-    if (filters.page && filters.limit) {
-      paramCount++;
-      queryStr += ` OFFSET $${paramCount}`;
-      params.push((filters.page - 1) * filters.limit);
-    }
-
-    const result = await query(queryStr, params);
-    return { data: result.rows };
+    return {
+      data: result.data,
+      total: result.total,
+      pagination
+    };
   }
 
-  static async createCompany(companyData: Partial<Company>): Promise<Company> {
-    const result = await query(`
-      INSERT INTO companies (name, email, phone, address_line1, address_line2, city, postal_code, country, vat_number, siret, vat_number, tax_regime, subscription_plan, is_active)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-      RETURNING *
-    `, [
-      companyData.name,
-      companyData.email,
-      companyData.phone || null,
-      companyData.address_line1 || null,
-      companyData.address_line2 || null,
-      companyData.city || null,
-      companyData.postal_code || null,
-      companyData.country || null,
-      companyData.vat_number || null,
-      companyData.siret || null,
-      companyData.vat_number || null,
-      companyData.tax_regime || null,
-      companyData.subscription_plan || 'free',
-      companyData.is_active !== undefined ? companyData.is_active : true
-    ]);
-    
-    return result.rows[0];
-  }
-
-  static async updateCompany(companyId: string, companyData: Partial<Company>): Promise<Company | null> {
-    const fields = [];
-    const params = [];
-    let paramCount = 0;
-
-    Object.entries(companyData).forEach(([key, value]) => {
-      if (value !== undefined && key !== 'id' && key !== 'created_at' && key !== 'user_count') {
-        paramCount++;
-        fields.push(`${key} = $${paramCount}`);
-        params.push(value);
-      }
-    });
-
-    if (fields.length === 0) {
-      return this.getCompany(companyId);
+  /**
+   * Crée une nouvelle entreprise
+   */
+  static async createCompany(companyData: CreateCompanyData): Promise<Company> {
+    // Validation des données avec règles métier
+    const validation = CompanyValidation.validateCreateWithBusinessRules(companyData);
+    if (validation.error) {
+      throw new Error(`Données invalides: ${validation.error}`);
     }
 
-    paramCount++;
-    fields.push(`updated_at = NOW()`);
-    params.push(companyId);
-
-    const result = await query(`
-      UPDATE companies 
-      SET ${fields.join(', ')}
-      WHERE id = $${paramCount}
-      RETURNING *
-    `, params);
-    
-    return result.rows[0] || null;
+    const validatedData = validation.value!;
+    return await CompanyRepository.create(validatedData);
   }
 
+  /**
+   * Met à jour une entreprise
+   */
+  static async updateCompany(companyId: string, companyData: UpdateCompanyData): Promise<Company | null> {
+    // Validation de l'ID entreprise
+    const idValidation = CompanyValidation.validateCompanyId(companyId);
+    if (idValidation.error) {
+      throw new Error(idValidation.error);
+    }
+
+    // Validation des données avec règles métier
+    const validation = CompanyValidation.validateUpdateWithBusinessRules(companyData);
+    if (validation.error) {
+      throw new Error(`Données invalides: ${validation.error}`);
+    }
+
+    const validatedData = validation.value!;
+    return await CompanyRepository.update(companyId, validatedData);
+  }
+
+  /**
+   * Supprime une entreprise
+   */
   static async deleteCompany(companyId: string): Promise<boolean> {
-    const result = await query('DELETE FROM companies WHERE id = $1', [companyId]);
-    return result.rowCount > 0;
+    return await CompanyRepository.delete(companyId);
   }
 
+  /**
+   * Bascule le statut actif/inactif d'une entreprise
+   */
   static async toggleCompanyStatus(companyId: string): Promise<Company | null> {
-    const result = await query(`
-      UPDATE companies 
-      SET is_active = NOT is_active, updated_at = NOW()
-      WHERE id = $1
-      RETURNING *
-    `, [companyId]);
-    
-    return result.rows[0] || null;
+    return await CompanyRepository.toggleStatus(companyId);
   }
 
+  /**
+   * Récupère les paramètres d'une entreprise
+   */
   static async getCompanySettings(companyId: string): Promise<CompanySettings | null> {
-    const result = await query('SELECT * FROM company_settings WHERE company_id = $1', [companyId]);
-    return result.rows[0] || null;
+    return await CompanyRepository.getSettings(companyId);
   }
 
-  static async updateCompanySettings(companyId: string, companySettings: Partial<CompanySettings>): Promise<CompanySettings | null> {
-    const fields = [];
-    const params = [];
-    let paramCount = 0;
-
-    Object.entries(companySettings).forEach(([key, value]) => {
-      if (value !== undefined && key !== 'id') {
-        paramCount++;
-        fields.push(`${key} = $${paramCount}`);
-        params.push(value);
-      }
-    });
-
-    if (fields.length === 0) {
-      return this.getCompanySettings(companyId);
-    }
-
-    paramCount++;
-    fields.push(`updated_at = NOW()`);
-    params.push(companyId);
-
-    const result = await query(`
-      UPDATE company_settings 
-      SET ${fields.join(', ')}
-      WHERE company_id = $${paramCount}
-      RETURNING *
-    `, params);
-    
-    return result.rows[0] || null;
+  /**
+   * Met à jour les paramètres d'une entreprise
+   */
+  static async updateCompanySettings(companyId: string, settings: Partial<CompanySettings>): Promise<CompanySettings | null> {
+    return await CompanyRepository.updateSettings(companyId, settings);
   }
 
+  /**
+   * Supprime les paramètres d'une entreprise
+   */
   static async deleteCompanySettings(companyId: string): Promise<boolean> {
-    const result = await query('DELETE FROM company_settings WHERE company_id = $1', [companyId]);
-    return result.rowCount > 0;
+    return await CompanyRepository.deleteSettings(companyId);
   }
 
+  /**
+   * Récupère les utilisateurs d'une entreprise
+   */
   static async getCompanyUsers(companyId: string): Promise<CompanyUser[]> {
-    const result = await query(`
-      SELECT u.id, u.first_name || ' ' || u.last_name as name, u.email, u.telephone as phone
-      FROM users u
-      WHERE u.company_id = $1
-      ORDER BY u.created_at DESC
-    `, [companyId]);
-    return result.rows;
+    return await CompanyRepository.getUsers(companyId);
+  }
+
+  /**
+   * Vérifie si une entreprise existe
+   */
+  static async companyExists(companyId: string): Promise<boolean> {
+    return await CompanyRepository.exists(companyId);
+  }
+
+  /**
+   * Récupère les statistiques d'une entreprise
+   */
+  static async getCompanyStats(companyId: string): Promise<{
+    user_count: number;
+    invoice_count: number;
+    quote_count: number;
+    client_count: number;
+  }> {
+    return await CompanyRepository.getStats(companyId);
   }
 }
 

@@ -11,10 +11,10 @@
         </router-link>
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Devis {{ quote?.quoteNumber }}
+            Devis {{ quote?.quote_number }}
           </h1>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Émis le {{ formatDate(quote?.issueDate) }}
+            Émis le {{ formatDate(quote?.issue_date) }}
           </p>
         </div>
       </div>
@@ -40,7 +40,7 @@
           </button>
           
           <button
-            v-if="quote?.status === 'accepted' && !quote.convertedToInvoice"
+            v-if="quote?.status === 'accepted'"
             @click="convertToInvoice"
             class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
           >
@@ -74,19 +74,16 @@
           
           <div class="flex items-center space-x-4">
             <img
-              :src="quote.client.avatar_url"
-              :alt="quote.client.name"
+              :src="`https://ui-avatars.com/api/?name=${encodeURIComponent(quote.client_name || 'Client')}&background=a855f7&color=fff`"
+              :alt="quote.client_name || 'Client'"
               class="h-12 w-12 rounded-full"
             />
             <div>
               <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                {{ quote.client.name }}
+                {{ quote.client_name || 'Client inconnu' }}
               </h4>
               <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ quote.client.email }}
-              </p>
-              <p v-if="quote.client.phone" class="text-sm text-gray-500 dark:text-gray-400">
-                {{ quote.client.phone }}
+                ID Client: {{ quote.client_id }}
               </p>
             </div>
           </div>
@@ -119,23 +116,23 @@
                 </tr>
               </thead>
               <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                <tr v-for="item in quote.items" :key="item.id">
+                <tr v-for="item in (quote.items as any[])" :key="item.id">
                   <td class="px-6 py-4">
                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                       {{ item.description }}
                     </div>
-                    <div v-if="item.discountPercent > 0" class="text-sm text-green-600">
-                      Remise: {{ item.discountPercent }}%
+                    <div v-if="item.discount_percent && parseFloat(item.discount_percent) > 0" class="text-sm text-green-600">
+                      Remise: {{ item.discount_percent }}%
                     </div>
                   </td>
                   <td class="px-6 py-4 text-center text-sm text-gray-900 dark:text-gray-100">
                     {{ item.quantity }}
                   </td>
                   <td class="px-6 py-4 text-right text-sm text-gray-900 dark:text-gray-100">
-                    {{ formatCurrency(item.unitPrice) }}
+                    {{ formatCurrency(parseFloat(item.unit_price)) }}
                   </td>
                   <td class="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {{ formatCurrency(item.totalHt) }}
+                    {{ formatCurrency(parseFloat(item.total)) }}
                   </td>
                 </tr>
               </tbody>
@@ -155,23 +152,18 @@
           <div class="space-y-3">
             <div class="flex justify-between text-sm">
               <span class="text-gray-600 dark:text-gray-400">Sous-total HT</span>
-              <span class="text-gray-900 dark:text-gray-100">{{ formatCurrency(quote.subtotalHt) }}</span>
-            </div>
-            
-            <div v-if="quote.discountAmount > 0" class="flex justify-between text-sm">
-              <span class="text-gray-600 dark:text-gray-400">Remise</span>
-              <span class="text-green-600">-{{ formatCurrency(quote.discountAmount) }}</span>
+              <span class="text-gray-900 dark:text-gray-100">{{ formatCurrency(parseFloat((quote as any).subtotal)) }}</span>
             </div>
             
             <div class="flex justify-between text-sm">
               <span class="text-gray-600 dark:text-gray-400">TVA</span>
-              <span class="text-gray-900 dark:text-gray-100">{{ formatCurrency(quote.taxAmount) }}</span>
+              <span class="text-gray-900 dark:text-gray-100">{{ formatCurrency(parseFloat((quote as any).tax)) }}</span>
             </div>
             
             <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
               <div class="flex justify-between">
                 <span class="text-base font-medium text-gray-900 dark:text-gray-100">Total TTC</span>
-                <span class="text-base font-medium text-gray-900 dark:text-gray-100">{{ formatCurrency(quote.totalAmount) }}</span>
+                <span class="text-base font-medium text-gray-900 dark:text-gray-100">{{ formatCurrency(parseFloat((quote as any).total)) }}</span>
               </div>
             </div>
           </div>
@@ -181,23 +173,13 @@
         <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-4">
           <div>
             <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Validité</h4>
-            <p class="text-sm text-gray-900 dark:text-gray-100">{{ formatDate(quote.validUntil) }}</p>
+            <p class="text-sm text-gray-900 dark:text-gray-100">{{ formatDate((quote as any).valid_until) }}</p>
             <p v-if="isExpired" class="text-xs text-red-600">
               Expiré depuis {{ getDaysExpired() }} jours
             </p>
             <p v-else-if="isExpiringSoon" class="text-xs text-yellow-600">
               Expire dans {{ getDaysUntilExpiry() }} jours
             </p>
-          </div>
-
-          <div v-if="quote.acceptedDate">
-            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Date d'acceptation</h4>
-            <p class="text-sm text-gray-900 dark:text-gray-100">{{ formatDate(quote.acceptedDate) }}</p>
-          </div>
-
-          <div v-if="quote.rejectedDate">
-            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Date de rejet</h4>
-            <p class="text-sm text-gray-900 dark:text-gray-100">{{ formatDate(quote.rejectedDate) }}</p>
           </div>
         </div>
 
@@ -265,12 +247,12 @@ const quote = ref<Quote | null>(null)
 // Computed
 const isExpired = computed(() => {
   if (!quote.value || quote.value.status === 'accepted') return false
-  return new Date(quote.value.validUntil) < new Date()
+  return new Date((quote.value as any).valid_until) < new Date()
 })
 
 const isExpiringSoon = computed(() => {
   if (!quote.value || quote.value.status === 'accepted') return false
-  const validUntil = new Date(quote.value.validUntil)
+  const validUntil = new Date((quote.value as any).valid_until)
   const today = new Date()
   const diffDays = Math.ceil((validUntil.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
   return diffDays <= 7 && diffDays > 0
@@ -281,7 +263,11 @@ const loadQuote = async () => {
   try {
     loading.value = true
     const response = await quoteService.getQuote(route.params.id as string)
-    quote.value = response.data
+    if (response.success && response.data) {
+      quote.value = response.data
+    } else {
+      router.push('/devis')
+    }
   } catch (error) {
     console.error('Erreur lors du chargement du devis:', error)
     router.push('/devis')
@@ -293,13 +279,8 @@ const loadQuote = async () => {
 const downloadPdf = async () => {
   if (!quote.value) return
   try {
-    const blob = await quoteService.downloadQuotePdf(quote.value.id)
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `devis-${quote.value.quoteNumber}.pdf`
-    link.click()
-    window.URL.revokeObjectURL(url)
+    // TODO: Implémenter le téléchargement PDF
+    console.log('Téléchargement PDF non implémenté')
   } catch (error) {
     console.error('Erreur lors du téléchargement:', error)
   }
@@ -308,7 +289,7 @@ const downloadPdf = async () => {
 const sendQuote = async () => {
   if (!quote.value) return
   try {
-    await quoteService.sendQuote(quote.value.id)
+    await quoteService.updateQuoteStatus(quote.value.id, 'sent')
     loadQuote() // Recharger pour mettre à jour le statut
   } catch (error) {
     console.error('Erreur lors de l\'envoi:', error)
@@ -318,7 +299,7 @@ const sendQuote = async () => {
 const acceptQuote = async () => {
   if (!quote.value) return
   try {
-    await quoteService.acceptQuote(quote.value.id)
+    await quoteService.updateQuoteStatus(quote.value.id, 'accepted')
     loadQuote() // Recharger pour mettre à jour
   } catch (error) {
     console.error('Erreur lors de l\'acceptation:', error)
@@ -328,7 +309,7 @@ const acceptQuote = async () => {
 const rejectQuote = async () => {
   if (!quote.value) return
   try {
-    await quoteService.rejectQuote(quote.value.id)
+    await quoteService.updateQuoteStatus(quote.value.id, 'rejected')
     loadQuote() // Recharger pour mettre à jour
   } catch (error) {
     console.error('Erreur lors du rejet:', error)
@@ -338,9 +319,11 @@ const rejectQuote = async () => {
 const convertToInvoice = async () => {
   if (!quote.value) return
   try {
-    const response = await quoteService.convertToInvoice(quote.value.id)
-    // Rediriger vers la facture créée
-    router.push(`/factures/${response.data.invoiceId}`)
+    const response = await quoteService.convertQuoteToInvoice(quote.value.id)
+    if (response.success && response.data) {
+      // Rediriger vers la facture créée
+      router.push(`/factures/${response.data.invoice.id}`)
+    }
   } catch (error) {
     console.error('Erreur lors de la conversion:', error)
   }
@@ -351,9 +334,8 @@ const extendValidity = async () => {
   try {
     const newValidUntil = new Date()
     newValidUntil.setDate(newValidUntil.getDate() + 30) // +30 jours
-    await quoteService.extendQuoteValidity(quote.value.id, {
-      validUntil: newValidUntil.toISOString(),
-      notifyClient: true
+    await quoteService.updateQuote(quote.value.id, {
+      valid_until: newValidUntil.toISOString()
     })
     loadQuote() // Recharger pour mettre à jour
   } catch (error) {
@@ -377,7 +359,7 @@ const formatDate = (dateString?: string) => {
 const getDaysExpired = () => {
   if (!quote.value) return 0
   const today = new Date()
-  const validUntil = new Date(quote.value.validUntil)
+  const validUntil = new Date((quote.value as any).valid_until)
   const diffTime = today.getTime() - validUntil.getTime()
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }
@@ -385,7 +367,7 @@ const getDaysExpired = () => {
 const getDaysUntilExpiry = () => {
   if (!quote.value) return 0
   const today = new Date()
-  const validUntil = new Date(quote.value.validUntil)
+  const validUntil = new Date((quote.value as any).valid_until)
   const diffTime = validUntil.getTime() - today.getTime()
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }

@@ -10,7 +10,8 @@
     >
       <div class="flex items-center justify-center h-16 px-4 cursor-pointer bg-primary-100 dark:bg-primary-900" @click="router.push('/')">
         <img src="../assets/x-logo.png" alt="Jeroka" class="h-12 w-12" />
-        <h1 class="text-xl font-bold bg-gradient-to-r from-purple-400 via-violet-700 to-blue-400 bg-clip-text text-transparent" style="font-family: 'Poppins', 'Inter', system-ui, sans-serif; font-weight: 900; font-size: 26px;">Jeroka</h1>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 via-purple-700 to-fuchsia-500 bg-clip-text text-transparent" style="font-family: 'Poppins', 'Inter', system-ui, sans-serif; font-weight: 900; font-size: 26px;">Jeroka</h1>
+        <img src="../assets/hero-image.webp" alt="Jeroka" class="h-12 w-18 ml-4" />
       </div>
       
       <nav class="mt-8">
@@ -178,6 +179,7 @@ const navigation = computed(() => {
     { name: 'Devis', href: '/devis', icon: ClipboardDocumentListIcon },
     { name: 'Produits', href: '/produits', icon: CubeIcon },
     { name: 'Commandes', href: '/commandes', icon: ShoppingCartIcon },
+    { name: 'Fournisseurs', href: '/fournisseurs', icon: UsersIcon },
     { name: 'Emails', href: '/emails', icon: EnvelopeIcon },
     { name: 'Comptabilite', href: '/comptabilite', icon: CurrencyDollarIcon },
     { name: 'Parametres', href: '/parametres', icon: CogIcon },

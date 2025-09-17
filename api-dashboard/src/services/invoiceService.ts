@@ -1,5 +1,7 @@
 import { InvoiceRepository, CreateInvoiceData, UpdateInvoiceData, CreateInvoiceItemData } from '../repositories/invoiceRepository';
 import UserRepository from '../repositories/userRepository';
+import { ClientRepository } from '../repositories/personRepository';
+import { InvoiceValidation } from '../validations/invoiceValidation';
 
 export interface InvoiceWithItems {
   id: string;
@@ -76,6 +78,14 @@ export class InvoiceService {
       throw new Error('Utilisateur non trouvé');
     }
 
+    // Validation des filtres
+    if (filters) {
+      const validation = InvoiceValidation.validateFilters(filters);
+      if (validation.error) {
+        throw new Error(`Filtres invalides: ${validation.error}`);
+      }
+    }
+
     const page = filters?.page || 1;
     const limit = filters?.limit || 10;
     const offset = (page - 1) * limit;
@@ -108,13 +118,23 @@ export class InvoiceService {
   /**
    * Récupère une facture par ID
    */
-  static async getInvoice(userId: string, invoiceId: string): Promise<InvoiceWithItems | null> {
-    const user = await UserRepository.findById(userId);
-    if (!user) {
-      throw new Error('Utilisateur non trouvé');
+  static async getInvoice(user: any, invoiceId: string): Promise<InvoiceWithItems | null> {
+    // Validation de l'ID facture
+    const idValidation = InvoiceValidation.validateInvoiceId(invoiceId);
+    if (idValidation.error) {
+      throw new Error(idValidation.error);
     }
-
+    
     const invoice = await InvoiceRepository.findById(invoiceId, user.company_id);
+    if(!invoice) {
+      throw new Error('Facture non trouvée');
+      return null;
+    }
+    const client = await ClientRepository.getClientById(invoice.client_id, user.company_id);
+    if(!client) {
+      throw new Error('Client non trouvé');
+      return null;
+    }
     if (!invoice) {
         throw new Error('Facture non trouvée');
         return null;
@@ -123,6 +143,7 @@ export class InvoiceService {
     const items = await InvoiceRepository.getInvoiceItems(invoice.id);
     return {
       ...invoice,
+      client_name: client.company_name || client.first_name + ' ' + client.last_name,
       items
     };
   }
@@ -136,8 +157,16 @@ export class InvoiceService {
       throw new Error('Utilisateur non trouvé');
     }
 
+    // Validation des données avec règles métier
+    const validation = InvoiceValidation.validateCreateWithBusinessRules(data);
+    if (validation.error) {
+      throw new Error(`Données invalides: ${validation.error}`);
+    }
+
+    const validatedData = validation.value!;
+
     // Calculer les totaux
-    const subtotal = data.items.reduce((sum, item) => {
+    const subtotal = validatedData.items.reduce((sum: number, item: any) => {
       const itemTotal = item.quantity * item.unit_price;
       const discount = item.discount_percent ? (itemTotal * item.discount_percent / 100) : 0;
       return sum + (itemTotal - discount);
@@ -150,22 +179,22 @@ export class InvoiceService {
     const invoiceNumber = await InvoiceRepository.generateInvoiceNumber(user.company_id);
 
     const invoiceData: CreateInvoiceData = {
-      client_id: data.client_id,
+      client_id: validatedData.client_id,
       company_id: user.company_id,
-      status: data.status || 'draft',
+      status: validatedData.status || 'draft',
       total,
       tax,
       subtotal,
-      due_date: new Date(data.due_date),
+      due_date: new Date(validatedData.due_date),
       issue_date: new Date(),
-      notes: data.notes
+      notes: validatedData.notes
     };
 
     const invoice = await InvoiceRepository.create(invoiceData);
 
     // Créer les éléments de la facture
     const items = [];
-    for (const itemData of data.items) {
+    for (const itemData of validatedData.items) {
       const itemTotal = itemData.quantity * itemData.unit_price;
       const discount = itemData.discount_percent ? (itemTotal * itemData.discount_percent / 100) : 0;
       

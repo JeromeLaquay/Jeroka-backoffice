@@ -18,7 +18,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:3000/api/v1",
+      "value": "http://localhost:3002/api/v1",
       "type": "string"
     },
     {
@@ -1020,104 +1020,75 @@
       "name": "📅 Calendrier",
       "item": [
         {
-          "name": "Règles Disponibilité",
+          "name": "Règles de disponibilité - Lister",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{base_url}}/calendar/availability",
+              "raw": "{{base_url}}/availability-rules",
               "host": ["{{base_url}}"],
-              "path": ["calendar", "availability"]
+              "path": ["availability-rules"]
             }
           }
         },
         {
-          "name": "Créer Règle Disponibilité",
+          "name": "Règles de disponibilité - Créer",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              {"key": "Content-Type","value": "application/json"}
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"dayOfWeek\": 1,\n  \"startTime\": \"09:00\",\n  \"endTime\": \"17:00\",\n  \"isActive\": true\n}"
+              "raw": "{\n  \"day\": \"2025-09-17\",\n  \"startTime\": \"09:00:00\",\n  \"endTime\": \"12:00:00\",\n  \"appointmentTime\": 30\n}"
             },
             "url": {
-              "raw": "{{base_url}}/calendar/availability",
+              "raw": "{{base_url}}/availability-rules",
               "host": ["{{base_url}}"],
-              "path": ["calendar", "availability"]
+              "path": ["availability-rules"]
             }
           }
         },
         {
-          "name": "Liste Créneaux",
+          "name": "Rendez-vous - Lister",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{base_url}}/calendar/slots?date=2024-01-15",
+              "raw": "{{base_url}}/appointments?startDate=2025-09-16&endDate=2025-09-20",
               "host": ["{{base_url}}"],
-              "path": ["calendar", "slots"],
+              "path": ["appointments"],
               "query": [
-                {
-                  "key": "date",
-                  "value": "2024-01-15"
-                }
+                {"key":"startDate","value":"2025-09-16"},
+                {"key":"endDate","value":"2025-09-20"}
               ]
             }
           }
         },
         {
-          "name": "Créer Créneau",
+          "name": "Rendez-vous - Créer",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              {"key": "Content-Type","value": "application/json"}
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"date\": \"2024-01-15\",\n  \"startTime\": \"14:00\",\n  \"endTime\": \"15:00\",\n  \"clientName\": \"Jean Dupont\",\n  \"clientEmail\": \"jean.dupont@example.com\",\n  \"clientPhone\": \"+33123456789\",\n  \"notes\": \"Rendez-vous pour devis\"\n}"
+              "raw": "{\n  \"availabilityRuleId\": \"<REGLE_ID>\",\n  \"clientFirstName\": \"Jean\",\n  \"clientLastName\": \"Dupont\",\n  \"clientEmail\": \"jean.dupont@example.com\",\n  \"clientPhone\": \"+33123456789\",\n  \"notes\": \"Présentation des services\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/calendar/slots",
+              "raw": "{{base_url}}/appointments",
               "host": ["{{base_url}}"],
-              "path": ["calendar", "slots"]
+              "path": ["appointments"]
             }
           }
         },
         {
-          "name": "Modifier Créneau",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"startTime\": \"15:00\",\n  \"endTime\": \"16:00\",\n  \"notes\": \"Rendez-vous reporté\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/calendar/slots/1",
-              "host": ["{{base_url}}"],
-              "path": ["calendar", "slots", "1"]
-            }
-          }
-        },
-        {
-          "name": "Supprimer Créneau",
+          "name": "Rendez-vous - Supprimer",
           "request": {
             "method": "DELETE",
             "url": {
-              "raw": "{{base_url}}/calendar/slots/1",
+              "raw": "{{base_url}}/appointments/1",
               "host": ["{{base_url}}"],
-              "path": ["calendar", "slots", "1"]
+              "path": ["appointments", "1"]
             }
           }
         }
