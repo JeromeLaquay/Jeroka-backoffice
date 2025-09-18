@@ -114,7 +114,7 @@ import BackupSettings from '../../components/settings/BackupSettings.vue'
 import IntegrationsSettings from '../../components/settings/IntegrationsSettings.vue'
 import EnvironmentSwitcher from '../../components/EnvironmentSwitcher.vue'
 // État
-const activeTab = ref('development') // Commencer par l'onglet développement
+const activeTab = ref('system') // Commencer par l'onglet développement
 const userProfile = ref<any>(null)
 const companySettings = ref<any>(null)
 const systemSettings = ref<any>(null)

@@ -65,7 +65,7 @@ app.use(helmet({
 // CORS configuration
 app.use(cors({
   origin: [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
+    process.env.FRONTEND_URL || 'http://localhost:3001',
     process.env.BACKOFFICE_URL || 'http://localhost:3001',
     'https://backoffice.jerokaxperience.fr',  // Ajouter explicitement
     'https://apibackoffice.jerokaxperience.fr'  // Ajouter explicitement

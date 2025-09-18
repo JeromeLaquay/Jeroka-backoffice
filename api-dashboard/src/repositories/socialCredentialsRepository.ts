@@ -131,22 +131,28 @@ export class SocialCredentialsRepository {
   }
 
   private static mapRowToCredentials(row: any): SocialCredentials {
-    const decryptedCredentials = EncryptionService.decrypt(row.encrypted_credentials);
-    
+    const decryptedText = EncryptionService.decrypt(row.encrypted_credentials);
+    let parsedCredentials: any = {};
+    try {
+      parsedCredentials = typeof decryptedText === 'string' ? JSON.parse(decryptedText) : decryptedText;
+    } catch (_) {
+      parsedCredentials = {};
+    }
+
     return {
       id: row.id,
       companyId: row.company_id,
       platform: row.platform,
-      credentials: JSON.parse(decryptedCredentials),
+      credentials: parsedCredentials,
       isActive: row.is_active,
       expiresAt: row.expires_at,
       lastUsedAt: row.last_used_at,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       decryptedCredentials: {
-        oauthClientId: row.decryptedCredentials.oauth_client_id,
-        oauthClientSecret: row.decryptedCredentials.oauth_client_secret,
-        redirectUri: row.decryptedCredentials.redirect_uri
+        oauthClientId: Boolean(parsedCredentials?.oauthClientId),
+        oauthClientSecret: Boolean(parsedCredentials?.oauthClientSecret),
+        redirectUri: Boolean(parsedCredentials?.redirectUri)
       }
     };
   }

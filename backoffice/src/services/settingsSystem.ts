@@ -9,16 +9,19 @@ export type GoogleOAuthStatus = {
 class SettingsSystem {
   async testCalendar(): Promise<{ success: boolean }> {
     const res = await apiService.post('/settings/google/test/calendar')
+    console.log('testCalendar', res);
     return res
   }
 
   async testGmail(): Promise<{ success: boolean }> {
     const res = await apiService.post('/settings/google/test/gmail')
+    console.log('testGmail', res);
     return res
   }
 
   async testDrive(): Promise<{ success: boolean }> {
     const res = await apiService.post('/settings/google/test/drive')
+    console.log('testDrive', res);
     return res
   }
 
@@ -32,6 +35,7 @@ class SettingsSystem {
 
   async getGoogleStatus(): Promise<{ success: boolean; data?: GoogleOAuthStatus }> {
     const res = await apiService.get<GoogleOAuthStatus>('/settings/google/status')
+    console.log('getGoogleStatus', res);
     return { success: res.success, data: res.data }
   }
 }

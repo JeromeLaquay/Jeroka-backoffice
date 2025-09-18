@@ -437,9 +437,9 @@ CREATE INDEX idx_publication_platforms_status ON publication_platforms(status);
 -- Table pour stocker les identifiants de réseaux sociaux par entreprise
 CREATE TABLE company_social_credentials (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id),
     platform VARCHAR(20) NOT NULL CHECK (platform IN ('meta', 'linkedin', 'twitter', 'site web', 'google')),
-    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    company_id UUID REFERENCES companies(id),
     -- Champs chiffrés (AES-256)
     encrypted_credentials JSONB NOT NULL,
     

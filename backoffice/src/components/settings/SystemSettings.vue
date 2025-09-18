@@ -141,6 +141,13 @@
             </button>
           </div>
         </div>
+        <!-- voyant vert ou rouge selon le statut de la connexion -->
+        <div class="flex items-center justify-center">
+          <div class="w-4 h-4 rounded-full" :class="googleOAuthStatus.isConnected ? 'bg-green-500' : 'bg-red-500'"></div>
+          <div class="text-sm text-gray-500 dark:text-gray-400">
+            {{ googleOAuthStatus.isConnected ? 'Connexion réussie' : 'Connexion échouée' }}
+          </div>
+        </div>
 
         <!-- Boutons de test -->
         <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-600">
@@ -201,6 +208,12 @@ defineEmits<{
 
 const route = useRoute()
 
+onMounted(() => {
+  testGoogleCalendar()
+  testGoogleGmail()
+  testGoogleDrive()
+})
+
 // Etat local minimal pour les formulaires
 const meta = ref({ appId: '', appSecret: '', accessToken: '', pageId: '' })
 const linkedin = ref({ clientId: '', clientSecret: '', accessToken: '', organizationId: '' })
@@ -214,6 +227,8 @@ const loadConfigured = async () => {
   try {
     const res = await credentialsService.listConfigured()
     if (res.success && res.data) {
+
+      console.log('res.data.configuredPlatforms', res.data.configuredPlatforms)
       configured.value = { meta: false, linkedin: false, twitter: false, 'site web': false, google: false }
       for (const p of res.data.configuredPlatforms) {
         configured.value[p.platform] = p.isConfigured
@@ -251,8 +266,10 @@ const connectGoogle = async () => {
 
 const refreshGoogleStatus = async () => {
   try {
+    console.log('refreshGoogleStatus')
     const res = await settingsSystem.getGoogleStatus()
     if (res.success && res.data) {
+      console.log('res.data', res.data)
       googleOAuthStatus.value = res.data
       // Mettre à jour le statut configuré
       configured.value.google = res.data.isConnected || res.data.hasServiceAccount
@@ -265,27 +282,27 @@ const refreshGoogleStatus = async () => {
 const testGoogleCalendar = async () => { 
   const res = await settingsSystem.testCalendar()
   if (res.success) {
-    alert('Connexion Calendar réussie !')
+    console.log('Connexion Calendar réussie !')
   } else {
-    alert('Erreur de connexion Calendar')
+    console.log('Erreur de connexion Calendar')
   }
 }
 
 const testGoogleGmail = async () => { 
   const res = await settingsSystem.testGmail()
   if (res.success) {
-    alert('Connexion Gmail réussie !')
+    console.log('Connexion Gmail réussie !')
   } else {
-    alert('Erreur de connexion Gmail')
+    console.log('Erreur de connexion Gmail')
   }
 }
 
 const testGoogleDrive = async () => { 
   const res = await settingsSystem.testDrive()
   if (res.success) {
-    alert('Connexion Drive réussie !')
+    console.log('Connexion Drive réussie !')
   } else {
-    alert('Erreur de connexion Drive')
+    console.log('Erreur de connexion Drive')
   }
 }
 
@@ -309,7 +326,6 @@ watch(() => route.query, (query) => {
     // Nettoyer l'URL
     window.history.replaceState({}, document.title, window.location.pathname)
   }
-}, { immediate: true })
-
+}, { immediate: true });
 onMounted(loadConfigured)
 </script>

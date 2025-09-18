@@ -33,9 +33,10 @@ export class EncryptionService {
     });
   }
 
-  static decrypt(encryptedData: string): string {
+  static decrypt(encryptedData: any): string {
     const key = this.getEncryptionKey();
-    const { encrypted, iv, tag } = JSON.parse(encryptedData);
+    const payload = typeof encryptedData === 'string' ? JSON.parse(encryptedData) : encryptedData;
+    const { encrypted, iv, tag } = payload;
     
     const decipher = crypto.createDecipheriv(this.ALGORITHM, key, Buffer.from(iv, 'hex'));
     decipher.setAAD(Buffer.from('jeroka-social-credentials'));

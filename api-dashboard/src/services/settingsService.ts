@@ -62,19 +62,19 @@ export class SettingsService {
     }
   }
 
-  // Google OAuth settings per company (AES encrypted at rest)
+  // Google OAuth settings par utilisateur (AES au repos)
   static async saveGoogleSettings(userId: string, payload: any, repo: any) {
     const masked = {
       calendarId: payload.calendarId || null,
       hasOAuth: !!(payload.oauthClientId && payload.refreshToken),
       hasServiceAccount: !!payload.serviceAccountJson
     }
-    await repo.upsert(  userId, 'google', payload);
+    await repo.upsertGoogle(userId, 'google', payload);
     return masked;
   }
 
-  static async getGoogleSettings(companyId: string, repo: any) {
-    const cred = await repo.getByCompanyAndPlatform(companyId, 'google');
+  static async getGoogleSettings(userId: string, repo: any) {
+    const cred = await repo.getByUserIdAndPlatform(userId, 'google');
     if (!cred) return { hasOAuth: false, hasServiceAccount: false };
     const c = cred.credentials || {};
     return {

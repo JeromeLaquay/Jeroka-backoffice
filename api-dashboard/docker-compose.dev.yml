@@ -51,8 +51,11 @@ services:
       
       OPENAI_API_KEY: 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
       # CORS
-      FRONTEND_URL: http://localhost:3000
+      FRONTEND_URL: http://localhost:3001
       BACKOFFICE_URL: http://localhost:3001
+      VITE_API_URL: http://localhost:3002
+
+      ENCRYPTION_KEY: 8f6a2b5c9d1e0f3a7c4b2a1d8e9f0c3b4a6d7e8f1c2b3a4958674e3c1d2f0a9
 
       GOOGLE_CLIENT_ID: 970287844414-rfc4io1lije03bqge9liidn2nh8l7v7i.apps.googleusercontent.com
       GOOGLE_CLIENT_SECRET: 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
@@ -73,8 +76,6 @@ services:
       AI_REQUEST_TIMEOUT: 300000
       AI_IMAGE_TIMEOUT: 300000
       SERVER_TIMEOUT: 300000
-      
-      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       
     volumes:
       # - .:/app  # ← Commenter cette ligne

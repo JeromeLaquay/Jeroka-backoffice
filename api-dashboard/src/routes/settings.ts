@@ -159,61 +159,56 @@ router.get('/google/connect', verifyToken, async (req: AuthRequest, res: Respons
   }
 });
 
-router.get('/google/callback', verifyToken, async (req: AuthRequest, res: Response) => {
+router.get('/google/callback', async (req: Request, res: Response) => {
   try {
-    const { code, state } = req.query;
-    
+    const { code, state } = req.query as { code?: string; state?: string };
     if (!code || !state) {
       return res.status(400).json({ success: false, message: 'Code ou state manquant' });
     }
 
-    const companyId = state as string;
-    
-    // Récupérer les credentials OAuth de l'entreprise
-    const existingCreds = await SocialCredentialsRepository.getByUserIdAndPlatform(req.user!.id, 'google');
-    
-    if (!existingCreds || !existingCreds.credentials.oauthClientId || !existingCreds.credentials.oauthClientSecret) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Credentials OAuth non trouvés' 
-      });
+    const userId = String(state);
+
+    // Charger credentials OAuth (DB ou ENV fallback)
+    const existingCreds = await SocialCredentialsRepository.getByUserIdAndPlatform(userId, 'google');
+    const clientId = existingCreds?.credentials?.oauthClientId || process.env.GOOGLE_CLIENT_ID || '';
+    const clientSecret = existingCreds?.credentials?.oauthClientSecret || process.env.GOOGLE_CLIENT_SECRET || '';
+    const redirectUri = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3002/api/v1/settings/google/callback';
+
+    if (!clientId || !clientSecret) {
+      return res.status(400).json({ success: false, message: 'OAuth Client ID/Secret manquant' });
     }
 
-    const oauth2Client = new google.auth.OAuth2(
-      existingCreds.credentials.oauthClientId,
-      existingCreds.credentials.oauthClientSecret,
-      process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3002/api/v1/settings/google/callback'
-    );
+    const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
 
     // Échanger le code contre les tokens
-    const { tokens } = await oauth2Client.getToken(code as string);
-    
+    const { tokens } = await oauth2Client.getToken(code);
     if (!tokens.refresh_token) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Refresh token non reçu. Veuillez révoquer l\'accès et réessayer.' 
-      });
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+      const reason = encodeURIComponent('refresh_token_absent')
+      return res.redirect(`${frontendUrl}/parametres?google=error&reason=${reason}`);
     }
 
-    // Mettre à jour les credentials avec le refresh token
-    const updatedCredentials = {
-      ...existingCreds.credentials,
+    // Persister pour ce userId
+    const updated = {
+      ...(existingCreds?.credentials || {}),
+      oauthClientId: clientId,
+      oauthClientSecret: clientSecret,
       refreshToken: tokens.refresh_token,
       accessToken: tokens.access_token,
       expiryDate: tokens.expiry_date
     };
+    console.log('tokens', tokens);
+    console.log('updated', updated);
+    await SocialCredentialsRepository.upsertGoogle(userId, 'google', updated);
 
-    await SocialCredentialsRepository.upsertGoogle(req.user!.id, 'google', updatedCredentials);
-
-    logger.info('Connexion OAuth Google réussie', { companyId });
-    
-    // Rediriger vers le frontend avec un paramètre de succès
+    logger.info('Connexion OAuth Google réussie', { userId });
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
     return res.redirect(`${frontendUrl}/parametres?google=connected`);
   } catch (error: any) {
     logger.error('Erreur callback OAuth Google', { error: error.message });
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
-    return res.redirect(`${frontendUrl}/parametres?google=error`);
+    const reason = encodeURIComponent(error?.message || 'unknown_error')
+    return res.redirect(`${frontendUrl}/parametres?google=error&reason=${reason}`);
   }
 });
 
@@ -221,7 +216,7 @@ router.get('/google/status', verifyToken, async (req: AuthRequest, res: Response
   try {
     const userId = req.user!.id;
     const googleSettings = await SettingsService.getGoogleSettings(userId, SocialCredentialsRepository);
-    
+    console.log('googleSettings', googleSettings);
     return res.json({ 
       success: true, 
       data: {
