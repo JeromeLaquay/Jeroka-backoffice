@@ -11,18 +11,6 @@ export interface DashboardStats {
   new_messages_week: number
   new_invoices_month: number
   new_quotes_month: number
-
-  total_clients_percentage: number
-  total_messages_percentage: number
-  total_invoices_percentage: number
-  total_quotes_percentage: number
-
-  revenue_6_months: any
-  sales_distribution: any
-  financial_evolution: any
-  vat_due: any
-  revenue_evolution: any
-  expenses_evolution: any 
   
   recent_clients: any
   recent_messages: any

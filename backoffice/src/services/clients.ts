@@ -2,7 +2,8 @@ import { apiService } from './api'
 
 export interface Client {
   id: string
-  type: 'individual' | 'company'
+  type: 'client' | 'supplier'
+  type_label: 'Particulier' | 'Entreprise'
   first_name: string
   last_name: string
   company_name?: string
@@ -31,7 +32,8 @@ export interface Client {
 }
 
 export interface CreateClientRequest {
-  type: 'individual' | 'company'
+  type: 'client' | 'supplier'
+  type_label: 'Particulier' | 'Entreprise'
   firstName: string
   lastName: string
   companyName?: string

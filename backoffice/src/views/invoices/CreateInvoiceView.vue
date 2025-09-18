@@ -309,13 +309,15 @@ const isFormValid = computed(() => {
 // Méthodes
 const loadClients = async () => {
   try {
-    const response = await clientsService.getClients({ limit: 100 })
+    const response = await clientsService.getClients({ type: 'client' })
     if (response.success && response.data && Array.isArray(response.data)) {
       // Mapper les clients pour correspondre à l'interface attendue par ClientSelector
+      console.log('response.data', response.data)
       clients.value = response.data.map((client: any) => ({
         ...client,
         avatar_url: client.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(client.name)}&background=a855f7&color=fff`
       }))
+      console.log('clients', clients.value)
     }
   } catch (error) {
     console.error('Erreur lors du chargement des clients:', error)

@@ -298,11 +298,40 @@ const loadStats = async () => {
   const response = await dashboardService.getStats()
   console.log('response', response)
   stats.value = response
-  
-  // Utiliser directement les données de l'ancien format
-  if (response.stats && Array.isArray(response.stats)) {
-    topStats.value = response.stats
+  topStats.value = [{
+    name: 'Clients',
+    value: response.total_clients,
+    change: response.new_clients_month,
+    icon: 'UsersIcon',
+    iconColor: 'green',
+    changeColor: 'text-green-600'
+  },
+  {
+    name: 'Messages',
+    value: response.total_messages,
+    change: response.new_messages_week,
+    icon: 'EnvelopeIcon',
+    iconColor: 'blue',
+    changeColor: 'text-blue-600'
+  },
+  {
+    name: 'Factures',
+    value: response.total_invoices,
+    change: response.new_invoices_month,
+    icon: 'DocumentTextIcon',
+    iconColor: 'secondary',
+    changeColor: 'text-secondary-600'
+  },
+  {
+    name: 'Devis',
+    value: response.total_quotes,
+    change: response.new_quotes_month,
+    icon: 'ClipboardDocumentListIcon',
+    iconColor: 'primary',
+    changeColor: 'text-primary-600'
   }
+]
+  
 }
 
 

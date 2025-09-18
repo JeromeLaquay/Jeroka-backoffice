@@ -28,7 +28,7 @@
           </div>
 
           <div
-            v-else-if="filteredClients.length === 0 && query !== ''"
+            v-else-if="filteredClients?.length === 0 && query !== ''"
             class="relative cursor-default select-none py-2 px-4 text-gray-700 dark:text-gray-300"
           >
             Aucun client trouvé.

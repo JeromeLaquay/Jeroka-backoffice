@@ -499,7 +499,7 @@ CREATE TABLE appointments (
 );
 
 CREATE INDEX idx_appointments_availability_rule_id ON appointments(availability_rule_id);
-CREATE INDEX idx_appointments_person_email ON appointments(person_email);
+CREATE INDEX idx_appointments_email ON appointments(email);
 CREATE INDEX idx_appointments_created_at ON appointments(created_at);
 
 -- =============================================

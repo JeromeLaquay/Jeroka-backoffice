@@ -96,6 +96,7 @@ export class QuoteService {
       const items = await QuoteRepository.getQuoteItems(quote.id);
       quotesWithItems.push({
         ...quote,
+        client_id: quote.person_id,
         items
       });
     }
@@ -127,6 +128,7 @@ export class QuoteService {
     const items = await QuoteRepository.getQuoteItems(quote.id);
     return {
       ...quote,
+      client_id: quote.person_id,
       items
     };
   }
@@ -161,7 +163,7 @@ export class QuoteService {
     const quoteNumber = await QuoteRepository.generateQuoteNumber(user.company_id);
 
     const quoteData: CreateQuoteData = {
-      client_id: validatedData.client_id,
+      person_id: validatedData.client_id,
       company_id: user.company_id,
       status: validatedData.status || 'draft',
       total,
@@ -196,6 +198,7 @@ export class QuoteService {
 
     return {
       ...quote,
+      client_id: quote.person_id,
       items
     };
   }
@@ -240,7 +243,7 @@ export class QuoteService {
     }
 
     const updateData: UpdateQuoteData = {
-      client_id: validatedData.client_id,
+      person_id: validatedData.client_id,
       status: validatedData.status,
       total: validatedData.total,
       tax: validatedData.tax,
@@ -281,6 +284,7 @@ export class QuoteService {
     const items = await QuoteRepository.getQuoteItems(quote.id);
     return {
       ...quote,
+      client_id: quote.person_id,
       items
     };
   }
@@ -326,6 +330,7 @@ export class QuoteService {
     const items = await QuoteRepository.getQuoteItems(quote.id);
     return {
       ...quote,
+      client_id: quote.person_id,
       items
     };
   }
@@ -353,7 +358,7 @@ export class QuoteService {
   }
 
   /**
-   * Convertit un devis en facture
+   * TODO: Convertit un devis en facture
    */
   static async convertToInvoice(userId: string, quoteId: string): Promise<{ quote: QuoteWithItems, invoice: any }> {
     const user = await UserRepository.findById(userId);

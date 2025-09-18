@@ -14,7 +14,7 @@
             {{ isEdit ? 'Modifier le devis' : 'Nouveau devis' }}
           </h1>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {{ isEdit ? `Modification du devis ${quote?.quoteNumber}` : 'Créez une nouvelle proposition commerciale' }}
+            {{ isEdit ? `Modification du devis ${quote?.quote_number}` : 'Créez une nouvelle proposition commerciale' }}
           </p>
         </div>
       </div>
@@ -300,8 +300,8 @@ const loadQuote = async () => {
     // Pré-remplir le formulaire
     if (quote.value) {
       Object.assign(form, {
-        quoteNumber: quote.value.quoteNumber,
-        clientId: quote.value.clientId,
+        quoteNumber: quote.value.quote_number,
+        clientId: quote.value.client_id,
         items: quote.value.items.map((item: any) => ({
           description: item.description,
           quantity: item.quantity,
@@ -310,13 +310,13 @@ const loadQuote = async () => {
           vatRate: item.vatRate || 20
         })),
         status: quote.value.status,
-        issueDate: quote.value.issueDate.split('T')[0],
-        validUntil: quote.value.validUntil.split('T')[0],
+        issueDate: quote.value.issue_date.split('T')[0],
+        validUntil: quote.value.valid_until.split('T')[0],
         notes: quote.value.notes || ''
       })
 
       // Trouver le client correspondant dans la liste
-      const client = clients.value.find(c => c.id === quote.value?.clientId)
+      const client = clients.value.find(c => c.id === quote.value?.client_id)
       selectedClient.value = client || null
     }
   } catch (error) {
@@ -378,7 +378,7 @@ const handleSubmit = async () => {
 
     if (isEdit.value) {
       const response = await quoteService.updateQuote(route.params.id as string, {
-        clientId: form.clientId,
+        client_id: form.clientId,
         items: form.items.map((item: any) => ({
           description: item.description,
           quantity: item.quantity,
@@ -386,7 +386,7 @@ const handleSubmit = async () => {
           discountPercent: item.discountPercent || 0,
           vatRate: item.vatRate || 20
         })),
-        validUntil: form.validUntil,
+        valid_until: form.validUntil,
         notes: form.notes,
         status: form.status
       })
@@ -396,7 +396,7 @@ const handleSubmit = async () => {
       }
     } else {
       const response = await quoteService.createQuote({
-        clientId: form.clientId,
+        client_id: form.clientId,
         items: form.items.map((item: any) => ({
           description: item.description,
           quantity: item.quantity,
@@ -404,7 +404,7 @@ const handleSubmit = async () => {
           discountPercent: item.discountPercent || 0,
           vatRate: item.vatRate || 20
         })),
-        validUntil: form.validUntil,
+        valid_until: form.validUntil,
         notes: form.notes
       })
       
@@ -418,10 +418,20 @@ const handleSubmit = async () => {
     loading.value = false
   }
 }
-
+// Méthodes
 const loadClients = async () => {
-  const response = await clientsService.getClients()
-  clients.value = response.data
+  try {
+    const response = await clientsService.getClients({ type: 'client' })
+    if (response.success && response.data && Array.isArray(response.data)) {
+      // Mapper les clients pour correspondre à l'interface attendue par ClientSelector
+      clients.value = response.data.map((client: any) => ({
+        ...client,
+        avatar_url: client.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(client.name)}&background=a855f7&color=fff`
+      }))
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des clients:', error)
+  }
 }
 
 // Watchers

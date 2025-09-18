@@ -15,8 +15,10 @@ router.use(verifyToken);
  */
 router.get('/stats', verifyToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   try {
-    const rows = await query('SELECT * FROM dashboard_stats WHERE company_id = $1', [req.user!.company_id]);
-    const stats: DashboardStats | null = rows?.[0] || null;
+    const result = await query('SELECT * FROM dashboard_stats WHERE company_id = $1', [req.user!.company_id]);
+    console.log('rows', result);
+    const stats: DashboardStats | null = (result as any)?.rows?.[0] || (Array.isArray(result) ? (result as any)[0] : null) || null;
+    console.log('stats', stats);
     return res.json({ success: true, data: stats });
   } catch (error) {
     console.error('Erreur lors de la récupération des statistiques:', error);
@@ -43,18 +45,6 @@ export interface DashboardStats {
   new_messages_week: number
   new_invoices_month: number
   new_quotes_month: number
-
-  total_clients_percentage: number
-  total_messages_percentage: number
-  total_invoices_percentage: number
-  total_quotes_percentage: number
-
-  revenue_6_months: any
-  sales_distribution: any
-  financial_evolution: any
-  vat_due: any
-  revenue_evolution: any
-  expenses_evolution: any 
   
   recent_clients: any
   recent_messages: any
