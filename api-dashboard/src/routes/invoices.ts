@@ -16,13 +16,13 @@ router.use(verifyToken);
  */
 router.get('/', async (req: AuthRequest, res: Response) => {
   try {
-    const { page = 1, limit = 10, status, clientId, dateFrom, dateTo } = req.query;
+    const { page = 1, limit = 10, status, personId, dateFrom, dateTo } = req.query;
     
     const result = await InvoiceService.getInvoices(req.user!.id, {
       page: Number(page),
       limit: Number(limit),
       status: status as string,
-      clientId: clientId as string,
+      personId: personId as string,
       dateFrom: dateFrom as string,
       dateTo: dateTo as string
     });

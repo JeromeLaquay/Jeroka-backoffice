@@ -122,7 +122,6 @@ app.use(`${API_PREFIX}/availability-rules`, availabilityRulesRoutes);
 app.use(`${API_PREFIX}/social-networks`, socialNetworksRoutes);
 app.use(`${API_PREFIX}/credentials`, credentialsRoutes);
 app.use(`${API_PREFIX}/settings`, settingsRoutes);
-app.use(`${API_PREFIX}/site/message`, messageSiteRoutes);
 app.use(`${API_PREFIX}`, adminRoutes);
 app.use(`${API_PREFIX}`, driveRoutes);
 
