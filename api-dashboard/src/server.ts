@@ -18,7 +18,7 @@ import { requestLogger } from './middleware/requestLogger';
 import authRoutes from './routes/auth';
 import usersRoutes from './routes/users';
 import messagesRoutes from './routes/messages';
-import clientsRoutes from './routes/clients';
+import personsRoutes from './routes/person';
 import publicationsRoutes from './routes/publications';
 import productsRoutes from './routes/products';
 import invoicesRoutes from './routes/invoices';
@@ -33,6 +33,7 @@ import credentialsRoutes from './routes/credentials';
 import socialNetworksRoutes from './routes/credentials';
 import settingsRoutes from './routes/settings';
 import adminRoutes from './routes/admin';
+import driveRoutes from './routes/drive';
 
 // Load environment variables
 dotenv.config();
@@ -108,7 +109,7 @@ const API_PREFIX = '/api/v1';
 app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/users`, usersRoutes);
 app.use(`${API_PREFIX}/messages`, messagesRoutes);
-app.use(`${API_PREFIX}/clients`, clientsRoutes);
+app.use(`${API_PREFIX}/persons`, personsRoutes);
 app.use(`${API_PREFIX}/publications`, publicationsRoutes);
 app.use(`${API_PREFIX}/products`, productsRoutes);
 app.use(`${API_PREFIX}/invoices`, invoicesRoutes);
@@ -123,6 +124,7 @@ app.use(`${API_PREFIX}/credentials`, credentialsRoutes);
 app.use(`${API_PREFIX}/settings`, settingsRoutes);
 app.use(`${API_PREFIX}/site/message`, messageSiteRoutes);
 app.use(`${API_PREFIX}`, adminRoutes);
+app.use(`${API_PREFIX}`, driveRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

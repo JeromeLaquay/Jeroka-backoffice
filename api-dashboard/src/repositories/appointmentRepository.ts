@@ -1,7 +1,7 @@
 import { Appointment, AppointmentDTO } from '@/types/appointment';
 import { query } from '../database/connection';
 export class AppointmentRepository {
-  static async findByUserId(userId: string, { startDate, endDate }: { startDate?: string, endDate?: string }) : Promise<AppointmentDTO[]> {
+  static async findByUserId(userId: string, { startDate, endDate }: { startDate?: string | null, endDate?: string | null }) : Promise<AppointmentDTO[]> {
     const result = await query(`
       SELECT 
         a.*, 
@@ -16,6 +16,13 @@ export class AppointmentRepository {
         AND ($3::date IS NULL OR ar.day <= $3::date)
       ORDER BY ar.day, ar.start_time
     `, [userId, startDate ?? null, endDate ?? null]);
+    return result.rows;
+  }
+
+  static async findByAvailabiityRuleId(availabilityRuleId: string) {
+    const result = await query(`
+      SELECT * FROM appointments WHERE availability_rule_id = $1
+    `, [availabilityRuleId]);
     return result.rows;
   }
 

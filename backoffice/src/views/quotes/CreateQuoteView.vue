@@ -253,7 +253,7 @@ import ClientSelector from '../../components/orders/ClientSelector.vue'
 import QuoteItemRow from '../../components/quotes/QuoteItemRow.vue'
 import QuoteSummary from '../../components/quotes/QuoteSummary.vue'
 import { quoteService, type CreateQuoteRequest, type Quote } from '../../services/quotes'
-import { clientsService } from '../../services/clients'
+import { clientsService } from '../../services/persons'
 
 const route = useRoute()
 const router = useRouter()

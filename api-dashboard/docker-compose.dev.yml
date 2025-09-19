@@ -13,7 +13,8 @@ services:
       - postgres_dev_data:/var/lib/postgresql/data
       - ./src/database/migrations.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
       - ./src/database/createViews.sql:/docker-entrypoint-initdb.d/02-createViews.sql:ro
-      - ./src/database/insert_data.sql:/docker-entrypoint-initdb.d/03-insert_data.sql:ro
+      - ./src/database/createFunctions.sql:/docker-entrypoint-initdb.d/03-createFunctions.sql:ro
+      - ./src/database/insert_data.sql:/docker-entrypoint-initdb.d/04-insert_data.sql:ro
     ports:
       - "5432:5432"
     networks:

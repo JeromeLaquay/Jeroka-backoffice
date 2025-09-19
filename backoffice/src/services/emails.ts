@@ -316,17 +316,18 @@ class EmailsService {
   /**
    * Obtenir les statistiques des emails
    */
-  getEmailStats(emails: Email[]): {
+  getEmailStats(emails: Email[] | undefined): {
     total: number
     withAttachments: number
     categorized: number
     uncategorized: number
   } {
+    const list = Array.isArray(emails) ? emails : []
     return {
-      total: emails.length,
-      withAttachments: emails.filter(email => email.hasAttachments).length,
-      categorized: emails.filter(email => email.categoryId).length,
-      uncategorized: emails.filter(email => !email.categoryId).length
+      total: list.length,
+      withAttachments: list.filter(email => email.hasAttachments).length,
+      categorized: list.filter(email => email.categoryId).length,
+      uncategorized: list.filter(email => !email.categoryId).length
     }
   }
 

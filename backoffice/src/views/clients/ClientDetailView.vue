@@ -33,16 +33,34 @@
       </div>
       <div class="mt-4 sm:mt-0 flex space-x-3">
         <router-link 
+          :to="`/factures/create?clientId=${client.id}`"
+          class="btn-primary"
+        >
+          Nouvelle facture
+        </router-link>
+        <router-link 
           :to="`/clients/${client.id}/edit`"
           class="btn-secondary"
         >
           Modifier
         </router-link>
         <router-link 
-          :to="`/factures/create?clientId=${client.id}`"
-          class="btn-primary"
+          :to="`/devis?clientId=${client.id}`"
+          class="btn-secondary"
         >
-          Nouvelle facture
+          Voir les devis
+        </router-link>
+        <router-link 
+          :to="`/factures?clientId=${client.id}`"
+          class="btn-secondary"
+        >
+          Voir les factures
+        </router-link>
+        <router-link 
+          :to="`/commandes?clientId=${client.id}`"
+          class="btn-secondary"
+        >
+          Voir les commandes
         </router-link>
       </div>
     </div>
@@ -154,7 +172,7 @@
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600 dark:text-gray-400">Type</span>
               <span class="badge badge-info">
-                {{ client.type === 'individual' ? 'Particulier' : 'Entreprise' }}
+                {{ client.type === 'client' ? 'Particulier' : 'Entreprise' }}
               </span>
             </div>
             <div class="flex items-center justify-between">
@@ -179,7 +197,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ArrowLeftIcon } from '@heroicons/vue/24/outline'
-import { clientsService, type Client } from '../../services/clients'
+import { personsService, type Person } from '../../services/persons'
 
 const route = useRoute()
 
@@ -197,7 +215,7 @@ interface Order {
   statusText: string
 }
 
-const client = ref<Client | null>(null)
+const client = ref<Person | null>(null)
 const recentOrders = ref<Order[]>([])
 const stats = ref({
   totalOrders: 0,
@@ -224,7 +242,7 @@ const loadClientData = async () => {
     loading.value = true
     error.value = ''
     
-    const response = await clientsService.getClient(clientId)
+    const response = await personsService.getPerson(clientId)
     
     if (response.success) {
       client.value = response.data

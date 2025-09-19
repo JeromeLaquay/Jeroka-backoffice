@@ -180,11 +180,6 @@ const router = createRouter({
           component: () => import('../views/Emails/EmailsView.vue')
         },
         {
-          path: '/emails/documents',
-          name: 'EmailDocuments',
-          component: () => import('../views/Emails/DocumentsView.vue')
-        },
-        {
           path: '/annonces',
           name: 'Annonces',
           component: () => import('../views/announcements/AnnouncementsView.vue')
@@ -193,6 +188,11 @@ const router = createRouter({
           path: '/calendrier',
           name: 'Calendrier',
           component: () => import('../views/calendar/CalendarView.vue')
+        },
+        {
+          path: '/documents',
+          name: 'Documents',
+          component: () => import('../views/documents/DriveView.vue')
         },
         {
           path: '/admin',

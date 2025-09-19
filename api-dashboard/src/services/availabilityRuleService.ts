@@ -1,25 +1,51 @@
-import {AvailabilityRulesRepository} from '../repositories/availabilityRulesRepository';
-import { AvailabilityRule } from '../types/availabilityRules';
 import GoogleCalendarAvailabilityRuleService from '../api/google/calendar/googleCalendarAvailabilityRuleService';
 
 export class AvailabilityRuleService {
 
-  static async createRules(userId: string, day: string, startTime: string, endTime: string, appointmentTime: number): Promise<AvailabilityRule[]> {
-    const availabilityRules = await this.generateAvailabilityRules(userId, day, startTime, endTime, appointmentTime);
-    const results = await Promise.all(availabilityRules.map(async (rule: AvailabilityRule) => {
-      //const googleEvent = await GoogleCalendarAvailabilityRuleService.createAvailabilityRuleEvent(userId, rule.day, rule.startTime, rule.endTime);
-      //if (googleEvent?.id) {
-        //rule.googleEventId = googleEvent.id;
-        //return AvailabilityRulesRepository.create(userId, rule.day, rule.startTime, rule.endTime, rule.googleEventId);
-      //}
-      console.log(rule);
-      console.log(userId);
-      return AvailabilityRulesRepository.create(userId, rule.day, rule.startTime, rule.endTime, '1');
-    }));
+  static async createRules(userId: string, day: string, startTime: string, endTime: string, appointmentTime: number): Promise<any[]> {
+    console.log('createRules generate AvailabilityRules');
+    const availabilityRules = await this.generateAvailabilityRulesByAppointmentTime(userId, day, startTime, endTime, appointmentTime);
+    
+    const results: any[] = [];
+    
+    for (const rule of availabilityRules) {
+      try {
+        console.log('createRules pour le crenau', rule.day, rule.startTime, rule.endTime);
+        
+        // Vérifier si le créneau existe déjà dans Google Calendar
+        const existingGoogleEvent = await GoogleCalendarAvailabilityRuleService.findAvailabilityRuleEventByUserIdAndDay(userId, rule.day, rule.startTime, rule.endTime);
+        if (existingGoogleEvent?.id) {
+          console.log('Créneau existant trouvé dans Google Calendar, ignoré');
+          continue; // Ignorer ce créneau au lieu de planter
+        }
+        
+        // Créer un événement Google Calendar
+        console.log('createRules créer un événement Google Calendar');
+        const googleEvent = await GoogleCalendarAvailabilityRuleService.createAvailabilityRuleEvent(userId, rule.day, rule.startTime, rule.endTime);
+        if (googleEvent?.id) {
+          console.log('createRules événement Google Calendar créé:', googleEvent.id);
+          results.push({
+            id: googleEvent.id,
+            day: rule.day,
+            startTime: rule.startTime,
+            endTime: rule.endTime,
+            status: 'created'
+          });
+        } else {
+          console.log('Erreur lors de la création de l\'événement Google Calendar pour le créneau:', rule);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la création du créneau:', rule, error);
+        // Continuer avec les autres créneaux même si un échoue
+      }
+    }
+    
+    console.log('results', results);
+    console.log('createRules fin de la création des règles de disponibilité');
     return results;
   }
 
-  static async generateAvailabilityRules(userId: string, day: string, startTime: string, endTime: string, appointmentTime: number): Promise<AvailabilityRule[]> {
+  static async generateAvailabilityRulesByAppointmentTime(userId: string, day: string, startTime: string, endTime: string, appointmentTime: number): Promise<any[]> {
     const rules: any[] = [];
     const start = new Date(`${day}T${startTime}`);
     const boundary = new Date(`${day}T${endTime}`);
@@ -44,11 +70,7 @@ export class AvailabilityRuleService {
       cursor = slotEnd;
     }
 
-    return rules as AvailabilityRule[];
-  }
-
-  static async findPendingWithoutAppointmentByUserId(userId: string) {
-    return AvailabilityRulesRepository.findPendingWithoutAppointmentByUserId(userId);
+    return rules as any[];
   }
 }
 export default AvailabilityRuleService;

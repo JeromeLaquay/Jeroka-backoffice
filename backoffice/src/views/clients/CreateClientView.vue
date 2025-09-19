@@ -223,7 +223,7 @@
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { clientsService, type CreateClientRequest } from '../../services/clients'
+import { personsService, type CreatePersonRequest } from '../../services/persons'
 
 const router = useRouter()
 const route = useRoute()
@@ -261,30 +261,29 @@ const handleSubmit = async () => {
   loading.value = true
   
   try {
-    const clientData: CreateClientRequest = {
-      type: form.type,
-      firstName: form.firstName,
-      lastName: form.lastName,
-      companyName: form.companyName || undefined,
+    const clientData: CreatePersonRequest = {
+      type: 'client',
+      type_label: form.type === 'individual' ? 'Particulier' : 'Entreprise',
+      first_name: form.firstName,
+      last_name: form.lastName,
+      company_name: form.companyName || undefined,
       email: form.email,
       phone: form.phone || undefined,
       mobile: form.mobile || undefined,
       website: form.website || undefined,
-      address: {
-        line1: form.address.line1 || undefined,
-        line2: form.address.line2 || undefined,
-        city: form.address.city || undefined,
-        postalCode: form.address.postalCode || undefined,
-        country: form.address.country || 'France'
-      },
+      address_line1: form.address.line1 || undefined,
+      address_line2: form.address.line2 || undefined,
+      city: form.address.city || undefined,
+      postal_code: form.address.postalCode || undefined,
+      country: form.address.country || 'France',
       siret: form.siret || undefined,
-      vatNumber: form.vatNumber || undefined,
+      vat_number: form.vatNumber || undefined,
       status: form.status,
       source: form.source || undefined,
       notes: form.notes || undefined
     }
 
-    const response = await clientsService.createClient(clientData)
+    const response = await personsService.createPerson(clientData)
     
     if (response.success) {
       // Redirection vers la liste des clients

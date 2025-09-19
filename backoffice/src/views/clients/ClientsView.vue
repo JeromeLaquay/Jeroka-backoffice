@@ -362,10 +362,9 @@ import {
   UsersIcon, CheckCircleIcon, UserPlusIcon, BuildingOfficeIcon, 
   MagnifyingGlassIcon, ArrowPathIcon, PlusIcon, ExclamationTriangleIcon 
 } from '@heroicons/vue/24/outline'
-import { useClientStore } from '../../stores/clientStore'
+import { personsService, type Person } from '../../services/persons'
 
 const router = useRouter()
-const clientStore = useClientStore()
 
 // État réactif
 const clients = ref<any[]>([])
@@ -386,7 +385,7 @@ const pagination = ref({
 const filters = ref({
   search: '',
   status: '' as 'active' | 'inactive' | 'prospect' | '',
-  type: '' as 'individual' | 'company' | '',
+  type: 'client' as 'client' | 'supplier' | '',
   source: '',
   tags: [] as string[]
 })
@@ -418,7 +417,7 @@ const loadClients = async () => {
       )
     )
     
-    const response = await clientStore.getClients({
+    const response = await personsService.getPersons({
       page: pagination.value.page,
       limit: pagination.value.limit,
       ...cleanFilters
@@ -441,7 +440,7 @@ const loadClients = async () => {
 
 const loadStats = async () => {
   try {
-    const response = await clientStore.getClientStats()
+    const response = await personsService.getPersonStats()
     
     if (response.success && response.data) {
       stats.value = response.data
@@ -477,7 +476,7 @@ const confirmDelete = async () => {
   if (!clientToDelete.value) return
   
   try {
-    const response = await clientStore.deleteClient(clientToDelete.value)
+    const response = await personsService.deletePerson(clientToDelete.value)
     
     if (response.success) {
       showDeleteModal.value = false

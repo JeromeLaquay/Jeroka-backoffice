@@ -27,26 +27,15 @@
 
     <!-- Tab Content -->
     <div class="tab-content">
-      <!-- Disponibilités -->
-      <div v-if="activeTab === 'availability'" class="space-y-6">
-        <DisponibilitiesScreen />
-      </div>
 
       <!-- Rendez-vous -->
       <div v-if="activeTab === 'appointments'" class="space-y-6">
         <AppointmentScreen />
       </div>
 
-      <div v-if="activeTab === 'calendar'" class="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
-          <iframe 
-            src="https://calendar.google.com/calendar/embed?src=c63d2465ed5e47c30e0253bfa96748a438bf315e3d1fe62d730d7738ad4e18aa%40group.calendar.google.com&ctz=Europe%2FParis" 
-            class="w-full h-[600px] md:h-[700px] lg:h-[800px] border-0"
-            frameborder="0" 
-            scrolling="no"
-            title="Démonstration Google Calendar"
-            allowfullscreen
-          ></iframe>
-        </div>
+      <div v-if="activeTab === 'calendar'">
+        <DisponibilitiesScreen />  
+      </div>
     
   </div>
 </div>
@@ -63,21 +52,13 @@ const activeTab = ref('calendar')
 
 // Tabs
 const tabs = [
-  { id: 'calendar', name: 'Calendrier' },
-  { id: 'availability', name: 'Disponibilités' },
+  { id: 'calendar', name: 'Disponibilités' },
   { id: 'appointments', name: 'Rendez-vous' }
 ]
 
 </script>
 
 <style scoped>
-.calendar-view {
-  @apply  min-h-screen;
-}
-
-.tab-content {
-  @apply min-h-96;
-}
 
 /* Transitions pour les changements de thème */
 * {

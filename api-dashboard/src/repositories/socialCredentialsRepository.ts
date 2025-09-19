@@ -16,6 +16,7 @@ export interface SocialCredentials {
     oauthClientId: boolean;
     oauthClientSecret: boolean;
     redirectUri: boolean;
+    refreshToken: boolean;
   };
 }
 
@@ -61,14 +62,12 @@ export class SocialCredentialsRepository {
       SELECT * FROM company_social_credentials 
       WHERE user_id = $1 AND platform = $2 AND is_active = true
     `;
-    
     const result = await query(sql, [userId, platform]);
-    
     if (result.rows.length === 0) {
       return null;
     }
-    
-    return this.mapRowToCredentials(result.rows[0]);
+    const credentials = this.mapRowToCredentials(result.rows[0]);
+    return credentials;
   }
 
   static async getByCompany(companyId: string): Promise<SocialCredentials[]> {
@@ -138,7 +137,7 @@ export class SocialCredentialsRepository {
     } catch (_) {
       parsedCredentials = {};
     }
-
+    console.log('mapRowToCredentials parsedCredentials', parsedCredentials);
     return {
       id: row.id,
       companyId: row.company_id,
@@ -152,6 +151,7 @@ export class SocialCredentialsRepository {
       decryptedCredentials: {
         oauthClientId: Boolean(parsedCredentials?.oauthClientId),
         oauthClientSecret: Boolean(parsedCredentials?.oauthClientSecret),
+        refreshToken: Boolean(parsedCredentials?.refreshToken),
         redirectUri: Boolean(parsedCredentials?.redirectUri)
       }
     };

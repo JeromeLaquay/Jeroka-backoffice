@@ -12,17 +12,25 @@ export type CalendarEvent = {
   attendees?: Array<{ email: string; responseStatus?: string }>;
 };
 
+const calendarId = 'c63d2465ed5e47c30e0253bfa96748a438bf315e3d1fe62d730d7738ad4e18aa@group.calendar.google.com'
+
+
 const createOAuthClient = (credentials: any): OAuth2Client => {
-  const clientId = credentials.clientId || '';
-  const clientSecret = credentials.clientSecret || '';
+  const clientId = credentials.clientId || process.env.GOOGLE_CLIENT_ID || '';
+  const clientSecret = credentials.clientSecret || process.env.GOOGLE_CLIENT_SECRET || '';
   const refreshToken = credentials.refreshToken || '';
   const redirectUri = process.env.GOOGLE_REDIRECT_URI || 'urn:ietf:wg:oauth:2.0:oob';
+  
+  if (!clientId || !clientSecret || !refreshToken) {
+    throw new Error('Missing required OAuth credentials: clientId, clientSecret, or refreshToken');
+  }
+  
   const client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
   client.setCredentials({ refresh_token: refreshToken });
   return client;
 };
 
-export const listEvents = async (credentials: any, calendarId = 'primary', timeMin?: string, timeMax?: string, maxResults = 50): Promise<CalendarEvent[]> => {
+export const listEvents = async (credentials: any, timeMin?: string, timeMax?: string, maxResults = 50): Promise<CalendarEvent[]> => {
   const auth = createOAuthClient(credentials);
   const calendar = google.calendar({ version: 'v3', auth });
   try {
@@ -43,8 +51,9 @@ export const listEvents = async (credentials: any, calendarId = 'primary', timeM
   }
 };
 
-export const createEvent = async (credentials: any, calendarId = 'primary', event: Partial<CalendarEvent>): Promise<CalendarEvent | null> => {
+export const createEvent = async (credentials: any, event: Partial<CalendarEvent>): Promise<CalendarEvent | null> => {
   const auth = createOAuthClient(credentials);
+  console.log('createEvent auth', auth);
   const calendar = google.calendar({ version: 'v3', auth });
   try {
     const requestBody: any = {
@@ -55,8 +64,12 @@ export const createEvent = async (credentials: any, calendarId = 'primary', even
       location: event.location,
       attendees: event.attendees
     };
+    console.log('createEvent requestBody', requestBody);
+    console.log('createEvent calendarId', calendarId);
     const res = await calendar.events.insert({ calendarId, requestBody });
+    console.log('createEvent result jerome', res);
     const ev = res.data;
+    console.log('createEvent ev', ev);
     return ev.id ? {
       id: ev.id,
       summary: ev.summary ?? undefined,
@@ -72,7 +85,7 @@ export const createEvent = async (credentials: any, calendarId = 'primary', even
   }
 };
 
-export const updateEvent = async (credentials: any, calendarId = 'primary', eventId: string, updates: Partial<CalendarEvent>): Promise<CalendarEvent | null> => {
+export const updateEvent = async (credentials: any, eventId: string, updates: Partial<CalendarEvent>): Promise<CalendarEvent | null> => {
   const auth = createOAuthClient(credentials);
   const calendar = google.calendar({ version: 'v3', auth });
   try {
@@ -101,7 +114,7 @@ export const updateEvent = async (credentials: any, calendarId = 'primary', even
   }
 };
 
-export const deleteEvent = async (credentials: any, calendarId = 'primary', eventId: string): Promise<boolean> => {
+export const deleteEvent = async (credentials: any, eventId: string): Promise<boolean> => {
   const auth = createOAuthClient(credentials);
   const calendar = google.calendar({ version: 'v3', auth });
   try {
@@ -126,20 +139,20 @@ const testConnection = async (credentials: any): Promise<boolean> => {
 };
 
 export class GoogleCalendarService {
-  static async listEvents(credentials: any, calendarId = 'primary', timeMin?: string, timeMax?: string, maxResults = 50): Promise<CalendarEvent[]> {
-    return listEvents(credentials, calendarId, timeMin, timeMax, maxResults);
+  static async listEvents(credentials: any, timeMin?: string, timeMax?: string, maxResults = 50): Promise<CalendarEvent[]> {
+    return listEvents(credentials, timeMin, timeMax, maxResults);
   }
 
-  static async createEvent(credentials: any, calendarId = 'primary', event: Partial<CalendarEvent>): Promise<CalendarEvent | null> {
-    return createEvent(credentials, calendarId, event);
+  static async createEvent(credentials: any, event: Partial<CalendarEvent>): Promise<CalendarEvent | null> {
+    return createEvent(credentials, event);
   }
 
-  static async updateEvent(credentials: any, calendarId = 'primary', eventId: string, updates: Partial<CalendarEvent>): Promise<CalendarEvent | null> {
-    return updateEvent(credentials, calendarId, eventId, updates);
+  static async updateEvent(credentials: any, eventId: string, updates: Partial<CalendarEvent>): Promise<CalendarEvent | null> {
+    return updateEvent(credentials, eventId, updates);
   }
 
-  static async deleteEvent(credentials: any, calendarId = 'primary', eventId: string): Promise<boolean> {
-    return deleteEvent(credentials, calendarId, eventId);
+  static async deleteEvent(credentials: any, eventId: string): Promise<boolean> {
+    return deleteEvent(credentials, eventId);
   }
 
   static async testConnection(credentials: any): Promise<boolean> {

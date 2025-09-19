@@ -269,7 +269,7 @@ import ClientSelector from '../../components/orders/ClientSelector.vue'
 import InvoiceItemRow from '../../components/invoices/InvoiceItemRow.vue'
 import InvoiceSummary from '../../components/invoices/InvoiceSummary.vue'
 import { invoiceService, type CreateInvoiceRequest, type Invoice } from '../../services/invoices'
-import { clientsService } from '../../services/clients'
+import { clientsService } from '../../services/persons'
 
 const route = useRoute()
 const router = useRouter()

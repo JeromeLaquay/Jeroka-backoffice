@@ -456,51 +456,51 @@ CREATE INDEX idx_company_social_credentials_platform ON company_social_credentia
 CREATE INDEX idx_company_social_credentials_is_active ON company_social_credentials(is_active);
 
 -- =============================================
--- TABLE: availability_rules (Règles de disponibilité liées aux utilisateurs)
--- =============================================
-CREATE TABLE availability_rules (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    day DATE NOT NULL, -- jour disponible
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'reserved', 'cancelled')),
-    google_event_id VARCHAR(255),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
-    -- Contrainte pour éviter les doublons de jour par utilisateur
-    UNIQUE(user_id, day, start_time, end_time)
-);
-
-CREATE INDEX idx_availability_rules_user_id ON availability_rules(user_id);
-CREATE INDEX idx_availability_rules_day ON availability_rules(day);
-CREATE INDEX idx_availability_rules_start_time ON availability_rules(start_time);
-CREATE INDEX idx_availability_rules_end_time ON availability_rules(end_time);
-CREATE INDEX idx_availability_rules_status ON availability_rules(status);
-CREATE INDEX idx_availability_rules_google_event_id ON availability_rules(google_event_id);
-
--- =============================================
 -- TABLE: appointments (Rendez-vous liés aux entreprises)
 -- =============================================
 CREATE TABLE appointments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    availability_rule_id UUID NOT NULL REFERENCES availability_rules(id) ON DELETE CASCADE,
-    first_name VARCHAR(200) NOT NULL,
-    last_name VARCHAR(200) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    phone VARCHAR(20),
+    person_id UUID NOT NULL REFERENCES persons(id),
+    google_event_id VARCHAR(255),
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'reserved', 'finished','cancelled')),
+    start_time TIMESTAMP WITH TIME ZONE,
+    end_time TIMESTAMP WITH TIME ZONE,
     notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     
     -- Contrainte pour éviter les créneaux en double par user_id
-    UNIQUE( availability_rule_id)
+    UNIQUE( person_id, google_event_id)
 );
 
-CREATE INDEX idx_appointments_availability_rule_id ON appointments(availability_rule_id);
-CREATE INDEX idx_appointments_email ON appointments(email);
-CREATE INDEX idx_appointments_created_at ON appointments(created_at);
+-- =============================================
+-- TABLE: google_documents
+-- =============================================
+CREATE TABLE google_documents (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    google_doc_id VARCHAR(255), -- id du document dans Google Drive
+    google_email_id VARCHAR(255), -- id de l'email dans Google Drive
+    invoice_id UUID REFERENCES invoices(id),
+    quote_id UUID REFERENCES quotes(id),
+    name VARCHAR(255),
+    mime_type VARCHAR(255),
+    extracted_data TEXT,
+    analyzed_data TEXT,
+    web_view_link VARCHAR(255),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_google_documents_google_doc_id ON google_documents(google_doc_id);
+CREATE INDEX idx_google_documents_google_email_id ON google_documents(google_email_id);
+CREATE INDEX idx_google_documents_invoice_id ON google_documents(invoice_id);
+CREATE INDEX idx_google_documents_quote_id ON google_documents(quote_id);
+CREATE INDEX idx_google_documents_name ON google_documents(name);
+CREATE INDEX idx_google_documents_mime_type ON google_documents(mime_type);
+CREATE INDEX idx_google_documents_extracted_data ON google_documents(extracted_data);
+CREATE INDEX idx_google_documents_analyzed_data ON google_documents(analyzed_data);
+CREATE INDEX idx_google_documents_created_at ON google_documents(created_at);
+CREATE INDEX idx_google_documents_updated_at ON google_documents(updated_at);
 
 -- =============================================
 -- TRIGGERS pour updated_at automatique
@@ -522,7 +522,6 @@ CREATE TRIGGER update_quotes_updated_at BEFORE UPDATE ON quotes FOR EACH ROW EXE
 CREATE TRIGGER update_invoices_updated_at BEFORE UPDATE ON invoices FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_publications_updated_at BEFORE UPDATE ON publications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_publication_platforms_updated_at BEFORE UPDATE ON publication_platforms FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_availability_rules_updated_at BEFORE UPDATE ON availability_rules FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_appointments_updated_at BEFORE UPDATE ON appointments FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =============================================

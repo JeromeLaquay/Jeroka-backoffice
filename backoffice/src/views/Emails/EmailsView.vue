@@ -124,11 +124,17 @@
 
     <!-- Onglets -->
     <div class="mb-6">
-      <nav class="flex space-x-8" aria-label="Tabs">
+      <nav class="flex space-x-8" aria-label="Tabs" role="tablist">
         <button
           v-for="tab in tabs"
           :key="tab.id"
-          @click="activeTab = tab.id"
+          type="button"
+          role="tab"
+          :aria-selected="activeTab === tab.id"
+          :aria-controls="`panel-${tab.id}`"
+          @click="selectTab(tab.id)"
+          @keydown.enter.prevent="selectTab(tab.id)"
+          @keydown.space.prevent="selectTab(tab.id)"
           :class="[
             activeTab === tab.id
               ? 'border-primary-500 text-primary-600 dark:text-primary-400'
@@ -793,13 +799,16 @@ import emailsService, {
   type EmailAttachment,
   type AnalysisResult,
   type CreateCategoryRequest,
-  type UpdateCategoryRequest
 } from '../../services/emails.ts'
 
 const router = useRouter()
 
 // État réactif
 const activeTab = ref('categories')
+const selectTab = (id: string) => {
+  const available = tabs.value.map(t => t.id)
+  activeTab.value = available.includes(id) ? id : 'categories'
+}
 const categories = ref<EmailCategory[]>([])
 const senders = ref<EmailSender[]>([])
 const emails = ref<Email[]>([])
@@ -910,8 +919,10 @@ const loadCategories = async () => {
   loading.value.categories = true
   try {
     const response = await emailsService.getCategories()
-    if (response.success && response.data) {
-      categories.value = response.data
+    if (response.success) {
+      categories.value = (response.data as any) || []
+    } else {
+      categories.value = []
     }
   } catch (error) {
     console.error('Erreur lors du chargement des catégories:', error)
@@ -924,8 +935,10 @@ const loadSenders = async () => {
   loading.value.senders = true
   try {
     const response = await emailsService.getSenders()
-    if (response.success && response.data) {
-      senders.value = response.data
+    if (response.success) {
+      senders.value = (response.data as any) || []
+    } else {
+      senders.value = []
     }
   } catch (error) {
     console.error('Erreur lors du chargement des expéditeurs:', error)
@@ -945,9 +958,12 @@ const loadEmails = async (page = 1) => {
     }
     
     const response = await emailsService.getEmails(params)
-    if (response.success && response.data) {
-      emails.value = response.data.data
-      emailPagination.value = response.data.pagination
+    if (response.success) {
+      const payload: any = response.data || {}
+      emails.value = payload.data || []
+      emailPagination.value = payload.pagination || emailPagination.value
+    } else {
+      emails.value = []
     }
   } catch (error) {
     console.error('Erreur lors du chargement des emails:', error)
