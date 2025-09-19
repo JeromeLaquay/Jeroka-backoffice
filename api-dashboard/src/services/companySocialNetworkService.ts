@@ -18,9 +18,9 @@ export class CompanySocialNetworkService {
     const existing = await SocialCredentialsRepository.getByCompanyAndPlatform(companyId, platform);
     
     if (existing) {
-      await SocialCredentialsRepository.update(companyId, platform, credentials);
+      await SocialCredentialsRepository.update(companyId, null, platform, credentials);
     } else {
-      await SocialCredentialsRepository.create(companyId, platform, credentials);
+      await SocialCredentialsRepository.create(companyId, null, platform, credentials);
     }
   }
 

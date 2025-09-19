@@ -45,6 +45,7 @@ router.get('/drive/file/:fileId', verifyToken, async (req: AuthRequest, res: Res
     if (file.mimeType) res.setHeader('Content-Type', file.mimeType);
     if (file.name) res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(file.name)}"`);
     (file.stream as any).pipe(res);
+    return res.json({ success: true, data: file });
   } catch (error) {
     return res.status(500).json({ success: false, message: error instanceof Error ? error.message : 'Erreur inconnue' });
   }

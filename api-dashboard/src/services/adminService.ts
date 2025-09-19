@@ -1,5 +1,4 @@
 import UserRepository from '../repositories/userRepository';
-import companyService, { CompanyFilters } from './companyService';
 import { query } from '../database/connection';
 import { AdminStats, AdminUser, AdminCompany, CreateUserData, UpdateUserData, CreateCompanyData, UpdateCompanyData } from '../types/admin';
 import { UserService } from './userService';

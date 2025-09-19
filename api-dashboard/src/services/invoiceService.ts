@@ -1,12 +1,12 @@
 import { InvoiceRepository, CreateInvoiceData, UpdateInvoiceData, CreateInvoiceItemData } from '../repositories/invoiceRepository';
 import UserRepository from '../repositories/userRepository';
-import { ClientRepository } from '../repositories/personRepository';
+import { PersonRepository } from '../repositories/personRepository';
 import { InvoiceValidation } from '../validations/invoiceValidation';
 
 export interface InvoiceWithItems {
   id: string;
   invoice_number: string;
-  client_id: string;
+  person_id: string;
   company_id: string;
   status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
   total: number;
@@ -18,7 +18,7 @@ export interface InvoiceWithItems {
   notes?: string;
   created_at: Date;
   updated_at: Date;
-  client_name?: string;
+  person_name?: string;
   items: Array<{
     id: string;
     description: string;
@@ -31,7 +31,7 @@ export interface InvoiceWithItems {
 }
 
 export interface CreateInvoiceRequest {
-  client_id: string;
+  person_id: string;
   items: Array<{
     description: string;
     quantity: number;
@@ -45,7 +45,7 @@ export interface CreateInvoiceRequest {
 }
 
 export interface UpdateInvoiceRequest {
-  client_id?: string;
+  person_id?: string;
   items?: Array<{
     description: string;
     quantity: number;
@@ -69,7 +69,7 @@ export class InvoiceService {
     page?: number;
     limit?: number;
     status?: string;
-    clientId?: string;
+    personId?: string;
     dateFrom?: string;
     dateTo?: string;
   }): Promise<{ invoices: InvoiceWithItems[], total: number, page: number, limit: number, totalPages: number }> {
@@ -130,8 +130,8 @@ export class InvoiceService {
       throw new Error('Facture non trouvée');
       return null;
     }
-    const client = await ClientRepository.getClientById(invoice.client_id, user.company_id);
-    if(!client) {
+    const person = await PersonRepository.getPersonById(invoice.person_id, user.company_id);
+    if(!person) {
       throw new Error('Client non trouvé');
       return null;
     }
@@ -143,7 +143,7 @@ export class InvoiceService {
     const items = await InvoiceRepository.getInvoiceItems(invoice.id);
     return {
       ...invoice,
-      client_name: client.company_name || client.first_name + ' ' + client.last_name,
+      person_name: person.company_name || person.first_name + ' ' + person.last_name,
       items
     };
   }
@@ -179,7 +179,7 @@ export class InvoiceService {
     const invoiceNumber = await InvoiceRepository.generateInvoiceNumber(user.company_id);
 
     const invoiceData: CreateInvoiceData = {
-      client_id: validatedData.client_id,
+      person_id: validatedData.person_id,
       company_id: user.company_id,
       status: validatedData.status || 'draft',
       total,
@@ -244,7 +244,7 @@ export class InvoiceService {
     }
 
     const updateData: UpdateInvoiceData = {
-      client_id: data.client_id,
+      person_id: data.person_id,
       status: data.status,
       total: data.total,
       tax: data.tax,
@@ -388,7 +388,7 @@ export class InvoiceService {
     // TODO: Récupérer le devis depuis le service des devis
     // Pour l'instant, on simule la création
     const invoiceData: CreateInvoiceData = {
-      client_id: 'temp_client_id', // À remplacer par l'ID du client du devis
+      person_id: 'temp_person_id', // À remplacer par l'ID du client du devis
       company_id: user.company_id,
       status: 'draft',
       total: 0, // À calculer à partir du devis
