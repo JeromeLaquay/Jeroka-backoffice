@@ -28,7 +28,6 @@ import emailsRoutes from './routes/emails';
 import announcementsRoutes from './routes/announcements';
 import appointmentsRoutes from './routes/appointments';
 import availabilityRulesRoutes from './routes/availabilityRules';
-import messageSiteRoutes from './routes/site/messageSite';
 import credentialsRoutes from './routes/credentials';
 import socialNetworksRoutes from './routes/credentials';
 import settingsRoutes from './routes/settings';
