@@ -1,6 +1,6 @@
 import { PublicationService } from './publicationService';
 import { CompanyService } from './companyService';
-import { iaService } from '@/api/ia/iaService';
+import { iaService } from '../api/ia/iaService';
 
 export class PublicationIAService {
 
