@@ -301,7 +301,7 @@ const loadQuote = async () => {
     if (quote.value) {
       Object.assign(form, {
         quoteNumber: quote.value.quote_number,
-        clientId: quote.value.client_id,
+        clientId: quote.value.person_id,
         items: quote.value.items.map((item: any) => ({
           description: item.description,
           quantity: item.quantity,
@@ -316,7 +316,7 @@ const loadQuote = async () => {
       })
 
       // Trouver le client correspondant dans la liste
-      const client = clients.value.find(c => c.id === quote.value?.client_id)
+      const client = clients.value.find(c => c.id === quote.value?.person_id)
       selectedClient.value = client || null
     }
   } catch (error) {
