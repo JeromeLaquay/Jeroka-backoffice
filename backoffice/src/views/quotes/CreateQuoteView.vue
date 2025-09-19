@@ -253,7 +253,7 @@ import ClientSelector from '../../components/orders/ClientSelector.vue'
 import QuoteItemRow from '../../components/quotes/QuoteItemRow.vue'
 import QuoteSummary from '../../components/quotes/QuoteSummary.vue'
 import { quoteService, type CreateQuoteRequest, type Quote } from '../../services/quotes'
-import { clientsService } from '../../services/persons'
+import { personsService } from '../../services/persons'
 
 const route = useRoute()
 const router = useRouter()
@@ -378,7 +378,7 @@ const handleSubmit = async () => {
 
     if (isEdit.value) {
       const response = await quoteService.updateQuote(route.params.id as string, {
-        client_id: form.clientId,
+        person_id: form.clientId,
         items: form.items.map((item: any) => ({
           description: item.description,
           quantity: item.quantity,
@@ -396,7 +396,7 @@ const handleSubmit = async () => {
       }
     } else {
       const response = await quoteService.createQuote({
-        client_id: form.clientId,
+        person_id: form.clientId,
         items: form.items.map((item: any) => ({
           description: item.description,
           quantity: item.quantity,
@@ -421,7 +421,7 @@ const handleSubmit = async () => {
 // Méthodes
 const loadClients = async () => {
   try {
-    const response = await clientsService.getClients({ type: 'client' })
+    const response = await personsService.getPersons({ type: 'client' })
     if (response.success && response.data && Array.isArray(response.data)) {
       // Mapper les clients pour correspondre à l'interface attendue par ClientSelector
       clients.value = response.data.map((client: any) => ({

@@ -1,4 +1,5 @@
 import { apiService, ApiResponse } from './api'
+import { Person } from './persons'
 
 export interface QuoteItem {
   id: string
@@ -13,8 +14,8 @@ export interface QuoteItem {
 export interface Quote {
   id: string
   quote_number: string
-  client_id: string
-  client_name?: string
+  person_id: string
+  person?: Person
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted'
   total: number
   tax: number
@@ -27,14 +28,14 @@ export interface Quote {
 }
 
 export interface CreateQuoteRequest {
-  client_id: string
+  person_id: string
   items: Omit<QuoteItem, 'id'>[]
   valid_until: string
   notes?: string
 }
 
 export interface UpdateQuoteRequest {
-  client_id?: string
+  person_id?: string
   items?: Omit<QuoteItem, 'id'>[]
   valid_until?: string
   notes?: string
