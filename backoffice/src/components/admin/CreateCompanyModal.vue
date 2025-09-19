@@ -201,9 +201,8 @@ const form = reactive<CreateCompanyData>({
   city: '',
   postal_code: '',
   country: '',
-  vat_number: '',
+  vat_number: 0,
   siret: '',
-  vat_number: 20,
   tax_regime: 'standard',
   subscription_plan: 'free',
 });

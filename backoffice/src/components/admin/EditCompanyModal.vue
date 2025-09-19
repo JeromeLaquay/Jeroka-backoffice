@@ -256,9 +256,8 @@ const form = reactive<UpdateCompanyData>({
   city: '',
   postal_code: '',
   country: '',
-  vat_number: '',
+  vat_number: 0,
   siret: '',
-  vat_number: 20,
   tax_regime: 'standard',
   subscription_plan: 'free',
   is_active: true
@@ -273,9 +272,8 @@ const initializeForm = () => {
   form.city = props.company.city || '';
   form.postal_code = props.company.postal_code || '';
   form.country = props.company.country || '';
-  form.vat_number = props.company.vat_number || '';
+  form.vat_number = props.company.vat_number || 0;
   form.siret = props.company.siret || '';
-  form.vat_number = props.company.vat_number || 20;
   form.tax_regime = props.company.tax_regime || 'standard';
   form.subscription_plan = props.company.subscription_plan || 'free';
   form.is_active = props.company.is_active;

@@ -269,7 +269,7 @@ import ClientSelector from '../../components/orders/ClientSelector.vue'
 import InvoiceItemRow from '../../components/invoices/InvoiceItemRow.vue'
 import InvoiceSummary from '../../components/invoices/InvoiceSummary.vue'
 import { invoiceService, type CreateInvoiceRequest, type Invoice } from '../../services/invoices'
-import { clientsService } from '../../services/persons'
+import { personsService } from '../../services/persons'
 
 const route = useRoute()
 const router = useRouter()
@@ -309,7 +309,7 @@ const isFormValid = computed(() => {
 // Méthodes
 const loadClients = async () => {
   try {
-    const response = await clientsService.getClients({ type: 'client' })
+    const response = await personsService.getPersons({ type: 'client' })
     if (response.success && response.data && Array.isArray(response.data)) {
       // Mapper les clients pour correspondre à l'interface attendue par ClientSelector
       console.log('response.data', response.data)

@@ -65,7 +65,7 @@ export interface CreateCompanyData {
   city?: string;
   postal_code?: string;
   country?: string;
-  vat_number?: string;
+  vat_number?: number;
   siret?: string;
   tax_regime?: string;
   subscription_plan?: 'free' | 'basic' | 'premium' | 'enterprise';
@@ -80,7 +80,7 @@ export interface UpdateCompanyData {
   city?: string;
   postal_code?: string;
   country?: string;
-  vat_number?: string;
+  vat_number?: number;
   siret?: string;
   tax_regime?: string;
   is_active?: boolean;
