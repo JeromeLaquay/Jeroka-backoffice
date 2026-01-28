@@ -2,21 +2,23 @@
 import { query } from '../database/connection';
 import { EncryptionService } from '../services/encryptionService';
 
-export interface SocialCredentials {
-  id: string;
-  companyId: string;
-  platform: 'facebook' | 'linkedin' | 'twitter' | 'google';
-  credentials: any; // Déchiffré
-  isActive: boolean;
+export class SocialCredentials {
+  id?: string = '';
+  companyId?: string = '';
+  platform?: 'facebook' | 'linkedin' | 'twitter' | 'google' = 'google';
+  credentials?: any; // Déchiffré
+  isActive?: boolean = true;
   expiresAt?: Date;
   lastUsedAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  decryptedCredentials: {
-    oauthClientId: boolean;
-    oauthClientSecret: boolean;
-    redirectUri: boolean;
-    refreshToken: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  decryptedCredentials?: {
+    oauthClientId?: string;
+    oauthClientSecret?: string;
+    redirectUri?: string;
+    refreshToken?: string;
+    accessToken?: string;
+    expiryDate?: number;
   };
 }
 
@@ -149,10 +151,12 @@ export class SocialCredentialsRepository {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       decryptedCredentials: {
-        oauthClientId: Boolean(parsedCredentials?.oauthClientId),
-        oauthClientSecret: Boolean(parsedCredentials?.oauthClientSecret),
-        refreshToken: Boolean(parsedCredentials?.refreshToken),
-        redirectUri: Boolean(parsedCredentials?.redirectUri)
+        oauthClientId: parsedCredentials?.oauthClientId,
+        oauthClientSecret: parsedCredentials?.oauthClientSecret,
+        refreshToken: parsedCredentials?.refreshToken,
+        redirectUri: parsedCredentials?.redirectUri,
+        accessToken: parsedCredentials?.accessToken,
+        expiryDate: parsedCredentials?.expiryDate
       }
     };
   }

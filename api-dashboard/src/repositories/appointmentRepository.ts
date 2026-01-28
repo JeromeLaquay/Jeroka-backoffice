@@ -1,43 +1,115 @@
-import { Appointment, AppointmentDTO } from '@/types/appointment';
 import { query } from '../database/connection';
+import { Person } from './personRepository';
+export class Appointment {
+  id?: string;
+  person_id?: string;
+  user_id?: string;
+  google_event_id?: string;
+  status?: string;
+  start_time?: string;
+  end_time?: string;
+  notes?: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+export class AppointmentCreate {
+  user_id?: string;
+  google_event_id?: string;
+  start_time?: string;
+  end_time?: string;
+  status?: string;
+}
+
+export class AppointmentToUpdate {
+  user_id?: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+}
+
+export class AppointmentClient {
+  id?: string;
+  person_id?: string;
+  user_id?: string;
+  google_event_id?: string;
+  status?: string;
+  start_time?: string;
+  end_time?: string;
+  notes?: string;
+  created_at?: Date;
+  updated_at?: Date;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+}
 export class AppointmentRepository {
-  static async findByUserId(userId: string, { startDate, endDate }: { startDate?: string | null, endDate?: string | null }) : Promise<AppointmentDTO[]> {
+  static async getById(id: string) : Promise<Appointment> {
+    const result = await query(`
+      SELECT * FROM appointments WHERE id = $1
+    `, [id]);
+    return result.rows[0];
+  }
+  static async findByUserIdWithClient(userId: string) : Promise<AppointmentClient[]> {    
     const result = await query(`
       SELECT 
         a.*, 
-        ar.user_id, 
-        ar.day, 
-        ar.start_time, 
-        ar.end_time
+        p.first_name,
+        p.last_name,
+        p.email,
+        p.phone
       FROM appointments a
-      JOIN availability_rules ar ON ar.id = a.availability_rule_id
-      WHERE ar.user_id = $1
-        AND ($2::date IS NULL OR ar.day >= $2::date)
-        AND ($3::date IS NULL OR ar.day <= $3::date)
-      ORDER BY ar.day, ar.start_time
-    `, [userId, startDate ?? null, endDate ?? null]);
+      LEFT JOIN persons p ON a.person_id = p.id
+      WHERE a.user_id = $1
+    `, [userId]);
     return result.rows;
   }
 
-  static async findByAvailabiityRuleId(availabilityRuleId: string) {
+  static async create(userId: string, appointment: AppointmentCreate): Promise<Appointment> {
     const result = await query(`
-      SELECT * FROM appointments WHERE availability_rule_id = $1
-    `, [availabilityRuleId]);
-    return result.rows;
-  }
-
-  static async create(availabilityRuleId: string, { clientFirstName, clientLastName, clientEmail, clientPhone, notes }: { clientFirstName: string, clientLastName: string, clientEmail: string, clientPhone?: string, notes?: string }): Promise<Appointment> {
-    const result = await query(`
-      INSERT INTO appointments (availability_rule_id, client_first_name, client_last_name, client_email, client_phone, notes)
+      INSERT INTO appointments (user_id, google_event_id, start_time, end_time, status, notes)
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
-    `, [availabilityRuleId, clientFirstName, clientLastName, clientEmail, clientPhone ?? null, notes ?? null]);
+      `, [appointment.user_id, appointment.google_event_id, appointment.start_time, appointment.end_time, appointment.status ?? null, null]);
     return result.rows[0];
   }
+
   static async delete(id: string) {
     const result = await query(`
       DELETE FROM appointments WHERE id = $1
       RETURNING *
+    `, [id]);
+    return result.rows[0];
+  }
+
+  static async update(userId: string, id: string, personId: string, status: string) {
+    const result = await query(`
+      UPDATE appointments SET person_id = $2, status = $3 WHERE id = $1 AND user_id = $4
+      RETURNING *
+    `, [id, personId, status ?? null, userId]);
+    return result.rows[0];
+  }
+  static async updateStatus(id: string, status: string) {
+    const result = await query(`
+      UPDATE appointments SET status = $2 WHERE id = $1
+      RETURNING *
+    `, [id, status]);
+    return result.rows[0];
+  }
+
+  static async updateConfirmed(userId: string, id: string, personId: string) {
+    const result = await query(`
+      UPDATE appointments SET person_id = $2, status = 'reserved' WHERE id = $1 AND user_id = $3
+      RETURNING *
+    `, [id, personId, userId]);
+    return result.rows[0];
+  }
+
+  static async getByIdWithClient(id: string) : Promise<AppointmentClient> {
+    const result = await query(`
+      SELECT *  FROM appointments a JOIN persons p ON a.person_id = p.id WHERE a.id = $1
     `, [id]);
     return result.rows[0];
   }

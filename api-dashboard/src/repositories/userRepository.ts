@@ -27,9 +27,10 @@ export class UserRepository {
   }
 
   // Récupérer tous les utilisateurs d'une entreprise
-  static async findByCompany(): Promise<User[]> {
+  static async findByCompany(companyId: string): Promise<User[]> {
     const result = await query(
-      'SELECT id, email, first_name, last_name, role, is_active, email_verified, created_at, updated_at, last_login FROM users ORDER BY created_at DESC'
+      'SELECT id, email, first_name, last_name, role, is_active, email_verified, created_at, updated_at, last_login FROM users WHERE company_id = $1 ORDER BY created_at DESC',
+      [companyId]
     );
     return result.rows;
   }

@@ -1,28 +1,31 @@
 import { query } from '../database/connection';
 
-export interface Person {
-  id: string;
-  company_id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
+export class Person {
+  id?: string;
+  company_id?: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
   phone?: string;
   company_name?: string;
+  siret?: string;
+  vat_number?: string;
   address_line1?: string;
   address_line2?: string;
   city?: string;
   postal_code?: string;
   country?: string;
-  status: 'active' | 'inactive' | 'prospect' | 'lead';
-  type: 'individual' | 'company';
+  status?: 'active' | 'inactive' | 'prospect' | 'lead';
+  type?: 'client' | 'supplier';
+  type_client?: 'individual' | 'company';
   source?: string;
   tags?: string[];
   notes?: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
-export interface PersonFilters {
+export class PersonFilters {
   search?: string;
   status?: string;
   type?: string;
@@ -101,6 +104,22 @@ export class PersonRepository {
     };
   }
 
+  static async getPersonByEmail(companyId: string, email: string): Promise<Person | null> {
+    const result = await query(
+      'SELECT * FROM persons WHERE email = $1 AND company_id = $2',
+      [email, companyId]
+    );
+    return result.rows[0] || null;
+  }
+
+  static async getPersonBySiretOrNameOrEmailAndType(companyId: string, siret: string, firstName: string, lastName: string, email: string, type: 'client' | 'supplier'): Promise<Person | null> {
+    const result = await query(
+      'SELECT * FROM persons WHERE (siret = $1 OR (first_name LIKE $2 AND last_name LIKE $3) OR email LIKE $4) AND company_id = $5 AND type = $6',
+      [siret, firstName, lastName, email, companyId, type]
+    );
+    return result.rows[0] || null;
+  }
+
   /**
    * Récupère un person par ID
    */
@@ -119,8 +138,8 @@ export class PersonRepository {
     const result = await query(
       `INSERT INTO persons (
         company_id, first_name, last_name, email, phone, company_name,
-        address_line1, address_line2, city, postal_code, country, status, type, source, tags, notes
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+        address_line1, address_line2, city, postal_code, country, status, type, type_client, source, tags, notes
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING *`,
       [
         personData.company_id,
@@ -136,6 +155,7 @@ export class PersonRepository {
         personData.country,
         personData.status,
         personData.type,
+        personData.type_client,
         personData.source,
         personData.tags,
         personData.notes
@@ -202,8 +222,8 @@ export class PersonRepository {
         COUNT(*) FILTER (WHERE status = 'inactive') as inactive,
         COUNT(*) FILTER (WHERE status = 'prospect') as prospects,
         COUNT(*) FILTER (WHERE status = 'lead') as leads,
-        COUNT(*) FILTER (WHERE type = 'individual') as individuals,
-        COUNT(*) FILTER (WHERE type = 'company') as companies
+        COUNT(*) FILTER (WHERE type = 'client') as individuals,
+        COUNT(*) FILTER (WHERE type = 'supplier') as companies
       FROM persons 
       WHERE company_id = $1`,
       [companyId]
@@ -279,14 +299,7 @@ export class PersonRepository {
     
     return { sortField, order };
   }
-
-  static async getPersonByEmail(email: string, companyId: string): Promise<Person | null> {
-    const result = await query(
-      'SELECT * FROM persons WHERE email = $1 AND company_id = $2',
-      [email, companyId]
-    );
-    return result.rows[0] || null;
-  }
+  
 }
 
 export default PersonRepository;

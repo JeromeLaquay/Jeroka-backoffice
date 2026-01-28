@@ -17,6 +17,7 @@ export const personSchemas = {
     country: Joi.string().max(100).optional(),
     status: Joi.string().valid('active', 'inactive', 'prospect', 'lead').default('prospect'),
     type: Joi.string().valid('client', 'supplier').required(),
+    type_client: Joi.string().valid('individual', 'company').optional(),
     source: Joi.string().max(100).optional(),
     tags: Joi.array().items(Joi.string().max(50)).optional(),
     notes: Joi.string().max(1000).optional()
@@ -36,6 +37,7 @@ export const personSchemas = {
     country: Joi.string().max(100).optional(),
     status: Joi.string().valid('active', 'inactive', 'prospect', 'lead').optional(),
     type: Joi.string().valid('client', 'supplier').optional(),
+    type_client: Joi.string().valid('individual', 'company').optional(),
     source: Joi.string().max(100).optional(),
     tags: Joi.array().items(Joi.string().max(50)).optional(),
     notes: Joi.string().max(1000).optional()

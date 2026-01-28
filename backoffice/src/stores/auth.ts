@@ -233,24 +233,33 @@ export const useAuthStore = defineStore('auth', () => {
   const initializeAuth = async () => {
     loading.value = true
     
-    const storedToken = localStorage.getItem('auth_token')
-    const storedUser = localStorage.getItem('user')
-    
-    if (storedToken && storedUser) {
-      try {
+    try {
+      const storedToken = localStorage.getItem('auth_token')
+      const storedUser = localStorage.getItem('user')
+      
+      if (storedToken && storedUser) {
         token.value = storedToken
         user.value = JSON.parse(storedUser)
         
-        // Vérifier que le token est toujours valide en récupérant le profil
-        await refreshUserProfile()
-      } catch (err) {
-        console.error('Token invalide lors de l\'initialisation:', err)
-        // Nettoyer si le token est invalide
-        await logout()
+        // Vérifier que l'API est accessible avec un timeout
+        const isApiAvailable = await Promise.race([
+          checkApiConnection(),
+          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 3000))
+        ])
+        
+        if (isApiAvailable) {
+          await refreshUserProfile()
+        } else {
+          console.warn('API non accessible, utilisation du token stocké localement')
+        }
       }
+    } catch (err) {
+      console.error('Erreur lors de l\'initialisation:', err)
+      // En cas d'erreur, nettoyer et continuer sans bloquer l'app
+      await logout()
+    } finally {
+      loading.value = false
     }
-    
-    loading.value = false
   }
 
   // Fonction utilitaire pour vérifier la connexion API
@@ -259,7 +268,7 @@ export const useAuthStore = defineStore('auth', () => {
       await apiService.healthCheck()
       return true
     } catch (err) {
-      console.error('API non accessible:', err)
+      console.warn('API non accessible:', err)
       return false
     }
   }

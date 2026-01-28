@@ -7,7 +7,14 @@ RUN apk add --no-cache \
     make \
     g++ \
     postgresql-client \
-    wget
+    wget \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
 
 # Créer le répertoire de l'application
 WORKDIR /app

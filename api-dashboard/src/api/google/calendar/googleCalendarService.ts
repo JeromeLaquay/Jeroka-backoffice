@@ -3,13 +3,21 @@ import { OAuth2Client } from 'google-auth-library';
 import { logger } from '../../../utils/logger';
 
 export type CalendarEvent = {
-  id: string;
+  id?: string;
   summary?: string;
   description?: string;
   start?: { dateTime?: string; timeZone?: string };
   end?: { dateTime?: string; timeZone?: string };
   location?: string;
   attendees?: Array<{ email: string; responseStatus?: string }>;
+  colorId?: string; // Utilise colorId au lieu de color selon la documentation Google
+};
+
+export type GoogleCalendarColors = {
+  kind: string;
+  updated: string;
+  calendar: { [key: string]: { background: string; foreground: string } };
+  event: { [key: string]: { background: string; foreground: string } };
 };
 
 const calendarId = 'c63d2465ed5e47c30e0253bfa96748a438bf315e3d1fe62d730d7738ad4e18aa@group.calendar.google.com'
@@ -126,6 +134,18 @@ export const deleteEvent = async (credentials: any, eventId: string): Promise<bo
   }
 };
 
+export const getColors = async (credentials: any): Promise<GoogleCalendarColors | null> => {
+  const auth = createOAuthClient(credentials);
+  const calendar = google.calendar({ version: 'v3', auth });
+  try {
+    const res = await calendar.colors.get();
+    return res.data as GoogleCalendarColors;
+  } catch (error) {
+    logger.error('Calendar getColors error', { error: error instanceof Error ? error.message : error });
+    return null;
+  }
+};
+
 const testConnection = async (credentials: any): Promise<boolean> => {
   const auth = createOAuthClient(credentials);
   const calendar = google.calendar({ version: 'v3', auth });
@@ -157,6 +177,10 @@ export class GoogleCalendarService {
 
   static async testConnection(credentials: any): Promise<boolean> {
     return testConnection(credentials);
+  }
+
+  static async getColors(credentials: any): Promise<GoogleCalendarColors | null> {
+    return getColors(credentials);
   }
 }
 

@@ -56,6 +56,9 @@ CREATE TABLE companies (
     max_storage_mb INTEGER DEFAULT 1000,
     settings JSONB DEFAULT '{}', -- Configuration spécifique à l'entreprise
     billing_info JSONB DEFAULT '{}', -- Informations de facturation
+    google_calendar_id VARCHAR(255),
+    google_mail_id VARCHAR(255),
+    google_drive_folder_id VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -77,6 +80,9 @@ CREATE TABLE users (
     last_name VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
     avatar_url TEXT,
+    google_calendar_id VARCHAR(255),
+    google_mail_id VARCHAR(255),
+    google_drive_folder_id VARCHAR(255),
     role VARCHAR(50) DEFAULT 'user' CHECK (role IN ('admin', 'manager', 'user', 'viewer')),
     is_active BOOLEAN DEFAULT true,
     is_company_admin BOOLEAN DEFAULT false, -- Admin de l'entreprise
@@ -387,6 +393,10 @@ CREATE TABLE publications (
     type VARCHAR(50) DEFAULT 'standard' CHECK (type IN ('standard', 'promotion', 'event', 'announcement', 'tutorial')),
     status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'scheduled', 'published', 'archived')),
     category VARCHAR(100),
+    is_facebook_post BOOLEAN DEFAULT false,
+    is_instagram_post BOOLEAN DEFAULT false,
+    is_linkedin_post BOOLEAN DEFAULT false,
+    is_website_post BOOLEAN DEFAULT false,
     tags TEXT[],
     seo_title VARCHAR(255),
     seo_description TEXT,
@@ -419,7 +429,7 @@ CREATE TABLE publication_platforms (
     publication_id UUID NOT NULL REFERENCES publications(id) ON DELETE CASCADE,
     platform VARCHAR(50) NOT NULL CHECK (platform IN ('facebook', 'instagram', 'linkedin', 'website')),
     platform_post_id VARCHAR(255), -- ID du post sur la plateforme
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'published', 'failed')),
+    status VARCHAR(20) DEFAULT 'published' CHECK (status IN ('published', 'failed')),
     error_message TEXT,
     published_at TIMESTAMP WITH TIME ZONE,
     metrics JSONB, -- Likes, shares, comments, etc.
@@ -436,7 +446,7 @@ CREATE INDEX idx_publication_platforms_status ON publication_platforms(status);
 
 -- Table pour stocker les identifiants de réseaux sociaux par entreprise
 CREATE TABLE company_social_credentials (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES users(id),
     platform VARCHAR(20) NOT NULL CHECK (platform IN ('meta', 'linkedin', 'twitter', 'site web', 'google')),
     company_id UUID REFERENCES companies(id),
@@ -460,18 +470,28 @@ CREATE INDEX idx_company_social_credentials_is_active ON company_social_credenti
 -- =============================================
 CREATE TABLE appointments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    person_id UUID NOT NULL REFERENCES persons(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    person_id UUID REFERENCES persons(id) ,
     google_event_id VARCHAR(255),
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'reserved', 'finished','cancelled')),
-    start_time TIMESTAMP WITH TIME ZONE,
-    end_time TIMESTAMP WITH TIME ZONE,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'reserved', 'confirmed','cancelled', 'cancelled_by_client')),
+    start_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    end_time TIMESTAMP WITH TIME ZONE NOT NULL,
     notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     
     -- Contrainte pour éviter les créneaux en double par user_id
-    UNIQUE( person_id, google_event_id)
+    UNIQUE( user_id, person_id, google_event_id)
 );
+
+CREATE INDEX idx_appointments_user_id ON appointments(user_id);
+CREATE INDEX idx_appointments_person_id ON appointments(person_id);
+CREATE INDEX idx_appointments_google_event_id ON appointments(google_event_id);
+CREATE INDEX idx_appointments_status ON appointments(status);
+CREATE INDEX idx_appointments_start_time ON appointments(start_time);
+CREATE INDEX idx_appointments_end_time ON appointments(end_time);
+CREATE INDEX idx_appointments_created_at ON appointments(created_at);
+CREATE INDEX idx_appointments_updated_at ON appointments(updated_at);
 
 -- =============================================
 -- TABLE: google_documents
@@ -482,6 +502,8 @@ CREATE TABLE google_documents (
     google_email_id VARCHAR(255), -- id de l'email dans Google Drive
     invoice_id UUID REFERENCES invoices(id),
     quote_id UUID REFERENCES quotes(id),
+    person_id UUID REFERENCES persons(id),
+    company_id UUID REFERENCES companies(id),
     name VARCHAR(255),
     mime_type VARCHAR(255),
     extracted_data TEXT,
@@ -501,6 +523,51 @@ CREATE INDEX idx_google_documents_extracted_data ON google_documents(extracted_d
 CREATE INDEX idx_google_documents_analyzed_data ON google_documents(analyzed_data);
 CREATE INDEX idx_google_documents_created_at ON google_documents(created_at);
 CREATE INDEX idx_google_documents_updated_at ON google_documents(updated_at);
+
+CREATE TABLE history_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID,
+    invoice_id UUID,
+    quote_id UUID,
+    person_id UUID,
+    product_id UUID,
+    publication_id UUID,
+    publication_platform_id UUID,
+    appointment_id UUID,
+    google_document_id UUID,
+    google_event_id VARCHAR(255),
+    google_email_id VARCHAR(255),
+    google_doc_id VARCHAR(255),
+    google_doc_name VARCHAR(255),
+    google_doc_mime_type VARCHAR(255),
+    google_doc_extracted_data TEXT,
+    google_doc_analyzed_data TEXT,
+    status VARCHAR(255) DEFAULT 'success' CHECK (status IN ('success', 'error')),
+    type_error VARCHAR(255) DEFAULT '' CHECK (type_error IN ('','unknown', 'api', 'database', 'other')),
+    action VARCHAR(255) NOT NULL,
+    complementary_data TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_history_logs_status ON history_logs(status);
+CREATE INDEX idx_history_logs_action ON history_logs(action);
+CREATE INDEX idx_history_logs_created_at ON history_logs(created_at);
+CREATE INDEX idx_history_logs_user_id ON history_logs(user_id);
+CREATE INDEX idx_history_logs_invoice_id ON history_logs(invoice_id);
+CREATE INDEX idx_history_logs_quote_id ON history_logs(quote_id);
+CREATE INDEX idx_history_logs_person_id ON history_logs(person_id);
+CREATE INDEX idx_history_logs_product_id ON history_logs(product_id);
+CREATE INDEX idx_history_logs_publication_id ON history_logs(publication_id);
+CREATE INDEX idx_history_logs_publication_platform_id ON history_logs(publication_platform_id);
+CREATE INDEX idx_history_logs_appointment_id ON history_logs(appointment_id);
+CREATE INDEX idx_history_logs_google_document_id ON history_logs(google_document_id);
+CREATE INDEX idx_history_logs_google_event_id ON history_logs(google_event_id);
+CREATE INDEX idx_history_logs_google_email_id ON history_logs(google_email_id);
+CREATE INDEX idx_history_logs_google_doc_id ON history_logs(google_doc_id);
+CREATE INDEX idx_history_logs_google_doc_name ON history_logs(google_doc_name);
+CREATE INDEX idx_history_logs_google_doc_mime_type ON history_logs(google_doc_mime_type);
+CREATE INDEX idx_history_logs_google_doc_extracted_data ON history_logs(google_doc_extracted_data);
+CREATE INDEX idx_history_logs_google_doc_analyzed_data ON history_logs(google_doc_analyzed_data);
 
 -- =============================================
 -- TRIGGERS pour updated_at automatique

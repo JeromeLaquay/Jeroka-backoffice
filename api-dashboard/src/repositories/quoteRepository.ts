@@ -1,20 +1,20 @@
 import { query } from '../database/connection';
 
-export interface Quote {
-  id: string;
-  quote_number: string;
-  person_id: string;
+export class Quote {
+  id?: string;
+  quote_number?: string;
+  person_id?: string;
   person_name?: string;
-  company_id: string;
-  status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted';
-  total: number;
-  tax: number;
-  subtotal: number;
-  valid_until: Date;
-  issue_date: Date;
+  company_id?: string;
+  status?: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted';
+  total?: number;
+  tax?: number;
+  subtotal?: number;
+  valid_until?: Date;
+  issue_date?: Date;
   notes?: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
   person?: {
     id: string;
     name: string;
@@ -23,32 +23,33 @@ export interface Quote {
   };
 }
 
-export interface QuoteItem {
-  id: string;
-  quote_id: string;
-  description: string;
-  quantity: number;
-  unit_price: number;
-  total: number;
+export class QuoteItem {
+  id?: string;
+  quote_id?: string;
+  description?: string;
+  quantity?: number;
+  unit_price?: number;
+  total?: number;
   discount_percent?: number;
   vat_number?: number;
-  created_at: Date;
+  created_at?: Date;
 }
 
-export interface CreateQuoteData {
+export class CreateQuoteData {
+  google_doc_id?: string;
   quote_number?: string;
-  person_id: string;
-  company_id: string;
-  status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted';
-  total: number;
-  tax: number;
-  subtotal: number;
-  valid_until: Date;
-  issue_date: Date;
+  person_id?: string;
+  company_id?: string;
+  status?: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted';
+  total?: number;
+  tax?: number;
+  subtotal?: number;
+  valid_until?: string;
+  issue_date?: string;
   notes?: string;
 }
 
-export interface UpdateQuoteData {
+export class UpdateQuoteData {
   person_id?: string;
   status?: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted';
   total?: number;
@@ -59,12 +60,12 @@ export interface UpdateQuoteData {
   updated_at?: Date;
 }
 
-export interface CreateQuoteItemData {
-  quote_id: string;
-  description: string;
-  quantity: number;
-  unit_price: number;
-  total: number;
+export class CreateQuoteItemData {
+  quote_id?: string;
+  description?: string;
+  quantity?: number;
+  unit_price?: number;
+  total?: number;
   discount_percent?: number;
   vat_number?: number;
 }

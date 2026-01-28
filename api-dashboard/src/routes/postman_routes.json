@@ -1049,9 +1049,15 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{base_url}}/availability-rules",
+              "raw": "{{base_url}}/availability-rules?day=2025-09-17",
               "host": ["{{base_url}}"],
-              "path": ["availability-rules"]
+              "path": ["availability-rules"],
+              "query": [
+                {
+                  "key": "day",
+                  "value": "2025-09-17"
+                }
+              ]
             }
           }
         },
@@ -1078,13 +1084,9 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{base_url}}/appointments?startDate=2025-09-16&endDate=2025-09-20",
+              "raw": "{{base_url}}/appointments",
               "host": ["{{base_url}}"],
-              "path": ["appointments"],
-              "query": [
-                {"key":"startDate","value":"2025-09-16"},
-                {"key":"endDate","value":"2025-09-20"}
-              ]
+              "path": ["appointments"]
             }
           }
         },
@@ -1107,13 +1109,41 @@
           }
         },
         {
-          "name": "Rendez-vous - Supprimer",
+          "name": "Rendez-vous - Détails",
           "request": {
-            "method": "DELETE",
+            "method": "GET",
             "url": {
               "raw": "{{base_url}}/appointments/1",
               "host": ["{{base_url}}"],
               "path": ["appointments", "1"]
+            }
+          }
+        },
+        {
+          "name": "Règles de disponibilité - Supprimer",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/availability-rules/1",
+              "host": ["{{base_url}}"],
+              "path": ["availability-rules", "1"]
+            }
+          }
+        },
+        {
+          "name": "Événements Google Calendar - Lister",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/appointments/available-events?companyId=11111111-1111-1111-1111-111111111111",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "available-events"],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "11111111-1111-1111-1111-111111111111"
+                }
+              ]
             }
           }
         }
@@ -1191,6 +1221,49 @@
               "path": ["settings", "google", "test", "drive"]
             }
           }
+        },
+        {
+          "name": "Paramètres Google - Récupérer",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/settings/google",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "google"]
+            }
+          }
+        },
+        {
+          "name": "Paramètres Google - Sauvegarder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oauthClientId\": \"970287844414-rfc4io1lije03bqge9liidn2nh8l7v7i.apps.googleusercontent.com\",\n  \"oauthClientSecret\": \"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\",\n  \"calendarId\": \"primary\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/settings/google",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "google"]
+            }
+          }
+        },
+        {
+          "name": "Paramètres - Récupérer",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/settings",
+              "host": ["{{base_url}}"],
+              "path": ["settings"]
+            }
+          }
         }
       ]
     },
@@ -1213,14 +1286,31 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{base_url}}/drive/list/1ib41y9FgvQZDeqYmnCV458yG04Wk9j6P",
+              "raw": "{{base_url}}/drive/list?folderId=1ib41y9FgvQZDeqYmnCV458yG04Wk9j6P",
               "host": ["{{base_url}}"],
-              "path": ["drive", "list", "1ib41y9FgvQZDeqYmnCV458yG04Wk9j6P"]
+              "path": ["drive", "list"],
+              "query": [
+                {
+                  "key": "folderId",
+                  "value": "1ib41y9FgvQZDeqYmnCV458yG04Wk9j6P"
+                }
+              ]
             }
           }
         },
         {
           "name": "Télécharger Fichier Drive",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/drive/file/1JuQVpCwgjPkezzTEu3k9-El50dwLQWyH",
+              "host": ["{{base_url}}"],
+              "path": ["drive", "file", "1JuQVpCwgjPkezzTEu3k9-El50dwLQWyH"]
+            }
+          }
+        },
+        {
+          "name": "Prévisualiser Fichier Drive",
           "request": {
             "method": "GET",
             "url": {
@@ -1528,6 +1618,65 @@
               "raw": "{{base_url}}/dashboard/recent-activity",
               "host": ["{{base_url}}"],
               "path": ["dashboard", "recent-activity"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🌐 Routes Externes (Sans Login)",
+      "item": [
+        {
+          "name": "Créer Message Client",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/externes/create-message",
+              "host": ["{{base_url}}"],
+              "path": ["externes", "create-message"]
+            }
+          }
+        },
+        {
+          "name": "Récupérer Créneaux RDV",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/externes/get-appointment-slots/11111111-1111-1111-1111-111111111111",
+              "host": ["{{base_url}}"],
+              "path": ["externes", "get-appointment-slots", "11111111-1111-1111-1111-111111111111"]
+            }
+          }
+        },
+        {
+          "name": "Créer Rendez-vous",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientFirstName\": \"Jean\",\n  \"clientLastName\": \"Dupont\",\n  \"clientEmail\": \"jean.dupont@example.com\",\n  \"clientPhone\": \"+33123456789\",\n  \"notes\": \"Présentation des services\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/externes/create-appointment",
+              "host": ["{{base_url}}"],
+              "path": ["externes", "create-appointment"]
+            }
+          }
+        },
+        {
+          "name": "Récupérer Publications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/externes/get-publications",
+              "host": ["{{base_url}}"],
+              "path": ["externes", "get-publications"]
             }
           }
         }

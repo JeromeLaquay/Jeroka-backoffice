@@ -14,10 +14,8 @@
           data-cy="ai-generation-button"
           class="btn-secondary inline-flex items-center"
         >
-          <svg class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          Générer avec IA
+          <img src="../../assets/astronaute-db.png" alt="Thomas" class="h-8 w-8 mr-2" />
+          Générer avec Thomas
         </button>
         <button
           @click="openCreateModal"

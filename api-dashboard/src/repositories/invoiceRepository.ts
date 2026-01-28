@@ -33,12 +33,13 @@ export interface CreateInvoiceData {
   invoice_number?: string;
   person_id: string;
   company_id: string;
+  google_doc_id?: string;
   status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
   total: number;
   tax: number;
   subtotal: number;
-  due_date: Date;
-  issue_date: Date;
+  due_date: string;
+  issue_date: string;
   notes?: string;
 }
 

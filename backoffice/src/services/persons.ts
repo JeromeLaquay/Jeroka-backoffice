@@ -83,7 +83,7 @@ class PersonsService {
    * Récupérer un Person par son ID
    */
   async getPerson(id: string) {
-    const response = await apiService.axiosInstance.get(`/person/${id}`)
+    const response = await apiService.axiosInstance.get(`/persons/${id}`)
     return response.data
   }
 

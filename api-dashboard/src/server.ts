@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
+import multer from 'multer';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 
@@ -27,12 +28,12 @@ import dashboardRoutes from './routes/dashboard';
 import emailsRoutes from './routes/emails';
 import announcementsRoutes from './routes/announcements';
 import appointmentsRoutes from './routes/appointments';
-import availabilityRulesRoutes from './routes/availabilityRules';
 import credentialsRoutes from './routes/credentials';
 import socialNetworksRoutes from './routes/credentials';
 import settingsRoutes from './routes/settings';
 import adminRoutes from './routes/admin';
 import driveRoutes from './routes/drive';
+import withoutLoginRoutes from './routes/withoutLogin';
 
 // Load environment variables
 dotenv.config();
@@ -84,6 +85,11 @@ app.use(globalLimiter);
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Multer pour gérer les form-data
+const upload = multer();
+app.use(upload.any());
+
 app.use(cookieParser());
 
 // Request logging
@@ -117,12 +123,12 @@ app.use(`${API_PREFIX}/dashboard`, dashboardRoutes);
 app.use(`${API_PREFIX}/emails`, emailsRoutes);
 app.use(`${API_PREFIX}/announcements`, announcementsRoutes);
 app.use(`${API_PREFIX}/appointments`, appointmentsRoutes);
-app.use(`${API_PREFIX}/availability-rules`, availabilityRulesRoutes);
 app.use(`${API_PREFIX}/social-networks`, socialNetworksRoutes);
 app.use(`${API_PREFIX}/credentials`, credentialsRoutes);
 app.use(`${API_PREFIX}/settings`, settingsRoutes);
-app.use(`${API_PREFIX}`, adminRoutes);
-app.use(`${API_PREFIX}`, driveRoutes);
+app.use(`${API_PREFIX}/`, adminRoutes);
+app.use(`${API_PREFIX}/drive`, driveRoutes);
+app.use(`${API_PREFIX}/externes`, withoutLoginRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

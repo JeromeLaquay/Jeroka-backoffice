@@ -1,6 +1,7 @@
 import { MessageRepository, Message, MessageFilters, PaginatedResult } from '../repositories/messageRepository';
 import { MessageValidation } from '../validations/messageValidation';
 import { personService } from './personService';
+import { Person } from '../repositories/personRepository';
 
 export class MessageService {
   static async getMessages(companyId: string, filters: MessageFilters = {}): Promise<PaginatedResult<Message>> {
@@ -20,14 +21,11 @@ export class MessageService {
   }
 
   static async create(companyId: string, data: any): Promise<{ id: string; created_at: string; }> {
-    const { error, value } = MessageValidation.validateCreate(data);
-    if (error) {
-      throw new Error(error.message);
-    }
-    //créer client si pas existant
-    let client = await personService.getPersonByEmail(value.email, companyId);
-    if (!client) {
-      const clientData = {
+      const { error, value } = MessageValidation.validateCreate(data);
+      if (error) {
+        throw new Error(error.message);
+      }
+      const clientData : Person = {
         company_id: companyId,
         first_name: value.first_name,
         last_name: value.last_name,
@@ -36,10 +34,9 @@ export class MessageService {
         status: 'prospect' as const,
         type: 'individual' as const
       }
-      client = await personService.createperson(clientData);
+      const client = await personService.createPersonWithCheckUniqueEmail(clientData);
+      return MessageRepository.create(companyId, value);
     }
-    return MessageRepository.create(companyId, value);
-  }
 
   static async update(id: string, companyId: string, data: any): Promise<Message | null> {
     const { error, value } = MessageValidation.validateUpdate(data);

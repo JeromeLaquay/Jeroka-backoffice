@@ -73,6 +73,9 @@ services:
       # Logs
       LOG_LEVEL: debug
       
+      # Puppeteer
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
+      
       # Timeouts
       AI_REQUEST_TIMEOUT: 300000
       AI_IMAGE_TIMEOUT: 300000

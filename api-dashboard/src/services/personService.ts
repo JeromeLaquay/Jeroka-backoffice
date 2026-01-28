@@ -41,10 +41,10 @@ export class personService {
   }
 
   /**
-   * Crée un nouveau person
+   * Crée un nouveau personne avec vérification de l'unicité de l'email
    */
-  static async createperson(personData: Omit<Person, 'id' | 'created_at' | 'updated_at'>): Promise<Person> {
-    console.log('createperson', personData);
+  static async createPersonWithCheckUniqueEmail(personData: Person): Promise<Person> {
+    console.log('createPersonWithCheckUniqueEmail', personData);
     // Validation avec règles métier
     const validation = PersonValidation.validateCreateWithBusinessRules(personData);
     if (validation.error) {
@@ -52,7 +52,10 @@ export class personService {
     }
 
     // Vérifier l'unicité de l'email dans l'entreprise
-    const existingperson = await PersonRepository.getPersonByEmail(personData.email, personData.company_id);
+    if (!personData.email || !personData.company_id) {
+      throw new Error("L'email et l'identifiant de l'entreprise sont requis");
+    }
+    const existingperson = await PersonRepository.getPersonByEmail(personData.company_id, personData.email);
     if (existingperson) {
       throw new Error('Un person avec cet email existe déjà dans cette entreprise');
     }
@@ -93,7 +96,7 @@ export class personService {
 
     // Vérifier l'unicité de l'email si modifié
     if (updateData.email && updateData.email !== existingperson.email) {
-      const emailExists = await PersonRepository.getPersonByEmail(updateData.email, companyId);
+      const emailExists = await PersonRepository.getPersonByEmail(companyId, updateData.email);
       if (emailExists) {
         throw new Error('Un person avec cet email existe déjà dans cette entreprise');
       }
@@ -137,10 +140,6 @@ export class personService {
     }
 
     return PersonRepository.getPersonStats(companyId);
-  }
-
-  static async getPersonByEmail(email: string, companyId: string): Promise<Person | null> {
-    return PersonRepository.getPersonByEmail(email, companyId);
   }
 }
 export default personService;

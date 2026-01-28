@@ -1,6 +1,6 @@
 import { apiService as api } from './api'
 
-export interface AvailabilityRuleCreate {
+export interface AppointmentCreate {
   day: string
   startTime: string
   endTime: string,
@@ -8,30 +8,31 @@ export interface AvailabilityRuleCreate {
 }
 
 export interface Appointment {
-  id: string
-  day: string
-  start_time: string
-  end_time: string
-  availability_rule_id: string
-  client_first_name: string
-  client_last_name: string
-  client_email: string
-  client_phone?: string
-  notes?: string
-  created_at: Date
-  updated_at: Date
+  id?: string;
+  person_id?: string;
+  user_id?: string;
+  google_event_id?: string;
+  status?: string;
+  start_time?: string;
+  end_time?: string;
+  notes?: string;
+  created_at?: Date;
+  updated_at?: Date;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
 }
 
 // Availability Rules API
 export const availabilityApi = {
 
 
-  // Create new availability rule
-  create: async (rule: Omit<AvailabilityRuleCreate, 'id' | 'createdAt' | 'updatedAt'>): Promise<AvailabilityRuleCreate> => {
-    const response = await api.post<AvailabilityRuleCreate>('/availability-rules', rule)
-    return response.data || {} as AvailabilityRuleCreate
+  // Create new appointment
+  create: async (appointment: Omit<AppointmentCreate, 'id' | 'createdAt' | 'updatedAt'>): Promise<Appointment> => {
+    const response = await api.post<Appointment>('/appointments', appointment)
+    return response.data || {} as Appointment
   }
-
 }
 
 
@@ -39,12 +40,9 @@ export const availabilityApi = {
 // Appointments API
 export const appointmentsApi = {
   // Get all appointments
-  getAll: async (startDate?: string, endDate?: string): Promise<Appointment[]> => {
-    const params: any = {}
-    if (startDate) params.startDate = startDate
-    if (endDate) params.endDate = endDate
+  getAll: async (): Promise<Appointment[]> => {
 
-    const response = await api.get<Appointment[]>('/appointments', { params })
+    const response = await api.get<Appointment[]>('/appointments')
     return response.data || [] || []
   },
 

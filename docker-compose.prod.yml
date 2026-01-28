@@ -74,6 +74,9 @@ services:
       # Logs
       LOG_LEVEL: info
       
+      # Puppeteer
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
+      
       # Email (optionnel)
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
@@ -123,7 +126,7 @@ services:
     container_name: jeroka-adminer
     restart: unless-stopped
     ports:
-      - "8088:8080"
+      - "8089:8080"
     networks:
       - jeroka-network
     depends_on:

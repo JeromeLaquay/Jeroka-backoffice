@@ -25,6 +25,9 @@ export interface Company {
   created_at: Date;
   updated_at: Date;
   user_count?: number;
+  google_calendar_id?: string;
+  google_drive_folder_id?: string;
+  google_mail_id?: string;
 }
 
 export interface CompanyFilters {

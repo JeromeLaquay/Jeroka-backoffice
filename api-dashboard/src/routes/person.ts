@@ -150,7 +150,7 @@ router.post('/', [
     delete payload.lastName;
     delete payload.address;
     
-    const newperson = await personService.createperson(payload);
+    const newperson = await personService.createPersonWithCheckUniqueEmail(payload);
 
     return res.status(201).json({ success: true, message: 'person créé avec succès', data: newperson });
   } catch (error) {
