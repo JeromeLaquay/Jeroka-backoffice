@@ -23,6 +23,7 @@ jobs:
   deploy:
     name: 🚀 Déploiement sur le serveur
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     steps:
       - name: 📥 Checkout du code
@@ -53,7 +54,7 @@ jobs:
           echo "🔄 Début du déploiement sur ${{ secrets.SERVER_HOST }}"
           
           # Connexion SSH et exécution du script de déploiement
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
             set -e
             
             echo "📁 Navigation vers le répertoire du projet"
