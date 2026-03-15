@@ -119,46 +119,28 @@ jobs:
             fi
           EOF
       
-      - name: 🧪 Exécution des tests Cypress
+      - name: 📦 Setup Node pour Cypress (runner)
+        if: success() && (github.event.inputs.run_tests != 'false')
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: cypress/package-lock.json
+
+      - name: 🧪 Exécution des tests Cypress (sur le runner, pas sur le VPS)
         if: success() && (github.event.inputs.run_tests != 'false')
         run: |
-          echo "🧪 Exécution des tests Cypress sur le serveur déployé"
-          
-          # Exécution des tests directement sur le serveur via SSH avec timeout étendu
-          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
-            set -e
-            
-            echo "📁 Navigation vers le répertoire Cypress"
-            cd ~/Jeroka-backoffice/cypress
-            
-            echo "📦 Installation des dépendances Cypress"
-            npm install
-            
-            echo "🔧 Installation de TypeScript pour Cypress"
-            npm install --save-dev typescript
-            
-            echo "⏳ Attente de la disponibilité des services..."
-            sleep 30
-            
-            echo "🔍 Vérification de l'accessibilité des services..."
-            curl -f http://localhost:3001 || echo "⚠️ Backoffice non accessible"
-            curl -f http://localhost:3002/health || echo "⚠️ API non accessible"
-            
-            echo "🚀 Exécution des tests Cypress..."
-            CYPRESS_BASE_URL=http://localhost:3001 API_BASE_URL=http://localhost:3002 npm run cypress:run:chrome
-            
-            echo "📊 Génération du rapport de tests..."
-            npm run test:report
-            
-            echo "✅ Tests Cypress terminés !"
-          EOF
-          
-          # Récupération des rapports depuis le serveur
-          echo "📤 Récupération des rapports de tests..."
-          mkdir -p cypress/reports cypress/screenshots cypress/videos
-          scp -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/Jeroka-backoffice/cypress/cypress/reports/* ./cypress/reports/ || true
-          scp -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/Jeroka-backoffice/cypress/cypress/screenshots/* ./cypress/screenshots/ || true
-          scp -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/Jeroka-backoffice/cypress/cypress/videos/* ./cypress/videos/ || true
+          echo "🧪 Tests Cypress contre les URLs de production (sans charger le serveur)"
+          cd cypress
+          npm ci
+          echo "⏳ Attente que les services soient prêts..."
+          sleep 15
+          npm run cypress:run:chrome
+          npm run test:report
+        env:
+          CYPRESS_BASE_URL: https://backoffice.jerokaxperience.fr
+          API_BASE_URL: https://apibackoffice.jerokaxperience.fr
+          BACKOFFICE_URL: https://backoffice.jerokaxperience.fr
       
       - name: 📤 Upload des rapports de tests
         if: always() && (github.event.inputs.run_tests != 'false')
@@ -166,9 +148,9 @@ jobs:
         with:
           name: cypress-test-reports-${{ github.run_number }}
           path: |
-            cypress/reports/
-            cypress/screenshots/
-            cypress/videos/
+            cypress/cypress/reports/
+            cypress/cypress/screenshots/
+            cypress/cypress/videos/
           retention-days: 30
       
       - name: 📊 Notification de succès

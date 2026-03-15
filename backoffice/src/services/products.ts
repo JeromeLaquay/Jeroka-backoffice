@@ -88,10 +88,32 @@ class ProductService {
   }
 
   /**
-   * Supprime un produit
+   * Supprime un produit (API renvoie 204 No Content)
    */
   async deleteProduct(id: string): Promise<ApiResponse> {
     return await apiService.deleteProduct(id)
+  }
+
+  /**
+   * Dupliquer un produit (récupère puis crée avec nom/SKU modifiés)
+   */
+  async duplicateProduct(id: string): Promise<ApiResponse<any>> {
+    const existing = await apiService.getProduct(id)
+    if (!existing?.id) throw new Error('Produit introuvable')
+    const data = {
+      name: (existing.name ?? '') + ' (copie)',
+      description: existing.description ?? undefined,
+      shortDescription: existing.shortDescription ?? undefined,
+      sku: (existing.sku ?? '') + '-COPY',
+      category: existing.category ?? undefined,
+      priceHt: existing.priceHt ?? 0,
+      vatNumber: existing.vatNumber ?? undefined,
+      costPrice: existing.costPrice ?? undefined,
+      stockQuantity: existing.stockQuantity ?? 0,
+      minStockLevel: existing.minStockLevel ?? undefined,
+      unit: existing.unit ?? 'pièce'
+    }
+    return await apiService.createProduct(data)
   }
 
   /**
@@ -159,6 +181,13 @@ class ProductService {
    */
   async getLowStockProducts(): Promise<ApiResponse<ProductsListResponse>> {
     return await this.getProducts({ type: 'low-stock', limit: 100 })
+  }
+
+  /**
+   * Historique des mouvements de stock (optionnel, renvoie vide si non disponible)
+   */
+  async getStockHistory(_id: string, _params?: { limit?: number }): Promise<{ movements?: any[] }> {
+    return { movements: [] }
   }
 
   /**

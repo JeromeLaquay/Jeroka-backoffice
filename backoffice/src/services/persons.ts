@@ -2,54 +2,42 @@ import { apiService } from './api'
 
 export interface Person {
   id: string
-  type: 'client' | 'supplier'
-  type_label: 'Particulier' | 'Entreprise'
-  first_name: string
-  last_name: string
-  company_name?: string
+  type: string
+  typeClient: 'individual' | 'company'
+  firstName: string
+  lastName: string
+  companyName?: string
   email: string
   phone?: string
   mobile?: string
   website?: string
-  address_line1?: string
-  address_line2?: string
   city?: string
-  postal_code?: string
+  postalCode?: string
   country?: string
-  siret?: string
-  vat_number?: string
-  notes?: string
-  avatar_url?: string
   status: 'active' | 'inactive' | 'prospect'
-  source?: string
-  tags?: string[]
-  created_at: string
-  updated_at: string
-  company_id: string
-  custom_fields?: Record<string, any>
+  createdAt: string
+  updatedAt: string
 }
 
 export interface CreatePersonRequest {
-  type: 'client' | 'supplier'
-  type_label: 'Particulier' | 'Entreprise'
-  first_name: string
-  last_name: string
-  company_name?: string
+  typeClient?: 'individual' | 'company'
+  firstName: string
+  lastName: string
+  companyName?: string
   email: string
   phone?: string
   mobile?: string
   website?: string
-  address_line1?: string
-  address_line2?: string
+  addressLine1?: string
+  addressLine2?: string
   city?: string
-  postal_code?: string
+  postalCode?: string
   country?: string
   siret?: string
-  vat_number?: string
+  vatNumber?: string
   notes?: string
   status?: 'active' | 'inactive' | 'prospect'
   source?: string
-  tags?: string[]
 }
 
 export interface UpdatePersonRequest extends Partial<CreatePersonRequest> {}
@@ -104,10 +92,13 @@ class PersonsService {
   }
 
   /**
-   * Supprimer un Person
+   * Supprimer un Person.
+   * L'API renvoie 204 No Content (sans corps) ; responseType: 'text' évite une erreur de parsing JSON.
    */
   async deletePerson(id: string) {
-    const response = await apiService.axiosInstance.delete(`/persons/${id}`)
+    const response = await apiService.axiosInstance.delete(`/persons/${id}`, {
+      responseType: 'text'
+    })
     return response.data
   }
 

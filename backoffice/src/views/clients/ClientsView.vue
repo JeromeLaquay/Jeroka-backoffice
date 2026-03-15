@@ -199,23 +199,23 @@
                   <div class="flex-shrink-0 h-10 w-10">
                     <div class="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
                       <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {{ getInitials(client.first_name, client.last_name) }}
+                        {{ getInitials(client.firstName, client.lastName) }}
                       </span>
                     </div>
                   </div>
                   <div class="ml-4">
                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {{ client.first_name }} {{ client.last_name }}
+                      {{ client.firstName }} {{ client.lastName }}
                     </div>
-                    <div v-if="client.company_name" class="text-sm text-gray-500 dark:text-gray-400">
-                      {{ client.company_name }}
+                    <div v-if="client.companyName" class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ client.companyName }}
                     </div>
                   </div>
                 </div>
               </td>
               <td class="table-cell">
-                <span class="badge" :class="client.type === 'company' ? 'badge-primary' : 'badge-success'">
-                  {{ client.type === 'company' ? 'Entreprise' : 'Particulier' }}
+                <span class="badge" :class="client.typeClient === 'company' ? 'badge-primary' : 'badge-success'">
+                  {{ client.typeClient === 'company' ? 'Entreprise' : 'Particulier' }}
                 </span>
               </td>
               <td class="table-cell">
@@ -228,7 +228,7 @@
                 </span>
               </td>
               <td class="table-cell text-sm text-gray-500 dark:text-gray-400">
-                {{ formatDate(client.created_at) }}
+                {{ formatDate(client.createdAt) }}
               </td>
               <td class="table-cell text-right text-sm font-medium">
                 <div class="flex justify-end gap-2">
@@ -334,6 +334,9 @@
             <p class="text-sm text-gray-500 dark:text-gray-400">
               Êtes-vous sûr de vouloir supprimer ce client ? Cette action est irréversible.
             </p>
+            <p v-if="deleteError" class="mt-2 text-sm text-red-600 dark:text-red-400">
+              {{ deleteError }}
+            </p>
           </div>
           <div class="items-center px-4 py-3">
             <button
@@ -385,7 +388,7 @@ const pagination = ref({
 const filters = ref({
   search: '',
   status: '' as 'active' | 'inactive' | 'prospect' | '',
-  type: 'client' as 'client' | 'supplier' | '',
+  type: '' as '' | 'individual' | 'company',
   source: '',
   tags: [] as string[]
 })
@@ -393,6 +396,7 @@ const filters = ref({
 // État pour la suppression
 const showDeleteModal = ref(false)
 const clientToDelete = ref<string | null>(null)
+const deleteError = ref('')
 
 // Computed
 const visiblePages = computed(() => {
@@ -409,7 +413,6 @@ const visiblePages = computed(() => {
 // Méthodes
 const loadClients = async () => {
   try {
-    // Filtrer les valeurs vides
     const cleanFilters = Object.fromEntries(
       Object.entries(filters.value).filter(([_, value]) => 
         value !== '' && value !== null && value !== undefined && 
@@ -422,16 +425,13 @@ const loadClients = async () => {
       limit: pagination.value.limit,
       ...cleanFilters
     })
-    
-    if (response.success && response.data) {
-      clients.value = response.data
-      // Pour l'instant, on simule la pagination
-      pagination.value = {
-        page: pagination.value.page,
-        limit: pagination.value.limit,
-        total: response.data.length,
-        totalPages: Math.ceil(response.data.length / pagination.value.limit)
-      }
+
+    clients.value = response.items ?? []
+    pagination.value = {
+      page: response.page ?? pagination.value.page,
+      limit: response.limit ?? pagination.value.limit,
+      total: response.total ?? 0,
+      totalPages: response.totalPages ?? 0
     }
   } catch (error) {
     console.error('Erreur lors du chargement des clients:', error)
@@ -441,9 +441,13 @@ const loadClients = async () => {
 const loadStats = async () => {
   try {
     const response = await personsService.getPersonStats()
-    
-    if (response.success && response.data) {
-      stats.value = response.data
+    stats.value = {
+      total: response.total ?? 0,
+      active: response.active ?? 0,
+      prospects: response.prospect ?? 0,
+      inactive: response.inactive ?? 0,
+      companies: 0,
+      individuals: 0
     }
   } catch (error) {
     console.error('Erreur lors du chargement des statistiques:', error)
@@ -469,21 +473,22 @@ const editClient = (clientId: string) => {
 
 const deleteClient = (clientId: string) => {
   clientToDelete.value = clientId
+  deleteError.value = ''
   showDeleteModal.value = true
 }
 
 const confirmDelete = async () => {
   if (!clientToDelete.value) return
-  
+
+  deleteError.value = ''
   try {
-    const response = await personsService.deletePerson(clientToDelete.value)
-    
-    if (response.success) {
-      showDeleteModal.value = false
-      clientToDelete.value = null
-      refreshClients()
-    }
-  } catch (error) {
+    await personsService.deletePerson(clientToDelete.value)
+    showDeleteModal.value = false
+    clientToDelete.value = null
+    refreshClients()
+  } catch (error: any) {
+    const message = error?.message ?? error?.response?.data?.message ?? 'Erreur lors de la suppression'
+    deleteError.value = message
     console.error('Erreur lors de la suppression:', error)
   }
 }
@@ -491,6 +496,7 @@ const confirmDelete = async () => {
 const cancelDelete = () => {
   showDeleteModal.value = false
   clientToDelete.value = null
+  deleteError.value = ''
 }
 
 // Pagination

@@ -506,35 +506,56 @@ const hasFilters = computed(() => {
   return filters.search || filters.category || filters.status || filters.type
 })
 
-// Méthodes
+// Mapper une réponse API (PageDto items) vers le format vue
+function mapApiProductToView(item: any): Product {
+  const stockQty = item.stockQuantity ?? 0
+  const minStock = item.minStockLevel ?? 0
+  return {
+    id: String(item.id),
+    name: item.name ?? '',
+    description: item.description ?? undefined,
+    sku: item.sku ?? '',
+    category: item.category ?? '',
+    unitPrice: Number(item.priceHt ?? 0),
+    stock: { current: stockQty, minimum: minStock, maximum: undefined },
+    unit: item.unit ?? 'pièce',
+    status: item.active === true ? 'active' : 'inactive',
+    featured: false,
+    isService: false,
+    images: [],
+    tags: []
+  }
+}
+
 const loadProducts = async () => {
   try {
     loading.value = true
-    
     const params = {
       page: pagination.page,
       limit: pagination.limit,
       search: filters.search || undefined,
-      category: filters.category || undefined,
-      featured: filters.type === 'featured' ? true : undefined,
-      lowStock: filters.type === 'low-stock' ? true : undefined
+      category: filters.category || undefined
     }
-
     const response = await productService.getProducts(params)
-    products.value = response.data.products || []
-    pagination.total = response.data.total || 0
+    // API Java renvoie PageDto { items, page, limit, total, totalPages }
+    const items = response?.items ?? []
+    products.value = items.map(mapApiProductToView)
+    pagination.total = Number(response?.total ?? 0)
 
-    // Charger les statistiques
     try {
       const statsResponse = await productService.getProductStats()
-      stats.value = statsResponse.data || {}
+      // API renvoie { total, active }
+      stats.value = {
+        total: Number(statsResponse?.total ?? 0),
+        active: Number(statsResponse?.active ?? 0),
+        lowStock: 0,
+        totalValue: 0
+      }
     } catch (statsError) {
       console.error('Erreur lors du chargement des statistiques:', statsError)
-      // Continuer même si les stats échouent
     }
   } catch (error) {
     console.error('Erreur lors du chargement des produits:', error)
-    // Initialiser avec des valeurs par défaut en cas d'erreur
     products.value = []
     pagination.total = 0
   } finally {
@@ -545,10 +566,11 @@ const loadProducts = async () => {
 const loadCategories = async () => {
   try {
     const response = await productService.getCategories()
-    categories.value = response.data || []
+    // API Java renvoie { categories: string[] }
+    const list = response?.categories ?? []
+    categories.value = list.map((name: string) => ({ id: name, name }))
   } catch (error) {
     console.error('Erreur lors du chargement des catégories:', error)
-    // Initialiser avec des valeurs par défaut en cas d'erreur
     categories.value = []
   }
 }

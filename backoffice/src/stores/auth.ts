@@ -26,6 +26,17 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!token.value && !!user.value)
   const isAdmin = computed(() => user.value?.role === 'admin')
   
+  /** Normalise la réponse login/register : accepte { success, data } (Node) ou { accessToken, user } (Java). */
+  const normalizeAuthPayload = (response: any): { user: any; accessToken: string } | null => {
+    if (response?.success && response?.data?.user && response?.data?.accessToken) {
+      return { user: response.data.user, accessToken: response.data.accessToken }
+    }
+    if (response?.accessToken && response?.user) {
+      return { user: response.user, accessToken: response.accessToken }
+    }
+    return null
+  }
+
   // Convertir l'utilisateur API vers le format du store
   const transformApiUser = (apiUser: ApiUser): User => ({
     id: apiUser.id,
@@ -49,11 +60,10 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const credentials: LoginRequest = { email, password, rememberMe }
       const response = await apiService.login(credentials)
+      const payload = normalizeAuthPayload(response)
 
-      if (response.success && response.data) {
-        const { user: apiUser, accessToken } = response.data
-        
-        // Transformer et stocker les données utilisateur
+      if (payload) {
+        const { user: apiUser, accessToken } = payload
         const transformedUser = transformApiUser({
           ...apiUser,
           phone: '',
@@ -65,15 +75,11 @@ export const useAuthStore = defineStore('auth', () => {
 
         user.value = transformedUser
         token.value = accessToken
-
-        // Stocker dans localStorage
         localStorage.setItem('auth_token', accessToken)
         localStorage.setItem('user', JSON.stringify(transformedUser))
-
         return { success: true }
-      } else {
-        throw new Error(response.message || 'Erreur de connexion')
       }
+      throw new Error((response as any)?.message || 'Erreur de connexion')
     } catch (err: any) {
       const errorMessage = err.message || 'Erreur de connexion'
       error.value = errorMessage
@@ -93,11 +99,10 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const response = await apiService.register(userData)
+      const payload = normalizeAuthPayload(response)
 
-      if (response.success && response.data) {
-        const { user: apiUser, accessToken } = response.data
-        
-        // Transformer et stocker les données utilisateur
+      if (payload) {
+        const { user: apiUser, accessToken } = payload
         const transformedUser = transformApiUser({
           ...apiUser,
           phone: userData.phone || '',
@@ -109,23 +114,16 @@ export const useAuthStore = defineStore('auth', () => {
 
         user.value = transformedUser
         token.value = accessToken
-
-        // Stocker dans localStorage
         localStorage.setItem('auth_token', accessToken)
         localStorage.setItem('user', JSON.stringify(transformedUser))
-
         return { success: true }
-      } else {
-        throw new Error(response.message || 'Erreur lors de la création du compte')
       }
+      throw new Error((response as any)?.message || 'Erreur lors de la création du compte')
     } catch (err: any) {
-      const errorMessage = err.message || 'Erreur lors de la création du compte'
+      const apiMessage = err.response?.data?.message || err.response?.data?.error
+      const errorMessage = apiMessage || err.message || 'Erreur lors de la création du compte'
       error.value = errorMessage
-      
-      return { 
-        success: false, 
-        error: errorMessage
-      }
+      return { success: false, error: errorMessage }
     } finally {
       loading.value = false
     }

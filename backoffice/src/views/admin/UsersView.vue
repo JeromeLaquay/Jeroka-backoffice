@@ -78,6 +78,8 @@
       </div>
     </div>
 
+    <p v-if="toggleError" class="text-sm text-red-600 dark:text-red-400 mb-4">{{ toggleError }}</p>
+
     <!-- Tableau des utilisateurs -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
       <div class="overflow-x-auto">
@@ -374,14 +376,18 @@ const editUser = (user: AdminUser) => {
   showEditModal.value = true;
 };
 
+const toggleError = ref('');
+
 const toggleUserStatus = async (user: AdminUser) => {
+  toggleError.value = '';
   try {
     const response = await adminService.toggleUserStatus(user.id);
     if (response.success) {
       await loadUsers();
     }
-  } catch (error) {
-    console.error('Erreur lors du changement de statut:', error);
+  } catch (error: any) {
+    toggleError.value = error?.message ?? 'Erreur lors du changement de statut.';
+    console.error('Erreur lors du changement de statut:', error?.response?.data ?? error);
   }
 };
 

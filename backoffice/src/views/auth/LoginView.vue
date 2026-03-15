@@ -14,7 +14,7 @@
           Jeroka Xperience - Gestion TPE/PME
         </p>
       </div>
-      
+
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
         <div class="rounded-md shadow-sm -space-y-px">
           <div>
@@ -119,8 +119,8 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const form = reactive({
-  email: 'admin@jeroka.com',
-  password: 'admin123',
+  email: 'laquay.jerome@gmail.com',
+  password: 'Jeroume!13',
   rememberMe: false
 })
 
@@ -133,7 +133,7 @@ const handleLogin = async () => {
 
   try {
     const result = await authStore.login(form.email, form.password)
-    
+
     if (result.success) {
       router.push('/')
     } else {

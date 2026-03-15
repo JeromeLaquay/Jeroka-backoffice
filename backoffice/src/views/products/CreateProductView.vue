@@ -411,42 +411,42 @@ const isFormValid = computed(() => {
 const loadCategories = async () => {
   try {
     const response = await productService.getCategories()
-    categories.value = response.data
+    const list = response?.categories ?? []
+    categories.value = list.map((name: string) => ({ id: name, name }))
   } catch (error) {
     console.error('Erreur lors du chargement des catégories:', error)
+    categories.value = []
   }
 }
 
 const loadProduct = async () => {
   if (!isEdit.value) return
-  
   try {
     loading.value = true
     const response = await productService.getProduct(route.params.id as string)
-    product.value = response.data
-    
-    // Remplir le formulaire
+    product.value = response?.id != null ? response : null
     if (product.value) {
+      const p = product.value as any
       Object.assign(form, {
-        name: product.value?.name || '',
-        description: product.value?.description || '',
-        sku: product.value?.sku || '',
-        barcode: product.value?.barcode || '',
-        categoryId: product.value?.category || '',
-        brand: product.value?.brand || '',
-        unitPrice: product.value?.unitPrice || 0,
-        costPrice: product.value?.costPrice || 0,
-        vatRate: product.value?.vatRate || 20,
-        unit: product.value?.unit || 'pièce',
+        name: p.name ?? '',
+        description: p.description ?? '',
+        sku: p.sku ?? '',
+        barcode: p.barcode ?? '',
+        categoryId: p.category ?? '',
+        brand: p.brand ?? '',
+        unitPrice: Number(p.priceHt ?? 0),
+        costPrice: p.costPrice != null ? Number(p.costPrice) : 0,
+        vatRate: p.vatNumber != null ? Number(p.vatNumber) : 20,
+        unit: p.unit ?? 'pièce',
         stock: {
-          current: product.value?.stock?.current || 0,
-          minimum: product.value?.stock?.minimum || 0,
-          maximum: product.value?.stock?.maximum || null
+          current: p.stockQuantity ?? 0,
+          minimum: p.minStockLevel ?? 0,
+          maximum: null
         },
-        status: product.value?.status || 'active',
-        featured: product.value?.featured || false,
-        isService: product.value?.isService || false,
-        tags: [...(product.value?.tags || [])]
+        status: p.active === true ? 'active' : 'inactive',
+        featured: false,
+        isService: false,
+        tags: []
       })
     }
   } catch (error) {
@@ -460,10 +460,9 @@ const loadProduct = async () => {
 const generateSKU = async () => {
   try {
     const response = await productService.generateSKU(form.categoryId)
-    form.sku = response.data.sku
+    form.sku = response?.sku ?? `PRD-${Date.now()}`
   } catch (error) {
     console.error('Erreur lors de la génération du SKU:', error)
-    // Générer un SKU simple en fallback
     form.sku = `PRD-${Date.now()}`
   }
 }
@@ -481,21 +480,27 @@ const removeTag = (index: number) => {
 
 const handleSubmit = async () => {
   if (!isFormValid.value || loading.value) return
-
   try {
     loading.value = true
-    
-    const data = {
-      ...form,
-      stock: form.isService ? undefined : form.stock
+    const payload = {
+      name: form.name,
+      description: form.description ?? undefined,
+      shortDescription: undefined,
+      sku: form.sku,
+      category: form.categoryId || undefined,
+      priceHt: form.unitPrice,
+      vatNumber: form.vatRate,
+      costPrice: form.costPrice || undefined,
+      stockQuantity: form.isService ? undefined : form.stock.current,
+      minStockLevel: form.isService ? undefined : form.stock.minimum,
+      unit: form.unit,
+      ...(isEdit.value ? { active: form.status === 'active' } : {})
     }
-
     if (isEdit.value) {
-      await productService.updateProduct(route.params.id as string, data)
+      await productService.updateProduct(route.params.id as string, payload)
     } else {
-      await productService.createProduct(data)
+      await productService.createProduct(payload)
     }
-
     router.push('/produits')
   } catch (error) {
     console.error('Erreur lors de la sauvegarde:', error)

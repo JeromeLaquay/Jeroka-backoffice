@@ -262,34 +262,32 @@ const handleSubmit = async () => {
   
   try {
     const clientData: CreatePersonRequest = {
-      type: 'client',
-      type_label: form.type === 'individual' ? 'Particulier' : 'Entreprise',
-      first_name: form.firstName,
-      last_name: form.lastName,
-      company_name: form.companyName || undefined,
+      typeClient: form.type,
+      firstName: form.firstName,
+      lastName: form.lastName,
+      companyName: form.companyName || undefined,
       email: form.email,
       phone: form.phone || undefined,
       mobile: form.mobile || undefined,
       website: form.website || undefined,
-      address_line1: form.address.line1 || undefined,
-      address_line2: form.address.line2 || undefined,
+      addressLine1: form.address.line1 || undefined,
+      addressLine2: form.address.line2 || undefined,
       city: form.address.city || undefined,
-      postal_code: form.address.postalCode || undefined,
+      postalCode: form.address.postalCode || undefined,
       country: form.address.country || 'France',
       siret: form.siret || undefined,
-      vat_number: form.vatNumber || undefined,
+      vatNumber: form.vatNumber || undefined,
       status: form.status,
       source: form.source || undefined,
       notes: form.notes || undefined
     }
 
     const response = await personsService.createPerson(clientData)
-    
-    if (response.success) {
-      // Redirection vers la liste des clients
+    // API Java retourne le client créé directement (pas de wrapper { success, data })
+    if (response?.id) {
       router.push('/clients')
     } else {
-      console.error('Erreur lors de la création:', response.error)
+      console.error('Erreur lors de la création: réponse invalide', response)
     }
   } catch (error) {
     console.error('Erreur lors de la création:', error)

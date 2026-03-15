@@ -1,0 +1,42 @@
+{
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/target": true
+  },
+
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-21",
+      "path": "${env:JAVA_HOME}",
+      "default": true
+    }
+  ],
+  "java.jdt.ls.java.home": "${env:JAVA_HOME}",
+  "java.import.maven.enabled": true,
+  "java.saveActions.organizeImports": true,
+  "[java]": {
+    "editor.tabSize": 4,
+    "editor.defaultFormatter": "redhat.java"
+  },
+
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "typescript.preferences.quoteStyle": "single",
+  "javascript.preferences.quoteStyle": "single",
+
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/target": true
+  }
+}

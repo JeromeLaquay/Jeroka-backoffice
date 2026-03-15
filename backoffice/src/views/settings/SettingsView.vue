@@ -113,6 +113,7 @@ import SecuritySettings from '../../components/settings/SecuritySettings.vue'
 import BackupSettings from '../../components/settings/BackupSettings.vue'
 import IntegrationsSettings from '../../components/settings/IntegrationsSettings.vue'
 import EnvironmentSwitcher from '../../components/EnvironmentSwitcher.vue'
+import { settingsService } from '../../services/settings'
 // État
 const activeTab = ref('system') // Commencer par l'onglet développement
 const userProfile = ref<any>(null)
@@ -143,10 +144,11 @@ const loadUserProfile = async () => {
 
 const loadCompanySettings = async () => {
   try {
-    // Placeholder - à implémenter quand le service sera disponible
-    console.log('Chargement des paramètres entreprise...')
+    const data = await settingsService.getCompanySettings()
+    companySettings.value = data ?? null
   } catch (error) {
     console.error('Erreur lors du chargement des paramètres entreprise:', error)
+    companySettings.value = null
   }
 }
 

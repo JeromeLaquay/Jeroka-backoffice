@@ -59,6 +59,7 @@
                 <ClientSelector
                   v-model="form.clientId"
                   :selected-client="selectedClient"
+                  :clients="clients"
                   @client-selected="onClientSelected"
                   :required="true"
                 />
@@ -257,6 +258,7 @@ import OrderItemRow from '../../components/orders/OrderItemRow.vue'
 import AddressForm from '../../components/orders/AddressForm.vue'
 import OrderSummary from '../../components/orders/OrderSummary.vue'
 import { ordersService, type CreateOrderRequest, type Order } from '../../services/orders'
+import { personsService } from '../../services/persons'
 
 const route = useRoute()
 const router = useRouter()
@@ -266,6 +268,7 @@ const loading = ref(false)
 const order = ref<Order | null>(null)
 const selectedClient = ref<any>(null)
 const sameAsShipping = ref(true)
+const clients = ref<Array<{ id: string; name: string; email: string; avatar_url: string; phone?: string; address?: any }>>([])
 
 const isEdit = computed(() => !!route.params.id)
 
@@ -315,6 +318,24 @@ watch(() => form.shippingAddress, (value) => {
 }, { deep: true })
 
 // Méthodes
+const loadClients = async () => {
+  try {
+    const response = await personsService.getPersons({ page: 1, limit: 200 })
+    const list = response?.items ?? response?.data ?? []
+    const name = (c: any) => [c.firstName, c.lastName].filter(Boolean).join(' ').trim() || c.email || ''
+    clients.value = list.map((client: any) => ({
+      id: client.id,
+      name: name(client),
+      email: client.email ?? '',
+      avatar_url: client.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name(client))}&background=a855f7&color=fff`,
+      phone: client.phone,
+      address: client.address
+    }))
+  } catch (error) {
+    console.error('Erreur lors du chargement des clients:', error)
+  }
+}
+
 const loadOrder = async () => {
   if (!isEdit.value) return
 
@@ -418,6 +439,7 @@ const handleSubmit = async () => {
 
 // Lifecycle
 onMounted(() => {
+  loadClients()
   if (isEdit.value) {
     loadOrder()
   }

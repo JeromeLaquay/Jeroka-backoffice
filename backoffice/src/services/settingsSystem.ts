@@ -25,12 +25,27 @@ class SettingsSystem {
     return res
   }
 
-  // Méthodes OAuth Google
+  // Méthodes OAuth Google : appel authentifié pour obtenir l'URL, puis redirection
   async connectGoogle(): Promise<void> {
-    console.log('connect google');
-    const baseUrl = (import.meta as any)?.env?.VITE_API_URL || (window as any).__API_URL__ || 'http://localhost:3002/api/v1'
-    const connectUrl = `${baseUrl}/settings/google/connect`
-    window.open(connectUrl, '_blank')
+    try {
+      const res = await apiService.get<{ success?: boolean; redirectUrl?: string; message?: string }>(
+        '/settings/google/connect'
+      )
+      const redirectUrl = (res as any)?.redirectUrl ?? (res as any)?.data?.redirectUrl
+      if (redirectUrl) {
+        window.location.href = redirectUrl
+        return
+      }
+      const msg = (res as any)?.message || 'Impossible d\'obtenir l\'URL de connexion Google'
+      throw new Error(msg)
+    } catch (err: any) {
+      const msg = err.response?.data?.message ?? err.message ?? 'Connexion Google échouée'
+      const isNetworkError = !err.response && (err.message === 'Network Error' || err.code === 'ERR_NETWORK')
+      const message = isNetworkError
+        ? 'Erreur réseau : l\'API ne répond pas. Vérifiez que l\'API est démarrée (port 3002) et l\'URL dans les paramètres.'
+        : msg
+      throw new Error(message)
+    }
   }
 
   async getGoogleStatus(): Promise<{ success: boolean; data?: GoogleOAuthStatus }> {

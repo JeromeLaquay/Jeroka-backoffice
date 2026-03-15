@@ -107,10 +107,16 @@ class ApiService {
           return Promise.reject(error)
         }
 
-        // Standardiser les erreurs
+        // Standardiser les erreurs (API Java : { error } ou { message } ou { error: { message } })
+        const data = error.response?.data
+        const dataError = data?.error
+        const bodyMessage = typeof data?.message === 'string' ? data.message : null
+        const message = typeof dataError === 'string'
+          ? dataError
+          : (dataError?.message ?? bodyMessage ?? error.message ?? 'Erreur inconnue')
         const apiError = {
-          message: error.response?.data?.error?.message || error.message || 'Erreur inconnue',
-          code: error.response?.data?.error?.code || 'UNKNOWN_ERROR',
+          message,
+          code: typeof dataError === 'object' && dataError?.code ? dataError.code : 'UNKNOWN_ERROR',
           statusCode: error.response?.status || 500
         }
 
@@ -335,8 +341,8 @@ class ApiService {
   }
 
   async deleteProduct(id: string): Promise<ApiResponse> {
-    const response = await this.api.delete<ApiResponse>(`/products/${id}`)
-    return response.data
+    const response = await this.api.delete(`/products/${id}`, { responseType: 'text' })
+    return response.data as ApiResponse
   }
 
   async updateProductStock(id: string, stock: number, operation: 'add' | 'subtract' | 'set'): Promise<ApiResponse<any>> {

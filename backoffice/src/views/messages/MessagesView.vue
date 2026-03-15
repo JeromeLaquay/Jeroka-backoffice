@@ -589,12 +589,13 @@ const generateAIDraft = async (message: ContactMessage) => {
   aiLoading.value = true
   try {
     // Appel API pour génération IA
-    const { data } = await messagesService.generateAIDraft(message.id, {
+    const response = await messagesService.generateAIDraft(message.id, {
       tone: aiOptions.value.tone as 'professionnel' | 'amical' | 'formel' | 'concis',
       language: aiOptions.value.language as 'fr' | 'en'
     })
-    aiDraft.value = data.draft
-    selectedMessage.value!.response = data.draft
+    const draft = response?.draft ?? response?.data?.draft ?? ''
+    aiDraft.value = draft
+    selectedMessage.value!.response = draft
     console.log("selectedMessage", selectedMessage.value!.response)
   } catch (e) {
     console.error('Erreur génération IA:', e)

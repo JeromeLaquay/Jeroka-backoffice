@@ -75,6 +75,8 @@
               class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
             >
               <option value="">Sélectionner</option>
+              <option value="Conseil / Marketing">Conseil / Marketing</option>
+              <option value="Loisirs / Animation">Loisirs / Animation</option>
               <option value="technology">Technologie</option>
               <option value="consulting">Conseil</option>
               <option value="retail">Commerce</option>

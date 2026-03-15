@@ -124,7 +124,7 @@
             <div v-if="selectedClient" class="mt-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
               <div class="flex items-center space-x-3">
                 <img
-                  :src="selectedClient.avatar"
+                  :src="selectedClient.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedClient.name || '')}&background=a855f7&color=fff`"
                   :alt="selectedClient.name"
                   class="h-10 w-10 rounded-full"
                 />
@@ -309,16 +309,18 @@ const isFormValid = computed(() => {
 // Méthodes
 const loadClients = async () => {
   try {
-    const response = await personsService.getPersons({ type: 'client' })
-    if (response.success && response.data && Array.isArray(response.data)) {
-      // Mapper les clients pour correspondre à l'interface attendue par ClientSelector
-      console.log('response.data', response.data)
-      clients.value = response.data.map((client: any) => ({
-        ...client,
-        avatar_url: client.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(client.name)}&background=a855f7&color=fff`
-      }))
-      console.log('clients', clients.value)
-    }
+    const response = await personsService.getPersons({ page: 1, limit: 200 })
+    // API Java retourne PageDto avec items, pas { success, data }
+    const list = response.items ?? []
+    const onlyClients = list.filter((p: any) => p.type === 'client')
+    const name = (c: any) => [c.firstName, c.lastName].filter(Boolean).join(' ').trim() || c.email
+    clients.value = onlyClients.map((client: any) => ({
+      id: client.id,
+      name: name(client),
+      email: client.email ?? '',
+      avatar_url: client.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name(client))}&background=a855f7&color=fff`,
+      phone: client.phone
+    }))
   } catch (error) {
     console.error('Erreur lors du chargement des clients:', error)
   }
@@ -419,30 +421,65 @@ const updateDueDate = () => {
   }
 }
 
+// Calcul des totaux (aligné InvoiceSummary) pour l'API Java
+function computeTotals(): {
+  subtotalHt: number
+  discountPercent: number
+  discountAmount: number
+  totalHt: number
+  totalVat: number
+  totalTtc: number
+} {
+  const itemTotal = (item: any) => {
+    const sub = item.quantity * (item.unitPrice ?? 0)
+    const discount = sub * ((item.discountPercent ?? 0) / 100)
+    return sub - discount
+  }
+  const subtotalHt = form.items.reduce((sum: number, item: any) => sum + itemTotal(item), 0)
+  const discountAmount = Number(form.discountAmount) ?? 0
+  const totalHt = Math.max(0, subtotalHt - discountAmount)
+  const totalVat = form.items.reduce((sum: number, item: any) => {
+    return sum + itemTotal(item) * ((item.vatRate ?? 20) / 100)
+  }, 0)
+  const totalTtc = totalHt + totalVat
+  const discountPercent = subtotalHt > 0 ? (discountAmount / subtotalHt) * 100 : 0
+  return { subtotalHt, discountPercent, discountAmount, totalHt, totalVat, totalTtc }
+}
+
+const paymentTermsLabel = (days: number) => {
+  if (days === 0) return 'Immédiat'
+  return `${days} jours`
+}
+
 const handleSubmit = async () => {
   if (!isFormValid.value) return
 
   try {
     loading.value = true
+    const { subtotalHt, discountPercent, discountAmount, totalHt, totalVat, totalTtc } = computeTotals()
 
+    // API Java attend camelCase et totaux (CreateInvoiceRequest), pas d'items
     const invoiceData = {
-      client_id: form.clientId,
-      items: form.items.map((item: any) => ({
-        description: item.description,
-        quantity: item.quantity,
-        unit_price: item.unitPrice,
-        discount_percent: item.discountPercent,
-        vat_number: item.vatRate
-      })),
-      due_date: form.dueDate,
-      notes: form.notes,
-      status: form.status || 'draft'
+      quoteId: null,
+      personId: form.clientId,
+      title: form.invoiceNumber ? `Facture ${form.invoiceNumber}` : null,
+      description: null,
+      subtotalHt,
+      discountPercent,
+      discountAmount,
+      totalHt,
+      totalVat,
+      totalTtc,
+      issueDate: form.issueDate,
+      dueDate: form.dueDate,
+      paymentTerms: paymentTermsLabel(Number(form.paymentTerms) || 30),
+      notes: form.notes || null
     }
 
     if (isEdit.value) {
-      await invoiceService.updateInvoice(route.params.id as string, invoiceData)
+      await invoiceService.updateInvoice(route.params.id as string, invoiceData as any)
     } else {
-      await invoiceService.createInvoice(invoiceData)
+      await invoiceService.createInvoice(invoiceData as any)
     }
 
     router.push('/factures')

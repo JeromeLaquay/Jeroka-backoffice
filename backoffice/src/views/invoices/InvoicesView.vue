@@ -200,8 +200,8 @@
                     >
                       {{ invoice.invoice_number }}
                     </router-link>
-                    <div v-if="invoice.order" class="text-xs text-gray-500 dark:text-gray-400">
-                      Commande: {{ invoice.order.orderNumber }}
+                    <div v-if="(invoice as any).order" class="text-xs text-gray-500 dark:text-gray-400">
+                      Commande: {{ (invoice as any).order?.orderNumber }}
                     </div>
                   </div>
                 </td>
@@ -308,7 +308,7 @@
   <!-- Modal de suppression -->
   <DeleteConfirmModal
     :show="showDeleteConfirmation"
-    :title="`Supprimer la facture ${invoiceToDelete?.invoiceNumber}`"
+    :title="`Supprimer la facture ${invoiceToDelete?.invoice_number}`"
     :message="`Êtes-vous sûr de vouloir supprimer cette facture ? Cette action est irréversible.`"
     @confirm="deleteInvoice"
     @cancel="cancelDelete"
@@ -395,7 +395,8 @@ const filters = reactive({
   status: '',
   clientId: '',
   dateFrom: '',
-  dateTo: ''
+  dateTo: '',
+  period: ''
 })
 
 const pagination = reactive({
@@ -413,6 +414,25 @@ const hasFilters = computed(() => {
 })
 
 // Méthodes
+// Mappe une facture API (camelCase) vers le format attendu par le template (snake_case)
+const mapInvoiceFromApi = (item: any): Invoice => ({
+  id: item.id,
+  invoice_number: item.invoiceNumber,
+  client_name: item.clientName ?? '—',
+  client_id: item.personId ?? '',
+  issue_date: item.issueDate ?? '',
+  due_date: item.dueDate ?? '',
+  status: item.status ?? 'draft',
+  total: item.totalTtc != null ? Number(item.totalTtc) : 0,
+  tax: item.totalVat != null ? Number(item.totalVat) : 0,
+  subtotal: item.totalHt != null ? Number(item.totalHt) : 0,
+  paid_date: item.paidAt,
+  notes: item.notes,
+  created_at: item.createdAt ?? '',
+  updated_at: item.updatedAt ?? '',
+  items: []
+} as Invoice)
+
 const loadInvoices = async () => {
   loading.value = true
   try {
@@ -425,16 +445,26 @@ const loadInvoices = async () => {
       dateTo: filters.dateTo || undefined
     }
 
-    const response = await invoiceService.getInvoices(params)
-    if (response.success && response.data) {
-      invoices.value = response.data.invoices
-      pagination.total = response.data.total
-    }
+    const response = await invoiceService.getInvoices(params) as any
+    // API Java retourne PageDto { items, page, limit, total, totalPages }
+    const list = response.items ?? response.data?.invoices ?? []
+    invoices.value = Array.isArray(list) ? list.map(mapInvoiceFromApi) : []
+    pagination.total = response.total ?? response.data?.total ?? 0
 
-    // Charger les statistiques
     const statsResponse = await invoiceService.getInvoiceStats()
-    if (statsResponse.success && statsResponse.data) {
-      stats.value = statsResponse.data
+    // API Java retourne InvoiceStatsResponse directement (total, draft, sent, paid, totalAmount, etc.)
+    const s = statsResponse as any
+    stats.value = {
+      total: s.total ?? 0,
+      draft: s.draft ?? 0,
+      sent: s.sent ?? 0,
+      paid: s.paid ?? 0,
+      overdue: s.overdue ?? 0,
+      cancelled: s.cancelled ?? 0,
+      totalRevenue: s.totalAmount != null ? Number(s.totalAmount) : 0,
+      averageInvoice: (s.total ?? 0) > 0 && s.totalAmount != null
+        ? Number(s.totalAmount) / Number(s.total)
+        : 0
     }
   } catch (error) {
     console.error('Erreur lors du chargement des factures:', error)

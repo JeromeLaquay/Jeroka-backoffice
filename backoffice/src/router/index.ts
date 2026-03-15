@@ -50,6 +50,11 @@ const router = createRouter({
           component: () => import('../views/clients/ClientDetailView.vue')
         },
         {
+          path: '/clients/:id/edit',
+          name: 'EditClient',
+          component: () => import('../views/clients/EditClientView.vue')
+        },
+        {
           path: '/messages',
           name: 'Messages',
           component: () => import('../views/messages/MessagesView.vue')

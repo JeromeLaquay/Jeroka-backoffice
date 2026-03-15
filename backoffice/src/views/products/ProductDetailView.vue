@@ -388,7 +388,21 @@ const loadProduct = async () => {
   try {
     loading.value = true
     const response = await productService.getProduct(route.params.id as string)
-    product.value = response.data
+    if (response?.id == null) {
+      product.value = null
+      return
+    }
+    // Mapper les champs API vers le format attendu par le template
+    product.value = {
+      ...response,
+      unitPrice: Number(response.priceHt ?? 0),
+      vatRate: response.vatNumber != null ? Number(response.vatNumber) : 0,
+      stock: {
+        current: response.stockQuantity ?? 0,
+        minimum: response.minStockLevel ?? 0
+      },
+      isService: false
+    }
   } catch (error) {
     console.error('Erreur lors du chargement du produit:', error)
     router.push('/produits')
@@ -399,12 +413,12 @@ const loadProduct = async () => {
 
 const loadStockHistory = async () => {
   if (product.value?.isService) return
-  
   try {
     const response = await productService.getStockHistory(route.params.id as string, { limit: 10 })
-    stockHistory.value = response.data.movements
+    stockHistory.value = response?.movements ?? response?.data?.movements ?? []
   } catch (error) {
     console.error('Erreur lors du chargement de l\'historique:', error)
+    stockHistory.value = []
   }
 }
 

@@ -8,7 +8,7 @@
           Gérez toutes vos commandes clients
         </p>
       </div>
-      
+
       <div class="flex space-x-3">
         <button
           @click="refreshOrders"
@@ -18,7 +18,7 @@
           <ArrowPathIcon :class="['h-4 w-4 mr-2', { 'animate-spin': loading }]" />
           Actualiser
         </button>
-        
+
         <router-link
           to="/commandes/create"
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
@@ -267,11 +267,11 @@
         <!-- Pagination -->
         <div v-if="orders.length > 0" class="mt-6 flex items-center justify-between">
           <div class="text-sm text-gray-700 dark:text-gray-300">
-            Affichage de {{ ((pagination.page - 1) * pagination.limit) + 1 }} à 
-            {{ Math.min(pagination.page * pagination.limit, pagination.total) }} 
+            Affichage de {{ ((pagination.page - 1) * pagination.limit) + 1 }} à
+            {{ Math.min(pagination.page * pagination.limit, pagination.total) }}
             sur {{ pagination.total }} commandes
           </div>
-          
+
           <div class="flex space-x-2">
             <button
               @click="changePage(pagination.page - 1)"
@@ -280,11 +280,11 @@
             >
               <ChevronLeftIcon class="h-4 w-4" />
             </button>
-            
+
             <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300">
               {{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.limit) }}
             </span>
-            
+
             <button
               @click="changePage(pagination.page + 1)"
               :disabled="pagination.page >= Math.ceil(pagination.total / pagination.limit)"
@@ -310,7 +310,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
-import { 
+import {
   ShoppingCartIcon,
   PlusIcon,
   MagnifyingGlassIcon,

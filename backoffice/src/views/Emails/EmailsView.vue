@@ -1039,6 +1039,8 @@ const saveCategory = async () => {
       const response = await emailsService.createCategory(categoryForm.value)
       if (response.success) {
         await loadCategories()
+      }else{
+        console.error('Erreur lors de la création de la catégorie:', response.error)
       }
     }
     closeCategoryModal()

@@ -24,10 +24,10 @@
         </router-link>
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {{ client.name }}
+            {{ clientDisplayName }}
           </h1>
           <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ client.company_name || 'Client particulier' }}
+            {{ client.companyName || 'Client particulier' }}
           </p>
         </div>
       </div>
@@ -178,7 +178,7 @@
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600 dark:text-gray-400">Client depuis</span>
               <span class="text-sm text-gray-900 dark:text-gray-100">
-                {{ client.created_at }}
+                {{ formatDate(client.createdAt) }}
               </span>
             </div>
           </div>
@@ -223,15 +223,18 @@ const stats = ref({
   lastOrder: 'Aucune'
 })
 
-const fullAddress = computed(() => {
+const clientDisplayName = computed(() => {
+  if (!client.value) return ''
+  const first = client.value.firstName ?? ''
+  const last = client.value.lastName ?? ''
+  return `${first} ${last}`.trim() || 'Sans nom'
+})
 
-  const parts = [
-    client.value?.address_line1,
-    client.value?.address_line2,
-    client.value?.postal_code && client.value?.city ? `${client.value?.postal_code} ${client.value?.city}` : client.value?.city,
-    client.value?.country
-  ].filter(Boolean)
-  
+const fullAddress = computed(() => {
+  const c = client.value
+  if (!c) return 'Non renseignée'
+  const cityLine = [c.postalCode, c.city].filter(Boolean).join(' ')
+  const parts = [cityLine, c.country].filter(Boolean)
   return parts.join(', ') || 'Non renseignée'
 })
 
@@ -244,9 +247,8 @@ const loadClientData = async () => {
     
     const response = await personsService.getPerson(clientId)
     
-    if (response.success) {
-      client.value = response.data
-      console.log('client', client.value)
+    if (response?.id) {
+      client.value = response
       
       // TODO: Charger les commandes récentes et stats depuis l'API
       // Pour l'instant on garde des données de simulation

@@ -151,19 +151,26 @@ class MessagesService {
   }
 
   /**
-   * Récupérer les messages avec filtres et pagination
+   * Récupérer les messages avec filtres et pagination.
+   * Compatible API Java (items, page, limit, total, totalPages) et API Node (data.messages).
    */
   async getMessages(params: MessagesListParams = {}) {
     const response = await apiService.axiosInstance.get('/messages', { params })
-    const transformedMessages = response.data.data?.messages?.map((msg: any) => 
+    const raw = response.data
+    // API Java : { items, page, limit, total, totalPages }
+    const rawList = raw?.items ?? raw?.data?.messages
+    const transformedMessages = (Array.isArray(rawList) ? rawList : []).map((msg: any) =>
       this.transformMessageFromBackend(msg)
-    ) || []
-    
+    )
     return {
-      ...response.data,
+      ...raw,
       data: {
-        ...response.data.data,
-        messages: transformedMessages
+        ...raw?.data,
+        messages: transformedMessages,
+        total: raw?.total ?? raw?.data?.total,
+        page: raw?.page ?? raw?.data?.page,
+        limit: raw?.limit ?? raw?.data?.limit,
+        totalPages: raw?.totalPages ?? raw?.data?.totalPages
       }
     }
   }

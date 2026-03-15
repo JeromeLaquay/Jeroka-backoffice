@@ -154,6 +154,8 @@
               </div>
             </div>
 
+          <p v-if="errorMessage" class="text-sm text-red-600 dark:text-red-400 mb-4">{{ errorMessage }}</p>
+
           <!-- Actions -->
           <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
             <button
@@ -211,16 +213,20 @@ const closeModal = () => {
   emit('close');
 };
 
+const errorMessage = ref('');
+
 const handleSubmit = async () => {
+  errorMessage.value = '';
   try {
     loading.value = true;
-    console.log(form);
     const response = await adminService.createCompany(form);
     if (response.success) {
       emit('created');
     }
-  } catch (error) {
-    console.error('Erreur lors de la création de l\'entreprise:', error);
+  } catch (error: any) {
+    const msg = error?.response?.data?.error ?? error?.message ?? 'Erreur lors de la création de l\'entreprise';
+    errorMessage.value = msg;
+    console.error('Erreur lors de la création de l\'entreprise:', error?.response?.data ?? error);
   } finally {
     loading.value = false;
   }

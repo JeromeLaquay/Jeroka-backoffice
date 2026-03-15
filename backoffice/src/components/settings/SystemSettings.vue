@@ -142,11 +142,14 @@
           </div>
         </div>
         <!-- voyant vert ou rouge selon le statut de la connexion -->
-        <div class="flex items-center justify-center">
-          <div class="w-4 h-4 rounded-full" :class="googleOAuthStatus.isConnected ? 'bg-green-500' : 'bg-red-500'"></div>
-          <div class="text-sm text-gray-500 dark:text-gray-400">
-            {{ googleOAuthStatus.isConnected ? 'Connexion réussie' : 'Connexion échouée' }}
+        <div class="flex flex-col items-center justify-center gap-1">
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 rounded-full" :class="googleOAuthStatus.isConnected ? 'bg-green-500' : 'bg-red-500'"></div>
+            <span class="text-sm text-gray-500 dark:text-gray-400">
+              {{ googleOAuthStatus.isConnected ? 'Connexion réussie' : 'Connexion échouée' }}
+            </span>
           </div>
+          <p v-if="googleConnectError" class="text-sm text-red-600 dark:text-red-400">{{ googleConnectError }}</p>
         </div>
 
         <!-- Boutons de test -->
@@ -259,48 +262,69 @@ const saveTwitter = async () => {
 
 import settingsSystem from '../../services/settingsSystem'
 
-// Méthodes OAuth Google
+const googleConnectError = ref<string | null>(null)
 const connectGoogle = async () => {
-  await settingsSystem.connectGoogle()
+  googleConnectError.value = null
+  try {
+    await settingsSystem.connectGoogle()
+  } catch (e: any) {
+    googleConnectError.value = e?.message || 'Connexion Google échouée'
+  }
 }
 
 const refreshGoogleStatus = async () => {
   try {
-    console.log('refreshGoogleStatus')
     const res = await settingsSystem.getGoogleStatus()
     if (res.success && res.data) {
-      console.log('res.data', res.data)
-      googleOAuthStatus.value = res.data
-      // Mettre à jour le statut configuré
-      configured.value.google = res.data.isConnected || res.data.hasServiceAccount
+      const data = res.data
+      // Ne pas écraser isConnected: true si un test a déjà confirmé la connexion
+      const wasConnectedByTest = googleOAuthStatus.value.isConnected === true
+      googleOAuthStatus.value = {
+        ...data,
+        isConnected: data.isConnected || wasConnectedByTest
+      }
+      configured.value.google = data.isConnected || data.hasServiceAccount || wasConnectedByTest
     }
   } catch (e) {
     console.error('Erreur lors du chargement du statut Google:', e)
   }
 }
 
-const testGoogleCalendar = async () => { 
+const setGoogleConnectedIfTestOk = (success: boolean) => {
+  if (success) {
+    googleOAuthStatus.value = {
+      ...googleOAuthStatus.value,
+      isConnected: true
+    }
+    googleConnectError.value = null
+  }
+}
+
+const testGoogleCalendar = async () => {
   const res = await settingsSystem.testCalendar()
   if (res.success) {
     console.log('Connexion Calendar réussie !')
+    setGoogleConnectedIfTestOk(true)
   } else {
     console.log('Erreur de connexion Calendar')
   }
 }
 
-const testGoogleGmail = async () => { 
+const testGoogleGmail = async () => {
   const res = await settingsSystem.testGmail()
   if (res.success) {
     console.log('Connexion Gmail réussie !')
+    setGoogleConnectedIfTestOk(true)
   } else {
     console.log('Erreur de connexion Gmail')
   }
 }
 
-const testGoogleDrive = async () => { 
+const testGoogleDrive = async () => {
   const res = await settingsSystem.testDrive()
   if (res.success) {
     console.log('Connexion Drive réussie !')
+    setGoogleConnectedIfTestOk(true)
   } else {
     console.log('Erreur de connexion Drive')
   }

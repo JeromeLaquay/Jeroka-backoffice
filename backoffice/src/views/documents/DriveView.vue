@@ -7,6 +7,7 @@
           <p class="text-sm text-gray-600 dark:text-gray-400">
             Gérez vos dossiers et fichiers, et prévisualisez les documents extraits.
           </p>
+          <p v-if="loadError" class="mt-2 text-sm text-amber-600 dark:text-amber-400">{{ loadError }}</p>
         </div>
         <div class="flex items-center gap-2">
           <button @click="loadRoot" :disabled="loadingTree" class="px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50">
@@ -22,8 +23,12 @@
           <div v-if="loadingTree" class="absolute inset-0 bg-white/70 dark:bg-gray-800/70 flex items-center justify-center z-10">
             <div class="w-6 h-6 border-2 border-gray-300 border-t-primary-600 rounded-full animate-spin"></div>
           </div>
+          <template v-else-if="tree.length === 0 && !loadError">
+            <li class="text-gray-500 dark:text-gray-400 py-2 px-1">Aucun élément. Vérifiez la connexion Google (Paramètres).</li>
+          </template>
           <DriveNode
             v-for="node in tree"
+            v-else
             :key="node.id"
             :node="node"
             @select="onSelect"
@@ -139,24 +144,32 @@ const tree = ref<TreeNode[]>([])
 const selected = ref<DriveItem | null>(null)
 const previewUrl = computed(() => (selected.value ? googleDriveService.getPreviewUrl(selected.value) : null))
 const loadingTree = ref(false)
+const loadError = ref<string | null>(null)
 const loadingFolders = ref<Set<string>>(new Set())
 const showAnalyzeDropdown = ref(false)
 const showCreateDropdown = ref(false)
 
+function expandAll(nodes: any[]): any[] {
+  return (nodes || []).map((n: any) => ({
+    ...n,
+    expanded: true,
+    children: n?.children ? expandAll(n.children) : n.children
+  }))
+}
+
 async function loadRoot(): Promise<void> {
+  loadError.value = null
   loadingTree.value = true
-  const data = await googleDriveService.listChildren()
-  // Ouvrir tous les dossiers par défaut
-  const expandAll = (nodes: any[]): any[] => {
-    return (nodes || []).map((n: any) => ({
-      ...n,
-      expanded: true,
-      children: n?.children ? expandAll(n.children) : n.children
-    }))
+  try {
+    const data = await googleDriveService.listChildren()
+    tree.value = expandAll(data)
+    selected.value = null
+  } catch (e: any) {
+    loadError.value = e?.message || 'Erreur lors du chargement des documents.'
+    tree.value = []
+  } finally {
+    loadingTree.value = false
   }
-  tree.value = expandAll(data)
-  selected.value = null
-  loadingTree.value = false
 }
 
 function onSelect(node: TreeNode): void {
@@ -215,8 +228,8 @@ const DriveNode = defineComponent({
       if (n.expanded && (!n.children || n.children.length === 0)) {
         loadingFolders.value.add(n.id)
         try {
-          const children = await googleDriveService.listChildren()
-          n.children = (children || []).map((c: any) => ({ ...c, expanded: true }))
+          const children = await googleDriveService.listChildren(n.id)
+          n.children = (children || []).map((c: any) => ({ ...c, expanded: false }))
         } finally {
           loadingFolders.value.delete(n.id)
         }

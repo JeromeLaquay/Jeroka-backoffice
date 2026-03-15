@@ -1,4 +1,5 @@
 # docker-compose.prod.yml
+# Limites mémoire pour éviter OOM sur VPS 2 Go (réserve ~400 Mo pour système + SSH)
 
 services:
   # Base de données PostgreSQL
@@ -6,6 +7,10 @@ services:
     image: postgres:15-alpine
     container_name: jeroka-postgres
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 400M
     environment:
       POSTGRES_DB: jeroka_dashboard
       POSTGRES_USER: jeroka
@@ -34,6 +39,10 @@ services:
       target: production
     container_name: jeroka-api
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 550M
     environment:
       NODE_ENV: production
       PORT: 3002
@@ -106,6 +115,10 @@ services:
       context: ./backoffice
       dockerfile: Dockerfile
     container_name: jeroka-backoffice
+    deploy:
+      resources:
+        limits:
+          memory: 150M
     ports:
       - "3001:80"
     restart: unless-stopped
@@ -125,6 +138,10 @@ services:
     image: adminer:4.8.1
     container_name: jeroka-adminer
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     ports:
       - "8089:8080"
     networks:
