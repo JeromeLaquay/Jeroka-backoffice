@@ -154,15 +154,6 @@ Créer `api-java/.env` à partir des variables suivantes :
 | `ANTHROPIC_API_KEY` | Clé Anthropic/Claude (IA) |
 | `CORS_ORIGINS` | Origines autorisées (ex. `http://localhost:3001`) |
 
-### Compte de test (seed)
-
-```
-Email    : laquay.jerome@gmail.com
-Password : Jeroume!13
-```
-
----
-
 ## CI/CD
 
 Déploiement automatique sur push `main` via `.github/workflows/deploy.yml` :
