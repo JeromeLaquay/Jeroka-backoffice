@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,4 +25,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     long countByCompanyIdAndCreatedAtAfter(UUID companyId, Instant after);
 
     boolean existsByPersonId(UUID personId);
+
+    List<Message> findTop5ByCompanyIdOrderByCreatedAtDesc(UUID companyId);
 }

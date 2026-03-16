@@ -3,6 +3,7 @@ package fr.jeroka.apijava.mapping;
 import fr.jeroka.apijava.dto.auth.AuthResponse;
 import fr.jeroka.apijava.dto.auth.LoginRequest;
 import fr.jeroka.apijava.dto.auth.RegisterRequest;
+import fr.jeroka.apijava.dto.auth.UpdateProfileRequest;
 import fr.jeroka.apijava.entity.User;
 import fr.jeroka.apijava.security.JwtService;
 import fr.jeroka.apijava.service.AuthService;
@@ -37,6 +38,17 @@ public class AuthMappingService {
 
     public AuthResponse.UserInfo getMe(UUID userId) {
         var user = authService.getById(userId);
+        return new AuthResponse.UserInfo(
+                user.getId().toString(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getRole(),
+                user.getCompanyId().toString());
+    }
+
+    public AuthResponse.UserInfo updateProfile(UUID userId, UpdateProfileRequest request) {
+        var user = authService.updateProfile(userId, request.firstName(), request.lastName());
         return new AuthResponse.UserInfo(
                 user.getId().toString(),
                 user.getEmail(),

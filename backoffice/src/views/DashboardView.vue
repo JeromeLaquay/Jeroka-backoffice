@@ -69,18 +69,24 @@
         <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
           Chiffre d'affaires (6 derniers mois)
         </h3>
-        <div class="h-64 bg-gray-50 dark:bg-gray-700 rounded-md flex items-center justify-center">
-          <p class="text-gray-500 dark:text-gray-400">Graphique à venir (Chart.js)</p>
+        <div class="h-64 relative">
+          <Bar v-if="revenueChartData" :data="revenueChartData" :options="revenueChartOptions" />
+          <div v-else class="h-64 bg-gray-50 dark:bg-gray-700 rounded-md flex items-center justify-center">
+            <p class="text-gray-500 dark:text-gray-400">Aucune donnée disponible</p>
+          </div>
         </div>
       </div>
 
       <!-- Répartition des ventes -->
       <div class="card">
         <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-          Répartition des ventes
+          Répartition des factures
         </h3>
-        <div class="h-64 bg-gray-50 dark:bg-gray-700 rounded-md flex items-center justify-center">
-          <p class="text-gray-500 dark:text-gray-400">Graphique à venir (Chart.js)</p>
+        <div class="h-64 relative flex items-center justify-center">
+          <Doughnut v-if="salesChartData" :data="salesChartData" :options="salesChartOptions" />
+          <div v-else class="h-64 bg-gray-50 dark:bg-gray-700 rounded-md flex items-center justify-center">
+            <p class="text-gray-500 dark:text-gray-400">Aucune donnée disponible</p>
+          </div>
         </div>
       </div>
     </div>
@@ -174,7 +180,7 @@
                 {{ invoice.invoice_number }}
               </p>
               <p class="text-xs text-gray-500 dark:text-gray-400">
-                Client: {{ invoice.client_id }}
+                {{ invoice.client_name || '—' }}
               </p>
             </div>
             <div class="text-right">
@@ -182,14 +188,15 @@
                 {{ formatCurrency(parseFloat(String(invoice.total_ttc))) }}
               </p>
               <span 
-                :class="[
-                  'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
-                  invoice.status === 'paid' ? 'badge-success' : 
-                  invoice.status === 'pending' ? 'badge-warning' : 'badge-danger'
-                ]"
-              >
-                {{ invoice.status }}
-              </span>
+                  :class="[
+                    'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
+                    invoice.status === 'paid' ? 'badge-success' : 
+                    invoice.status === 'pending' ? 'badge-warning' :
+                    invoice.status === 'sent' ? 'badge-info' : 'badge-danger'
+                  ]"
+                >
+                  {{ getInvoiceStatusLabel(invoice.status) }}
+                </span>
             </div>
           </div>
         </div>
@@ -264,12 +271,86 @@ import {
   EnvelopeIcon,
   ClipboardDocumentListIcon
 } from '@heroicons/vue/24/outline'
+import { Bar, Doughnut } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend)
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const stats = ref<DashboardStats | null>(null)
 const topStats = ref<TopStat[]>([])
+
+const MONTH_LABELS: Record<string, string> = {
+  '01': 'Jan', '02': 'Fév', '03': 'Mar', '04': 'Avr',
+  '05': 'Mai', '06': 'Juin', '07': 'Juil', '08': 'Aoû',
+  '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Déc'
+}
+
+const revenueChartData = computed(() => {
+  const monthly = (stats.value as any)?.monthly_revenue
+  if (!monthly?.length) return null
+  const sorted = [...monthly].sort((a: any, b: any) => a.month.localeCompare(b.month))
+  return {
+    labels: sorted.map((m: any) => {
+      const [year, month] = m.month.split('-')
+      return `${MONTH_LABELS[month] || m.month} ${year}`
+    }),
+    datasets: [{
+      label: 'CA (€)',
+      data: sorted.map((m: any) => Number(m.total)),
+      backgroundColor: 'rgba(139, 92, 246, 0.7)',
+      borderColor: 'rgba(139, 92, 246, 1)',
+      borderWidth: 1,
+      borderRadius: 4
+    }]
+  }
+})
+
+const revenueChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    y: { beginAtZero: true, ticks: { callback: (v: any) => v + ' €' } }
+  }
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  paid: 'Payée', pending: 'En attente', sent: 'Envoyée',
+  draft: 'Brouillon', cancelled: 'Annulée', overdue: 'En retard'
+}
+const STATUS_COLORS = ['#22c55e', '#f59e0b', '#3b82f6', '#9ca3af', '#ef4444', '#f97316']
+
+const salesChartData = computed(() => {
+  const counts = (stats.value as any)?.invoice_status_counts
+  if (!counts || !Object.keys(counts).length) return null
+  const entries = Object.entries(counts) as [string, number][]
+  return {
+    labels: entries.map(([s]) => STATUS_LABELS[s] || s),
+    datasets: [{
+      data: entries.map(([, v]) => v),
+      backgroundColor: STATUS_COLORS.slice(0, entries.length)
+    }]
+  }
+})
+
+const salesChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { position: 'bottom' as const } }
+}
+
 interface TopStat {
   name: string
   value: number
@@ -279,15 +360,29 @@ interface TopStat {
   changeColor: string
 }
 
-// Fonctions pour la gestion des messages
 const getMessageTypeLabel = (type: string) => {
-  const labels = {
+  const labels: Record<string, string> = {
+    'website': 'Site web',
+    'email': 'Email',
+    'phone': 'Téléphone',
     'devis': 'Devis',
     'information': 'Info',
     'partnership': 'Partenariat',
     'other': 'Autre'
   }
-  return labels[type as keyof typeof labels] || 'Autre'
+  return labels[type] || 'Autre'
+}
+
+const getInvoiceStatusLabel = (status: string) => {
+  const labels: Record<string, string> = {
+    'draft': 'Brouillon',
+    'sent': 'Envoyée',
+    'pending': 'En attente',
+    'paid': 'Payée',
+    'cancelled': 'Annulée',
+    'overdue': 'En retard'
+  }
+  return labels[status] || status
 }
 
 const goToClient = (clientId: string) => {
@@ -296,42 +391,42 @@ const goToClient = (clientId: string) => {
 
 const loadStats = async () => {
   const response = await dashboardService.getStats()
-  console.log('response', response)
   stats.value = response
-  topStats.value = [{
-    name: 'Clients',
-    value: response.total_clients,
-    change: response.new_clients_month,
-    icon: 'UsersIcon',
-    iconColor: 'green',
-    changeColor: 'text-green-600'
-  },
-  {
-    name: 'Messages',
-    value: response.total_messages,
-    change: response.new_messages_week,
-    icon: 'EnvelopeIcon',
-    iconColor: 'blue',
-    changeColor: 'text-blue-600'
-  },
-  {
-    name: 'Factures',
-    value: response.total_invoices,
-    change: response.new_invoices_month,
-    icon: 'DocumentTextIcon',
-    iconColor: 'secondary',
-    changeColor: 'text-secondary-600'
-  },
-  {
-    name: 'Devis',
-    value: response.total_quotes,
-    change: response.new_quotes_month,
-    icon: 'ClipboardDocumentListIcon',
-    iconColor: 'primary',
-    changeColor: 'text-primary-600'
-  }
-]
-  
+  const n = (v: unknown) => Number(v ?? 0)
+  topStats.value = [
+    {
+      name: 'Clients',
+      value: n(response?.total_clients),
+      change: n(response?.new_clients_month),
+      icon: 'UsersIcon',
+      iconColor: 'green',
+      changeColor: 'text-green-600'
+    },
+    {
+      name: 'Messages',
+      value: n(response?.total_messages),
+      change: n(response?.new_messages_week),
+      icon: 'EnvelopeIcon',
+      iconColor: 'blue',
+      changeColor: 'text-blue-600'
+    },
+    {
+      name: 'Factures',
+      value: n(response?.total_invoices),
+      change: n(response?.new_invoices_month),
+      icon: 'DocumentTextIcon',
+      iconColor: 'secondary',
+      changeColor: 'text-secondary-600'
+    },
+    {
+      name: 'Devis',
+      value: n(response?.total_quotes),
+      change: n(response?.new_quotes_month),
+      icon: 'ClipboardDocumentListIcon',
+      iconColor: 'primary',
+      changeColor: 'text-primary-600'
+    }
+  ]
 }
 
 

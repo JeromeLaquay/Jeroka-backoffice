@@ -89,4 +89,12 @@ public class AuthService {
         user.setIsActive(true);
         return user;
     }
+
+    @Transactional
+    public User updateProfile(UUID userId, String firstName, String lastName) {
+        var user = getById(userId);
+        user.setFirstName(firstName.trim());
+        user.setLastName(lastName.trim());
+        return userRepository.save(user);
+    }
 }

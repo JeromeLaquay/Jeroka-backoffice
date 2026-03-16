@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { apiService, type LoginRequest, type RegisterRequest, type User as ApiUser } from '../services/api'
 
 export interface User {
@@ -37,20 +38,20 @@ export const useAuthStore = defineStore('auth', () => {
     return null
   }
 
-  // Convertir l'utilisateur API vers le format du store
+  // Convertir l'utilisateur API vers le format du store (API Java ne renvoie pas isActive, emailVerified, createdAt)
   const transformApiUser = (apiUser: ApiUser): User => ({
     id: apiUser.id,
     email: apiUser.email,
     firstName: apiUser.firstName,
     lastName: apiUser.lastName,
-    name: `${apiUser.firstName} ${apiUser.lastName}`,
-    role: apiUser.role as 'admin' | 'user' | 'manager',
+    name: `${apiUser.firstName ?? ''} ${apiUser.lastName ?? ''}`.trim() || apiUser.email,
+    role: (apiUser.role as 'admin' | 'user' | 'manager') || 'user',
     avatar_url: apiUser.avatar_url || `https://ui-avatars.com/api/?name=${apiUser.firstName}+${apiUser.lastName}&background=a855f7&color=fff`,
     phone: apiUser.phone,
-    isActive: apiUser.isActive,
-    emailVerified: apiUser.emailVerified,
+    isActive: apiUser.isActive ?? true,
+    emailVerified: apiUser.emailVerified ?? true,
     lastLogin: apiUser.lastLogin,
-    createdAt: apiUser.createdAt
+    createdAt: apiUser.createdAt ?? new Date().toISOString()
   })
 
   const login = async (email: string, password: string, rememberMe = false) => {
@@ -156,15 +157,19 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const response = await apiService.getCurrentUser()
-      
-      if (response.success && response.data) {
-        const transformedUser = transformApiUser(response.data)
+      const userData = response?.data ?? (response as any)
+      if ((response?.success && response?.data) || (userData?.id && userData?.email)) {
+        const transformedUser = transformApiUser(response?.data ?? userData)
         user.value = transformedUser
         localStorage.setItem('user', JSON.stringify(transformedUser))
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erreur lors du rafraîchissement du profil:', err)
-      // En cas d'erreur 401, la déconnexion sera gérée par l'intercepteur
+      const status = err?.statusCode ?? err?.response?.status
+      if (status === 401 || status === 403) {
+        await logout()
+        useRouter().push('/login')
+      }
     }
   }
 
@@ -280,19 +285,17 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       loading.value = true
       const response = await apiService.getCurrentUser()
-      
-      if (response.success && response.data) {
-        const transformedUser = transformApiUser(response.data)
+      const userData = response?.data ?? (response as any)
+      if ((response?.success && response?.data) || (userData?.id && userData?.email)) {
+        const transformedUser = transformApiUser(response?.data ?? userData)
         user.value = transformedUser
         localStorage.setItem('user', JSON.stringify(transformedUser))
         return true
-      } else {
-        // Token invalide, le supprimer
-        token.value = null
-        localStorage.removeItem('auth_token')
-        localStorage.removeItem('user')
-        return false
       }
+      token.value = null
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('user')
+      return false
     } catch (error) {
       console.error('Erreur lors du chargement de l\'utilisateur:', error)
       // Token invalide, le supprimer

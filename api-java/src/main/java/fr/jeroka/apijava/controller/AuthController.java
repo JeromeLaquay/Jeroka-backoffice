@@ -3,6 +3,7 @@ package fr.jeroka.apijava.controller;
 import fr.jeroka.apijava.dto.auth.AuthResponse;
 import fr.jeroka.apijava.dto.auth.LoginRequest;
 import fr.jeroka.apijava.dto.auth.RegisterRequest;
+import fr.jeroka.apijava.dto.auth.UpdateProfileRequest;
 import fr.jeroka.apijava.mapping.AuthMappingService;
 import fr.jeroka.apijava.security.JwtService;
 import jakarta.validation.Valid;
@@ -25,6 +26,18 @@ public class AuthController {
     @GetMapping("/me")
     public AuthResponse.UserInfo me(@AuthenticationPrincipal JwtService.UserPrincipal principal) {
         return authMappingService.getMe(UUID.fromString(principal.id()));
+    }
+
+    @GetMapping("/profile")
+    public AuthResponse.UserInfo profile(@AuthenticationPrincipal JwtService.UserPrincipal principal) {
+        return authMappingService.getMe(UUID.fromString(principal.id()));
+    }
+
+    @PutMapping("/profile")
+    public AuthResponse.UserInfo updateProfile(
+            @AuthenticationPrincipal JwtService.UserPrincipal principal,
+            @Valid @RequestBody UpdateProfileRequest request) {
+        return authMappingService.updateProfile(UUID.fromString(principal.id()), request);
     }
 
     @PostMapping("/login")

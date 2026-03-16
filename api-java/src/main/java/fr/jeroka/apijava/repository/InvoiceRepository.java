@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,4 +39,20 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
 
     @Query("SELECT COALESCE(SUM(i.amountDue), 0) FROM Invoice i WHERE i.companyId = :companyId")
     BigDecimal sumAmountDueByCompanyId(@Param("companyId") UUID companyId);
+
+    List<Invoice> findTop5ByCompanyIdOrderByCreatedAtDesc(UUID companyId);
+
+    @Query(value = """
+            SELECT TO_CHAR(DATE_TRUNC('month', issue_date::timestamp), 'YYYY-MM') AS month,
+                   COALESCE(SUM(total_ttc), 0) AS total
+            FROM invoices
+            WHERE company_id = :companyId
+            GROUP BY DATE_TRUNC('month', issue_date::timestamp)
+            ORDER BY DATE_TRUNC('month', issue_date::timestamp) DESC
+            LIMIT 12
+            """, nativeQuery = true)
+    List<Object[]> findMonthlyRevenueLast6Months(@Param("companyId") UUID companyId);
+
+    @Query("SELECT i.status, COUNT(i) FROM Invoice i WHERE i.companyId = :companyId GROUP BY i.status")
+    List<Object[]> countByStatusAndCompanyId(@Param("companyId") UUID companyId);
 }

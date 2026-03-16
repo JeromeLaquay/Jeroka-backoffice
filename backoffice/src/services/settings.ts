@@ -1,4 +1,4 @@
-import { apiService } from './api'
+import { apiService, type User as ApiUser } from './api'
 
 export type SystemSettings = {
   companySettings: Record<string, any>
@@ -33,6 +33,21 @@ export type CompanySettings = {
     vatRate?: number
     taxRegime?: string
   }
+}
+
+export type UserProfile = {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone?: string
+  position?: string
+  department?: string
+  avatar_url?: string
+  isActive: boolean
+  emailVerified: boolean
+  lastLoginAt?: string
+  createdAt: string
 }
 
 /** Réponse brute GET /company (API Java). */
@@ -118,6 +133,57 @@ export class SettingsApi {
 
   async uploadLogo(_file: File): Promise<{ data: { logo: string } }> {
     return Promise.reject(new Error('Upload logo non implémenté'))
+  }
+
+  async getUserProfile(): Promise<UserProfile | null> {
+    const data = await apiService.getProfile()
+    const raw = (data as any)?.data?.user ?? (data as any)?.user ?? (data as ApiUser | null)
+    if (!raw) return null
+    return {
+      id: raw.id,
+      firstName: raw.firstName,
+      lastName: raw.lastName,
+      email: raw.email,
+      phone: raw.phone,
+      position: '',
+      department: '',
+      avatar_url: raw.avatar_url,
+      isActive: raw.isActive ?? true,
+      emailVerified: raw.emailVerified ?? true,
+      lastLoginAt: raw.lastLogin,
+      createdAt: raw.createdAt ?? new Date().toISOString()
+    }
+  }
+
+  async updateUserProfile(payload: {
+    firstName: string
+    lastName: string
+    phone?: string
+    position?: string
+    department?: string
+  }): Promise<UserProfile | null> {
+    const body = {
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      phone: payload.phone
+    }
+    const data = await apiService.updateProfile(body)
+    const raw = (data as any)?.data?.user ?? (data as any)?.user ?? null
+    if (!raw) return this.getUserProfile()
+    return {
+      id: raw.id,
+      firstName: raw.firstName,
+      lastName: raw.lastName,
+      email: raw.email,
+      phone: raw.phone,
+      position: payload.position,
+      department: payload.department,
+      avatar_url: raw.avatar_url,
+      isActive: raw.isActive ?? true,
+      emailVerified: raw.emailVerified ?? true,
+      lastLoginAt: raw.lastLogin,
+      createdAt: raw.createdAt ?? new Date().toISOString()
+    }
   }
 }
 

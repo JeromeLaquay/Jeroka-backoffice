@@ -86,7 +86,6 @@ class ApiService {
         const token = localStorage.getItem('auth_token')
         if (token) {
           config.headers.Authorization = `Bearer ${token}`
-          console.log('Token ajouté à la requête:', token)
         }
         // S'assurer que les cookies sont envoyés
         config.withCredentials = true
@@ -170,18 +169,28 @@ class ApiService {
   }
 
   async getCurrentUser(): Promise<ApiResponse<User>> {
-    const response = await this.api.get<ApiResponse<User>>('/auth/me')
-    return response.data
+    const data = await this.get<any>('/auth/me')
+    // API Java renvoie l'objet user directement (sans wrapper { success, data })
+    if (data?.id && !data.success) {
+      return { success: true, data: data as User }
+    }
+    return data as ApiResponse<User>
   }
 
   async getProfile(): Promise<ApiResponse<{ user: User }>> {
-    const response = await this.api.get<ApiResponse<{ user: User }>>('/auth/profile')
-    return response.data
+    const data = await this.get<any>('/auth/profile')
+    if (data?.id && !data.success) {
+      return { success: true, data: { user: data as User } }
+    }
+    return data as ApiResponse<{ user: User }>
   }
 
   async updateProfile(data: Partial<User>): Promise<ApiResponse<{ user: User }>> {
-    const response = await this.api.put<ApiResponse<{ user: User }>>('/auth/profile', data)
-    return response.data
+    const body = await this.put<any>('/auth/profile', data)
+    if (body?.id && !body.success) {
+      return { success: true, data: { user: body as User } }
+    }
+    return body as ApiResponse<{ user: User }>
   }
 
   async changePassword(data: {
@@ -196,8 +205,54 @@ class ApiService {
   // ===== DASHBOARD =====
 
   async getDashboardStats(): Promise<ApiResponse<any>> {
-    const response = await this.api.get<ApiResponse<any>>('/dashboard/stats')
-    return response.data
+    const data = await this.get<any>('/dashboard/stats')
+    // API Java renvoie camelCase ; normaliser vers snake_case pour le front
+    if (data?.companyId != null && !data.success) {
+      const stats = {
+        company_id: data.companyId,
+        total_clients: data.totalClients ?? 0,
+        total_messages: data.totalMessages ?? 0,
+        total_invoices: data.totalInvoices ?? 0,
+        total_quotes: data.totalQuotes ?? 0,
+        new_clients_month: data.newClientsMonth ?? 0,
+        new_messages_week: data.newMessagesWeek ?? 0,
+        new_invoices_month: data.newInvoicesMonth ?? 0,
+        new_quotes_month: data.newQuotesMonth ?? 0,
+        recent_clients: (data.recentClients ?? []).map((c: any) => ({
+          id: c.id,
+          first_name: c.firstName,
+          last_name: c.lastName,
+          email: c.email,
+          created_at: c.createdAt
+        })),
+        recent_messages: (data.recentMessages ?? []).map((m: any) => ({
+          id: m.id,
+          first_name: m.firstName,
+          last_name: m.lastName,
+          email: m.email,
+          subject: m.subject,
+          status: m.status,
+          type: m.source,
+          created_at: m.createdAt
+        })),
+        recent_invoices: (data.recentInvoices ?? []).map((i: any) => ({
+          id: i.id,
+          invoice_number: i.invoiceNumber,
+          client_id: i.personId,
+          client_name: i.clientName,
+          status: i.status,
+          total_ttc: i.totalTtc,
+          created_at: i.createdAt
+        })),
+        monthly_revenue: (data.monthlyRevenue ?? []).map((m: any) => ({
+          month: m.month,
+          total: m.total
+        })),
+        invoice_status_counts: data.invoiceStatusCounts ?? {}
+      }
+      return { success: true, data: stats }
+    }
+    return data as ApiResponse<any>
   }
 
   async getRecentActivity(): Promise<ApiResponse<any>> {

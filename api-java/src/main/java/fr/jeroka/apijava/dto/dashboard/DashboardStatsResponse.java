@@ -1,5 +1,8 @@
 package fr.jeroka.apijava.dto.dashboard;
 
+import java.util.List;
+import java.util.Map;
+
 public record DashboardStatsResponse(
         String companyId,
         long totalClients,
@@ -9,5 +12,10 @@ public record DashboardStatsResponse(
         long newClientsMonth,
         long newMessagesWeek,
         long newInvoicesMonth,
-        long newQuotesMonth
+        long newQuotesMonth,
+        List<RecentClientDto> recentClients,
+        List<RecentMessageDto> recentMessages,
+        List<RecentInvoiceDto> recentInvoices,
+        List<MonthlyRevenueDto> monthlyRevenue,
+        Map<String, Long> invoiceStatusCounts
 ) {}

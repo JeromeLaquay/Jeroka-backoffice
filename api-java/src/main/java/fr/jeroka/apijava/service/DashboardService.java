@@ -1,5 +1,6 @@
 package fr.jeroka.apijava.service;
 
+import fr.jeroka.apijava.dto.dashboard.MonthlyRevenueDto;
 import fr.jeroka.apijava.repository.InvoiceRepository;
 import fr.jeroka.apijava.repository.MessageRepository;
 import fr.jeroka.apijava.repository.PersonRepository;
@@ -7,9 +8,13 @@ import fr.jeroka.apijava.repository.QuoteRepository;
 import fr.jeroka.apijava.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class DashboardService {
@@ -37,18 +42,37 @@ public class DashboardService {
         var startOfMonth = now.withDayOfMonth(1).toInstant();
         var startOfWeek = now.minusWeeks(1).toInstant();
 
-        long totalClients = personRepository.countByCompanyId(companyId);
-        long totalMessages = messageRepository.countByCompanyId(companyId);
-        long totalInvoices = invoiceRepository.countByCompanyId(companyId);
-        long totalQuotes = quoteRepository.countByCompanyId(companyId);
-        long newUsersMonth = userRepository.countByCompanyIdAndCreatedAtAfter(companyId, startOfMonth);
-        long newMessagesWeek = messageRepository.countByCompanyIdAndCreatedAtAfter(companyId, startOfWeek);
-        long newInvoicesMonth = invoiceRepository.countByCompanyIdAndCreatedAtAfter(companyId, startOfMonth);
-        long newQuotesMonth = quoteRepository.countByCompanyIdAndCreatedAtAfter(companyId, startOfMonth);
-
         return new DashboardStats(
-                totalClients, totalMessages, totalInvoices, totalQuotes,
-                0, newMessagesWeek, newInvoicesMonth, newQuotesMonth
+                personRepository.countByCompanyId(companyId),
+                messageRepository.countByCompanyId(companyId),
+                invoiceRepository.countByCompanyId(companyId),
+                quoteRepository.countByCompanyId(companyId),
+                userRepository.countByCompanyIdAndCreatedAtAfter(companyId, startOfMonth),
+                messageRepository.countByCompanyIdAndCreatedAtAfter(companyId, startOfWeek),
+                invoiceRepository.countByCompanyIdAndCreatedAtAfter(companyId, startOfMonth),
+                quoteRepository.countByCompanyIdAndCreatedAtAfter(companyId, startOfMonth),
+                personRepository.findTop5ByCompanyIdOrderByCreatedAtDesc(companyId),
+                messageRepository.findTop5ByCompanyIdOrderByCreatedAtDesc(companyId),
+                invoiceRepository.findTop5ByCompanyIdOrderByCreatedAtDesc(companyId),
+                buildMonthlyRevenue(companyId),
+                buildInvoiceStatusCounts(companyId)
         );
+    }
+
+    private List<MonthlyRevenueDto> buildMonthlyRevenue(UUID companyId) {
+        return invoiceRepository.findMonthlyRevenueLast6Months(companyId).stream()
+                .map(row -> new MonthlyRevenueDto(
+                        (String) row[0],
+                        new BigDecimal(row[1].toString())
+                ))
+                .toList();
+    }
+
+    private Map<String, Long> buildInvoiceStatusCounts(UUID companyId) {
+        return invoiceRepository.countByStatusAndCompanyId(companyId).stream()
+                .collect(Collectors.toMap(
+                        row -> (String) row[0],
+                        row -> (Long) row[1]
+                ));
     }
 }

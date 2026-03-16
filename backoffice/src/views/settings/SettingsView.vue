@@ -115,7 +115,7 @@ import IntegrationsSettings from '../../components/settings/IntegrationsSettings
 import EnvironmentSwitcher from '../../components/EnvironmentSwitcher.vue'
 import { settingsService } from '../../services/settings'
 // État
-const activeTab = ref('system') // Commencer par l'onglet développement
+const activeTab = ref('profile')
 const userProfile = ref<any>(null)
 const companySettings = ref<any>(null)
 const systemSettings = ref<any>(null)
@@ -135,8 +135,7 @@ const tabs = [
 // Méthodes simplifiées pour éviter les erreurs d'import
 const loadUserProfile = async () => {
   try {
-    // Placeholder - à implémenter quand le service sera disponible
-    console.log('Chargement du profil utilisateur...')
+    userProfile.value = await settingsService.getUserProfile()
   } catch (error) {
     console.error('Erreur lors du chargement du profil:', error)
   }
