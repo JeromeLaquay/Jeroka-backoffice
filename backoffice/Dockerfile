@@ -1,22 +1,10 @@
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Copy package.json and install dependencies
-COPY package*.json ./
-RUN npm install
-
-# Copy project files
-COPY . .
-
-# Build for production using Vite
+# Étape de build (inchangée)
+FROM node:20-alpine AS build
+...
 RUN npm run build-prod
 
-# Install serve to serve the built files
-RUN npm install -g serve
-
-# Expose port for the application
+# Runtime : nginx au lieu de serve
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
-
-# Command to serve the built application
-CMD ["serve", "-s", "dist", "-l", "80"] 

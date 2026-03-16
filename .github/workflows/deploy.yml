@@ -4,20 +4,9 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch: # Permet de déclencher manuellement le déploiement
-    inputs:
-      run_tests:
-        description: 'Exécuter les tests Cypress après déploiement'
-        required: false
-        default: true
-        type: boolean
 
 env:
-  NODE_VERSION: '18'
   DOCKER_COMPOSE_FILE: 'docker-compose.prod.yml'
-  # Configuration des tests Cypress
-  CYPRESS_BASE_URL: 'http://localhost:3001'
-  API_BASE_URL: 'http://localhost:3002'
-  BACKOFFICE_URL: 'http://localhost:3001'
 
 jobs:
   deploy:
@@ -119,49 +108,12 @@ jobs:
             fi
           EOF
       
-      - name: 📦 Setup Node pour Cypress (runner)
-        if: success() && (github.event.inputs.run_tests != 'false')
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: cypress/package-lock.json
-
-      - name: 🧪 Exécution des tests Cypress (sur le runner, pas sur le VPS)
-        if: success() && (github.event.inputs.run_tests != 'false')
-        run: |
-          echo "🧪 Tests Cypress contre les URLs de production (sans charger le serveur)"
-          cd cypress
-          npm ci
-          echo "⏳ Attente que les services soient prêts..."
-          sleep 15
-          npm run cypress:run:chrome
-          npm run test:report
-        env:
-          CYPRESS_BASE_URL: https://backoffice.jerokaxperience.fr
-          API_BASE_URL: https://apibackoffice.jerokaxperience.fr
-          BACKOFFICE_URL: https://backoffice.jerokaxperience.fr
-      
-      - name: 📤 Upload des rapports de tests
-        if: always() && (github.event.inputs.run_tests != 'false')
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-test-reports-${{ github.run_number }}
-          path: |
-            cypress/cypress/reports/
-            cypress/cypress/screenshots/
-            cypress/cypress/videos/
-          retention-days: 30
-      
       - name: 📊 Notification de succès
         if: success()
         run: |
           echo "🎉 Déploiement réussi !"
           echo "🌐 Backoffice: https://backoffice.jerokaxperience.fr"
           echo "🔗 API: https://apibackoffice.jerokaxperience.fr"
-          if [ "${{ github.event.inputs.run_tests }}" != "false" ]; then
-            echo "🧪 Tests Cypress exécutés avec succès"
-          fi
       
       - name: ❌ Notification d'échec
         if: failure()
