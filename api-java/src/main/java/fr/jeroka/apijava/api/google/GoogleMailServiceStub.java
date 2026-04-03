@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GoogleMailServiceStub implements GoogleMailService {
 
     private static final Map<String, List<GmailMessageSimple>> EMAILS_BY_KEY = new ConcurrentHashMap<>();
+    private static final Map<String, List<GoogleMailService.GmailLabel>> LABELS_BY_KEY = new ConcurrentHashMap<>();
 
     @Override
     public List<GmailMessageSimple> getRecentEmails(GoogleOAuthCredentials credentials,
@@ -37,13 +38,45 @@ public class GoogleMailServiceStub implements GoogleMailService {
     }
 
     @Override
-    public List<GmailLabel> getUserLabels(GoogleOAuthCredentials credentials) {
-        return List.of();
+    public List<GoogleMailService.GmailLabel> getUserLabels(GoogleOAuthCredentials credentials) {
+        return LABELS_BY_KEY.getOrDefault(storageKey(credentials), List.of());
     }
 
     @Override
     public String createLabel(GoogleOAuthCredentials credentials, String labelName) {
-        return "label-" + labelName.hashCode();
+        String id = "label-" + Math.abs(labelName.hashCode());
+        String key = storageKey(credentials);
+        LABELS_BY_KEY.compute(key, (String k, List<GoogleMailService.GmailLabel> existing) -> {
+            List<GoogleMailService.GmailLabel> list = existing != null ? new ArrayList<>(existing) : new ArrayList<>();
+            boolean already = list.stream().anyMatch(l -> l.name().equalsIgnoreCase(labelName));
+            if (!already) {
+                list.add(new GoogleMailService.GmailLabel(id, labelName));
+            }
+            return List.copyOf(list);
+        });
+        return id;
+    }
+
+    @Override
+    public void renameLabel(GoogleOAuthCredentials credentials, String labelId, String newLabelName) {
+        String key = storageKey(credentials);
+        LABELS_BY_KEY.computeIfPresent(key, (k, existing) -> {
+            List<GoogleMailService.GmailLabel> updated = existing.stream()
+                    .map(l -> l.id().equals(labelId) ? new GoogleMailService.GmailLabel(labelId, newLabelName) : l)
+                    .toList();
+            return List.copyOf(updated);
+        });
+    }
+
+    @Override
+    public void deleteLabel(GoogleOAuthCredentials credentials, String labelId) {
+        String key = storageKey(credentials);
+        LABELS_BY_KEY.computeIfPresent(key, (k, existing) -> {
+            List<GoogleMailService.GmailLabel> updated = existing.stream()
+                    .filter(l -> !l.id().equals(labelId))
+                    .toList();
+            return List.copyOf(updated);
+        });
     }
 
     private static String storageKey(GoogleOAuthCredentials c) {

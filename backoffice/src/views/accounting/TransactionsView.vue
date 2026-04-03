@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="transactions-page">
     <!-- En-tête -->
     <div class="flex justify-between items-center">
       <div>

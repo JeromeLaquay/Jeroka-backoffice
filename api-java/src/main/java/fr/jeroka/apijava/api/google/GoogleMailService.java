@@ -19,5 +19,9 @@ public interface GoogleMailService {
 
     String createLabel(GoogleOAuthCredentials credentials, String labelName);
 
+    void renameLabel(GoogleOAuthCredentials credentials, String labelId, String newLabelName);
+
+    void deleteLabel(GoogleOAuthCredentials credentials, String labelId);
+
     record GmailLabel(String id, String name) {}
 }

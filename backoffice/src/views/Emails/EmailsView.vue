@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="emails-page">
     <!-- Header -->
     <div class="sm:flex sm:items-center sm:justify-between">
       <div>
@@ -11,6 +11,7 @@
       <div class="mt-4 sm:mt-0 flex space-x-3">
         <button
           @click="showCategoryModal = true"
+          data-cy="emails-new-category-button"
           class="btn-secondary inline-flex items-center"
         >
           <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,6 +22,7 @@
         <button
           @click="showSyncModal = true"
           :disabled="syncing"
+          data-cy="emails-sync-button"
           class="btn-primary inline-flex items-center"
         >
           <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,6 +132,7 @@
           :key="tab.id"
           type="button"
           role="tab"
+          :data-cy="`emails-tab-${tab.id}`"
           :aria-selected="activeTab === tab.id"
           :aria-controls="`panel-${tab.id}`"
           @click="selectTab(tab.id)"
@@ -487,7 +490,11 @@
     </div>
 
     <!-- Modal Catégorie -->
-    <div v-if="showCategoryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div
+      v-if="showCategoryModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      data-cy="emails-category-modal"
+    >
       <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {{ editingCategory ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}
@@ -502,6 +509,7 @@
               v-model="categoryForm.name"
               type="text"
               required
+              data-cy="emails-category-name-input"
               class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               placeholder="Ex: Fournisseurs, Clients..."
             >
@@ -523,6 +531,7 @@
           <div class="flex justify-end gap-3">
             <button
               type="button"
+              data-cy="emails-category-cancel"
               @click="closeCategoryModal"
               class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
             >
@@ -530,6 +539,7 @@
             </button>
             <button
               type="submit"
+              data-cy="emails-category-submit"
               :disabled="saving"
               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
@@ -616,7 +626,8 @@
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
       <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"></div>
       
-      <div 
+      <div
+        data-cy="emails-sync-modal"
         class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white dark:bg-gray-800 rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
         @click.stop
       >
@@ -765,6 +776,7 @@
           <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 sm:px-6 sm:flex sm:flex-row-reverse">
             <button
               type="submit"
+              data-cy="emails-sync-submit"
               :disabled="syncing || !isValidSyncConfig"
               class="btn-primary mb-3 sm:mb-0 sm:ml-3"
             >
@@ -776,6 +788,7 @@
             </button>
             <button
               type="button"
+              data-cy="emails-sync-cancel"
               @click="closeSyncModal"
               class="btn-secondary"
               :disabled="syncing"
