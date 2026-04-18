@@ -1,6 +1,7 @@
 package fr.jeroka.apijava.service;
 
 import fr.jeroka.apijava.api.google.GoogleMailService;
+import fr.jeroka.apijava.api.google.GoogleMailService.GmailLabel;
 import fr.jeroka.apijava.api.google.GmailMessageSimple;
 import fr.jeroka.apijava.api.google.GoogleOAuthCredentials;
 import fr.jeroka.apijava.entity.EmailLabelPreference;
@@ -8,15 +9,25 @@ import fr.jeroka.apijava.entity.EmailSender;
 import fr.jeroka.apijava.repository.EmailLabelPreferenceRepository;
 import fr.jeroka.apijava.repository.EmailSenderRepository;
 import fr.jeroka.apijava.security.JwtService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class EmailsModuleService {
+
+    private static final Logger log = LoggerFactory.getLogger(EmailsModuleService.class);
 
     private final GoogleOAuthSettingsService googleOAuthSettingsService;
     private final GoogleMailService googleMailService;
@@ -107,17 +118,24 @@ public class EmailsModuleService {
         emailSenderRepository.save(sender);
     }
 
+    /**
+     * Synchronise avec Gmail : libellés utilisateur ↔ catégories applicatives, expéditeurs uniques depuis les messages.
+     */
     public SyncResultDto sync(JwtService.UserPrincipal principal, SyncRequest req) {
         var userId = requireUserId(principal);
         Optional<GoogleOAuthCredentials> creds = googleOAuthSettingsService.getCredentialsForUser(userId);
         if (creds.isEmpty()) {
-            return new SyncResultDto(0, 0);
+            return new SyncResultDto(0, 0, 0);
         }
         var since = Instant.now().minusSeconds(7 * 24L * 3600L);
         int max = req != null && req.count() != null ? req.count() : 100;
+        var gmailLabels = googleMailService.getUserLabels(creds.get());
+        var assignableLabelIds = assignableCategoryLabelIds(gmailLabels);
         var emails = googleMailService.getRecentEmails(creds.get(), since, Math.max(1, max));
-        upsertSendersFromEmails(userId, emails);
-        return new SyncResultDto(emails.size(), 0);
+        var uniqueSenders = upsertSendersFromSyncedEmails(userId, emails, assignableLabelIds);
+        log.debug("Sync Gmail : {} message(s) traité(s), {} expéditeur(s) unique(s), {} libellé(s) assignable(s)",
+                emails.size(), uniqueSenders, assignableLabelIds.size());
+        return new SyncResultDto(emails.size(), 0, uniqueSenders);
     }
 
     private static UUID requireUserId(JwtService.UserPrincipal principal) {
@@ -157,28 +175,94 @@ public class EmailsModuleService {
         emailLabelPreferenceRepository.save(pref);
     }
 
-    private void upsertSendersFromEmails(UUID userId, List<GmailMessageSimple> emails) {
-        for (GmailMessageSimple m : emails) {
+    private int upsertSendersFromSyncedEmails(UUID userId, List<GmailMessageSimple> emails,
+                                              Set<String> assignableLabelIds) {
+        var byEmail = buildUniqueSenderRows(emails, assignableLabelIds);
+        for (SenderSyncRow row : byEmail.values()) {
+            upsertSender(userId, row.parsed(), row.categoryLabelId());
+        }
+        return byEmail.size();
+    }
+
+    private Map<String, SenderSyncRow> buildUniqueSenderRows(List<GmailMessageSimple> emails,
+                                                             Set<String> assignableLabelIds) {
+        var sorted = emails.stream()
+                .sorted(Comparator.comparingLong(EmailsModuleService::internalDateMillis).reversed())
+                .toList();
+        Map<String, SenderSyncRow> rows = new LinkedHashMap<>();
+        for (GmailMessageSimple m : sorted) {
             var parsed = parseFrom(m.from());
-            if (parsed.email() == null || parsed.email().isBlank()) continue;
-            upsertSender(userId, parsed);
+            if (parsed.email() == null || parsed.email().isBlank()) {
+                continue;
+            }
+            var key = normalizeEmailKey(parsed.email());
+            if (rows.containsKey(key)) {
+                continue;
+            }
+            var labelId = pickFirstAssignableLabel(m.labelIds(), assignableLabelIds);
+            rows.put(key, new SenderSyncRow(parsed, labelId));
+        }
+        return rows;
+    }
+
+    private static long internalDateMillis(GmailMessageSimple m) {
+        if (m.internalDate() == null) {
+            return 0L;
+        }
+        var raw = m.internalDate().trim();
+        try {
+            return Long.parseLong(raw);
+        } catch (NumberFormatException e) {
+            try {
+                return Instant.parse(raw).toEpochMilli();
+            } catch (Exception e2) {
+                return 0L;
+            }
         }
     }
 
-    private void upsertSender(UUID userId, ParsedSender parsed) {
-        var existing = emailSenderRepository.findByUserIdAndEmail(userId, parsed.email());
+    private static String normalizeEmailKey(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static String pickFirstAssignableLabel(List<String> messageLabels, Set<String> assignable) {
+        if (messageLabels == null || messageLabels.isEmpty() || assignable.isEmpty()) {
+            return null;
+        }
+        return messageLabels.stream()
+                .filter(assignable::contains)
+                .sorted()
+                .findFirst()
+                .orElse(null);
+    }
+
+    /** Libellés déjà filtrés côté Gmail ({@code type=user}) ; on garde les ids valides. */
+    private static Set<String> assignableCategoryLabelIds(List<GmailLabel> userLabels) {
+        return userLabels.stream()
+                .map(GmailLabel::id)
+                .filter(id -> id != null && !id.isBlank())
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    private void upsertSender(UUID userId, ParsedSender parsed, String inferredCategoryLabelId) {
+        var key = normalizeEmailKey(parsed.email());
+        var existing = emailSenderRepository.findByUserIdAndEmailIgnoreCase(userId, key);
         if (existing.isPresent()) {
             var s = existing.get();
             if (parsed.name() != null && !parsed.name().isBlank()) {
                 s.setName(parsed.name());
+            }
+            if (inferredCategoryLabelId != null) {
+                s.setLabelId(inferredCategoryLabelId);
             }
             emailSenderRepository.save(s);
             return;
         }
         var sender = new EmailSender();
         sender.setUserId(userId);
-        sender.setEmail(parsed.email());
+        sender.setEmail(key);
         sender.setName(parsed.name());
+        sender.setLabelId(inferredCategoryLabelId);
         emailSenderRepository.save(sender);
     }
 
@@ -253,8 +337,10 @@ public class EmailsModuleService {
     public record SyncRequest(String mode, Integer count, String dateFrom, String dateTo,
                               Boolean includeAttachments, Boolean autoAnalyze) {}
 
-    public record SyncResultDto(int newEmails, int downloadedAttachments) {}
+    public record SyncResultDto(int newEmails, int downloadedAttachments, int uniqueSenders) {}
 
     private record ParsedSender(String email, String name) {}
+
+    private record SenderSyncRow(ParsedSender parsed, String categoryLabelId) {}
 }
 

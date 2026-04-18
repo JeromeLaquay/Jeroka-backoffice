@@ -1,5 +1,8 @@
 package fr.jeroka.apijava.api.google;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +10,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Implémentation in-memory (stub). Bean créé par ApiStubsConfig.
+ * Implémentation in-memory (stub). Activer avec {@code app.google.mail.stub=true}.
  */
+@Service
+@ConditionalOnProperty(name = "app.google.mail.stub", havingValue = "true", matchIfMissing = false)
 public class GoogleMailServiceStub implements GoogleMailService {
 
     private static final Map<String, List<GmailMessageSimple>> EMAILS_BY_KEY = new ConcurrentHashMap<>();
@@ -50,7 +55,7 @@ public class GoogleMailServiceStub implements GoogleMailService {
             List<GoogleMailService.GmailLabel> list = existing != null ? new ArrayList<>(existing) : new ArrayList<>();
             boolean already = list.stream().anyMatch(l -> l.name().equalsIgnoreCase(labelName));
             if (!already) {
-                list.add(new GoogleMailService.GmailLabel(id, labelName));
+                list.add(new GoogleMailService.GmailLabel(id, labelName, "user"));
             }
             return List.copyOf(list);
         });
@@ -62,7 +67,7 @@ public class GoogleMailServiceStub implements GoogleMailService {
         String key = storageKey(credentials);
         LABELS_BY_KEY.computeIfPresent(key, (k, existing) -> {
             List<GoogleMailService.GmailLabel> updated = existing.stream()
-                    .map(l -> l.id().equals(labelId) ? new GoogleMailService.GmailLabel(labelId, newLabelName) : l)
+                    .map(l -> l.id().equals(labelId) ? new GoogleMailService.GmailLabel(labelId, newLabelName, "user") : l)
                     .toList();
             return List.copyOf(updated);
         });

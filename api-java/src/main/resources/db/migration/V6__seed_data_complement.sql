@@ -78,29 +78,3 @@ INSERT INTO email_categories (id, user_id, name, download_attachments) VALUES
 ('c3333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'Réservations', true),
 ('c4444444-4444-4444-4444-444444444444', '22222222-2222-2222-2222-222222222222', 'Partenaires', false)
 ON CONFLICT (id) DO NOTHING;
-
--- =============================================
--- email_senders (expéditeurs suivis par utilisateur)
--- =============================================
-INSERT INTO email_senders (id, user_id, email, name, category_id) VALUES
-('f1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'contact@jeroka-demo.com', 'Contact Jeroka', 'c1111111-1111-1111-1111-111111111111'),
-('f2222222-2222-2222-2222-222222222222', '11111111-1111-1111-1111-111111111111', 'commercial@jeroka-demo.com', 'Commercial', 'c1111111-1111-1111-1111-111111111111'),
-('f3333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', 'contact@instant-ludique.com', 'Contact Instant Ludique', 'c3333333-3333-3333-3333-333333333333'),
-('f4444444-4444-4444-4444-444444444444', '22222222-2222-2222-2222-222222222222', 'reservation@instant-ludique.com', 'Réservations', 'c3333333-3333-3333-3333-333333333333')
-ON CONFLICT (id) DO NOTHING;
-
--- =============================================
--- refresh_tokens (1 par user pour démo - token fictif)
--- =============================================
-INSERT INTO refresh_tokens (id, user_id, token_hash, expires_at) VALUES
-('d1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'demo_hash_user1', NOW() + INTERVAL '30 days'),
-('d2222222-2222-2222-2222-222222222222', '22222222-2222-2222-2222-222222222222', 'demo_hash_user2', NOW() + INTERVAL '30 days')
-ON CONFLICT (id) DO NOTHING;
-
--- =============================================
--- company_social_credentials (entrée démo inactive)
--- La connexion Google réelle se fait via OAuth dans Paramètres.
--- =============================================
-INSERT INTO company_social_credentials (id, user_id, platform, encrypted_credentials, is_active) VALUES
-('f5555555-5555-5555-5555-555555555555', '11111111-1111-1111-1111-111111111111', 'google', '{"demo": true}', false)
-ON CONFLICT (id) DO NOTHING;

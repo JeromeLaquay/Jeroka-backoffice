@@ -65,6 +65,9 @@ app:
       client-id: ${GOOGLE_CLIENT_ID:}
       client-secret: ${GOOGLE_CLIENT_SECRET:}
       redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:3002/api/v1/settings/google/callback}
+    mail:
+      # true = stub sans appel Gmail (tests). false ou absent = API Gmail réelle.
+      stub: ${APP_GOOGLE_MAIL_STUB:false}
     drive:
       enabled: ${APP_GOOGLE_DRIVE_ENABLED:true}
     calendar:

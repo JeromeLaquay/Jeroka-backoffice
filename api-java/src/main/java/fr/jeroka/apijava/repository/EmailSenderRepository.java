@@ -11,5 +11,7 @@ public interface EmailSenderRepository extends JpaRepository<EmailSender, UUID> 
     List<EmailSender> findAllByUserIdOrderByUpdatedAtDesc(UUID userId);
     Optional<EmailSender> findByIdAndUserId(UUID id, UUID userId);
     Optional<EmailSender> findByUserIdAndEmail(UUID userId, String email);
+
+    Optional<EmailSender> findByUserIdAndEmailIgnoreCase(UUID userId, String email);
 }
 

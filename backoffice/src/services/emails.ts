@@ -169,8 +169,8 @@ class EmailsService {
     return response.data
   }
 
-  async syncEmails(config?: { mode?: string; count?: number; dateFrom?: string; dateTo?: string; includeAttachments?: boolean; autoAnalyze?: boolean }): Promise<ApiResponse<{ newEmails: number; downloadedAttachments: number }>> {
-    const response = await apiService.axiosInstance.post<ApiResponse<{ newEmails: number; downloadedAttachments: number }>>('/emails/sync', config)
+  async syncEmails(config?: { mode?: string; count?: number; dateFrom?: string; dateTo?: string; includeAttachments?: boolean; autoAnalyze?: boolean }): Promise<ApiResponse<{ newEmails: number; downloadedAttachments: number; uniqueSenders?: number }>> {
+    const response = await apiService.axiosInstance.post<ApiResponse<{ newEmails: number; downloadedAttachments: number; uniqueSenders?: number }>>('/emails/sync', config)
     return response.data
   }
 

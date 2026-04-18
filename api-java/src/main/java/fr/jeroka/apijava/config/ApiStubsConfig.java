@@ -2,8 +2,6 @@ package fr.jeroka.apijava.config;
 
 import fr.jeroka.apijava.api.google.GoogleDriveService;
 import fr.jeroka.apijava.api.google.GoogleDriveServiceStub;
-import fr.jeroka.apijava.api.google.GoogleMailService;
-import fr.jeroka.apijava.api.google.GoogleMailServiceStub;
 import fr.jeroka.apijava.api.google.calendar.GoogleCalendarService;
 import fr.jeroka.apijava.api.google.calendar.GoogleCalendarServiceStub;
 import fr.jeroka.apijava.api.ia.ChatgptService;
@@ -25,7 +23,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Définit tous les beans stub des modules api (google, ia, socialnetwork, docs).
+ * Définit les beans stub (Drive, Calendar, IA, réseaux). Gmail : {@code GoogleMailServiceStub}
+ * si {@code app.google.mail.stub=true}, sinon {@code GoogleMailGmailApiService}.
  * Garantit leur création depuis le package config pour éviter les erreurs d'ordre de chargement.
  */
 @Configuration
@@ -43,12 +42,6 @@ public class ApiStubsConfig {
     @ConditionalOnMissingBean(GoogleCalendarService.class)
     public GoogleCalendarService googleCalendarService() {
         return new GoogleCalendarServiceStub();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(GoogleMailService.class)
-    public GoogleMailService googleMailService() {
-        return new GoogleMailServiceStub();
     }
 
     @Bean

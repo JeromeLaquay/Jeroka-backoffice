@@ -16,7 +16,14 @@ public record GmailMessageSimple(
         List<GmailAttachmentSummary> attachments,
         String body,
         String htmlBody,
-        String textBody
+        String textBody,
+        /** Identifiants de libellés Gmail (user + système) tels que renvoyés par l'API. */
+        List<String> labelIds
 ) {
+    public GmailMessageSimple {
+        attachments = attachments == null ? List.of() : List.copyOf(attachments);
+        labelIds = labelIds == null ? List.of() : List.copyOf(labelIds);
+    }
+
     public record GmailAttachmentSummary(String filename, String mimeType, Long size, String id) {}
 }
