@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: docs-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JEROKA_AUTH_JWKS_URL:http://auth-service:3004/.well-known/jwks.json}
+
+server:
+  port: ${PORT:3011}
+
+jeroka:
+  core-forward:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
+logging:
+  level:
+    fr.jeroka: INFO

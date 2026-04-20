@@ -1,0 +1,83 @@
+name: CI — build Maven par artefact
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  maven-modules:
+    name: ${{ matrix.module }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - microservices/kafka-contracts
+          - microservices/jeroka-jwt-resource
+          - microservices/jeroka-core-forward
+          - microservices/auth-service
+          - microservices/gateway
+          - microservices/organization-service
+          - microservices/crm-service
+          - microservices/catalog-service
+          - microservices/billing-service
+          - microservices/scheduling-service
+          - microservices/content-service
+          - microservices/docs-service
+          - microservices/email-service
+          - microservices/email-events-worker
+          - microservices/audit-service
+          - microservices/dashboard-bff
+          - microservices/ia-docs-events-worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Installer modules Maven partagés
+        run: |
+          mvn -q -B -DskipTests install -f microservices/kafka-contracts/pom.xml
+          mvn -q -B -DskipTests install -f microservices/jeroka-jwt-resource/pom.xml
+          mvn -q -B -DskipTests install -f microservices/jeroka-core-forward/pom.xml
+      - name: Compile et package
+        run: mvn -q -B -DskipTests package -f ${{ matrix.module }}/pom.xml
+
+  kafka-schemas-json:
+    name: kafka-schemas (JSON valide)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Vérifier le JSON (parse)
+        run: python - <<'PY'
+import json
+from pathlib import Path
+
+root = Path("microservices/kafka-schemas")
+files = sorted(root.glob("*.json"))
+if not files:
+    raise SystemExit("Aucun fichier json trouvé dans microservices/kafka-schemas")
+
+bad = []
+for p in files:
+    try:
+        txt = p.read_text(encoding="utf-8").strip()
+        if not txt:
+            bad.append((p.name, "fichier vide"))
+            continue
+        json.loads(txt)
+    except Exception as e:
+        bad.append((p.name, str(e)))
+
+if bad:
+    msg = "\n".join([f"- {name}: {err}" for name, err in bad])
+    raise SystemExit("JSON invalide:\n" + msg)
+
+print(f"OK: {len(files)} fichier(s) JSON valides")
+PY

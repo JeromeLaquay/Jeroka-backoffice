@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: audit-service
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  datasource:
+    url: jdbc:postgresql://${AUDIT_DB_HOST:localhost}:${AUDIT_DB_PORT:5432}/${AUDIT_DB_NAME:jeroka_audit}
+    username: ${AUDIT_DB_USER:postgres}
+    password: ${AUDIT_DB_PASSWORD:postgres}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JEROKA_AUTH_JWKS_URL:http://auth-service:3004/.well-known/jwks.json}
+
+server:
+  port: ${PORT:3012}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
+logging:
+  level:
+    fr.jeroka: INFO

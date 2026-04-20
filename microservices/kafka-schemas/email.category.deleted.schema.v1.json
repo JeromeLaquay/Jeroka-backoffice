@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "jeroka.email.category.deleted.v1",
+  "title": "EmailCategoryDeletedPayload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["userId", "labelId", "occurredAt"],
+  "properties": {
+    "userId": { "type": "string", "format": "uuid" },
+    "labelId": { "type": "string", "minLength": 1 },
+    "occurredAt": { "type": "string", "format": "date-time" }
+  }
+}
+

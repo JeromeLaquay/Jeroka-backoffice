@@ -56,7 +56,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
         <div class="p-5">
           <div class="flex items-center">
@@ -78,7 +78,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
         <div class="p-5">
           <div class="flex items-center">
@@ -100,7 +100,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
         <div class="p-5">
           <div class="flex items-center">
@@ -155,7 +155,7 @@
 
     <!-- Contenu des onglets -->
     <div class="card">
-      
+
       <!-- Onglet Catégories -->
       <div v-if="activeTab === 'categories'" class="p-6">
         <div class="flex justify-between items-center mb-4">
@@ -163,11 +163,11 @@
             Catégories d'Emails
           </h2>
         </div>
-        
+
         <div v-if="loading.categories" class="flex justify-center py-12">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
-        
+
         <div v-else-if="categories.length === 0" class="text-center py-12">
           <span class="text-6xl mb-4 block">📂</span>
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
@@ -183,7 +183,7 @@
             Créer une catégorie
           </button>
         </div>
-        
+
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div
             v-for="category in categories"
@@ -209,13 +209,13 @@
                 </button>
               </div>
             </div>
-            
+
             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <span :class="category.downloadAttachments ? 'text-green-600' : 'text-gray-400'">
                 {{ category.downloadAttachments ? '📎 Télécharge les PJ' : '🚫 Ignore les PJ' }}
               </span>
             </div>
-            
+
             <div class="mt-3 text-xs text-gray-500 dark:text-gray-400">
               Créée le {{ emailsService.formatDate(category.createdAt) }}
             </div>
@@ -240,11 +240,11 @@
             </select>
           </div>
         </div>
-        
+
         <div v-if="loading.senders" class="flex justify-center py-12">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
-        
+
         <div v-else-if="filteredSenders.length === 0" class="text-center py-12">
           <span class="text-6xl mb-4 block">📮</span>
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
@@ -254,7 +254,7 @@
             Synchronisez vos emails pour voir les expéditeurs
           </p>
         </div>
-        
+
         <div v-else class="overflow-hidden">
           <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-700">
@@ -342,11 +342,11 @@
             </label>
           </div>
         </div>
-        
+
         <div v-if="loading.emails" class="flex justify-center py-12">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
-        
+
         <div v-else-if="emails.length === 0" class="text-center py-12">
           <span class="text-6xl mb-4 block">📧</span>
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
@@ -356,7 +356,7 @@
             Synchronisez votre boîte mail pour voir vos emails
           </p>
         </div>
-        
+
         <div v-else class="space-y-4">
           <div
             v-for="email in emails"
@@ -377,7 +377,7 @@
                     {{ getCategoryName(email.categoryId) }}
                   </span>
                 </div>
-                
+
                 <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                   <span>De: {{ email.from }}</span>
                   <span>{{ emailsService.formatDate(email.date) }}</span>
@@ -386,7 +386,7 @@
                   </span>
                 </div>
               </div>
-              
+
               <div class="flex gap-2">
                 <button
                   v-if="email.hasAttachments"
@@ -397,7 +397,7 @@
                 </button>
               </div>
             </div>
-            
+
             <!-- Pièces jointes -->
             <div v-if="email.hasAttachments && email.showAttachments" class="mt-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
               <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -430,7 +430,7 @@
                       {{ emailsService.getAnalysisStatusText(attachment.analyzed) }}
                     </span>
                   </div>
-                  
+
                   <div class="flex gap-2">
                     <button
                       @click="downloadAttachment(attachment.id)"
@@ -460,7 +460,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Pagination -->
           <div v-if="emailPagination.totalPages > 1" class="flex justify-center mt-6">
             <nav class="flex items-center gap-2">
@@ -471,11 +471,11 @@
               >
                 Précédent
               </button>
-              
+
               <span class="px-3 py-1 text-sm text-gray-600 dark:text-gray-400">
                 Page {{ emailPagination.page }} sur {{ emailPagination.totalPages }}
               </span>
-              
+
               <button
                 @click="loadEmails(emailPagination.page + 1)"
                 :disabled="emailPagination.page >= emailPagination.totalPages"
@@ -499,7 +499,7 @@
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {{ editingCategory ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}
         </h3>
-        
+
         <form @submit.prevent="saveCategory">
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -514,7 +514,7 @@
               placeholder="Ex: Fournisseurs, Clients..."
             >
           </div>
-          
+
           <div class="mb-6">
             <label class="flex items-center gap-2">
               <input
@@ -527,7 +527,7 @@
               </span>
             </label>
           </div>
-          
+
           <div class="flex justify-end gap-3">
             <button
               type="button"
@@ -556,7 +556,7 @@
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Résultat de l'analyse IA
         </h3>
-        
+
         <div v-if="currentAnalysis" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
@@ -573,7 +573,7 @@
               <span class="text-sm text-gray-900 dark:text-white">{{ (currentAnalysis.confidence * 100).toFixed(1) }}%</span>
             </div>
           </div>
-          
+
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Montant:</label>
@@ -582,14 +582,14 @@
               </span>
             </div>
           </div>
-          
+
           <div v-if="currentAnalysis.extractedData">
             <h4 class="text-md font-medium text-gray-900 dark:text-white mb-2">Données extraites:</h4>
             <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-sm">
               <pre class="whitespace-pre-wrap text-gray-900 dark:text-white">{{ JSON.stringify(currentAnalysis.extractedData, null, 2) }}</pre>
             </div>
           </div>
-          
+
           <div class="flex justify-end gap-3">
             <button
               @click="closeAnalysisModal"
@@ -618,14 +618,14 @@
   </div>
 
   <!-- Modal de Configuration de Synchronisation -->
-  <div 
-    v-if="showSyncModal" 
+  <div
+    v-if="showSyncModal"
     class="fixed inset-0 z-50 overflow-y-auto"
     @click="closeSyncModal"
   >
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
       <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"></div>
-      
+
       <div
         data-cy="emails-sync-modal"
         class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white dark:bg-gray-800 rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
@@ -652,7 +652,7 @@
                 </svg>
               </button>
             </div>
-            
+
             <div class="space-y-4">
               <!-- Mode de synchronisation -->
               <div>
@@ -772,7 +772,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 sm:px-6 sm:flex sm:flex-row-reverse">
             <button
               type="submit"
@@ -805,10 +805,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import emailsService, { 
-  type EmailCategory, 
-  type EmailSender, 
-  type Email, 
+import emailsService, {
+  type EmailCategory,
+  type EmailSender,
+  type Email,
   type EmailAttachment,
   type AnalysisResult,
   type CreateCategoryRequest,
@@ -903,15 +903,15 @@ const emailStats = computed(() => {
 
 const filteredSenders = computed(() => {
   if (!senderFilter.value) return senders.value
-  
+
   if (senderFilter.value === 'categorized') {
     return senders.value.filter(s => s.categoryId)
   }
-  
+
   if (senderFilter.value === 'uncategorized') {
     return senders.value.filter(s => !s.categoryId)
   }
-  
+
   return senders.value
 })
 
@@ -921,7 +921,7 @@ const today = computed(() => new Date().toISOString().split('T')[0])
 // Validation de la configuration de synchronisation
 const isValidSyncConfig = computed(() => {
   if (syncOptions.value.mode === 'date_range') {
-    return syncOptions.value.dateFrom && syncOptions.value.dateTo && 
+    return syncOptions.value.dateFrom && syncOptions.value.dateTo &&
            syncOptions.value.dateFrom <= syncOptions.value.dateTo
   }
   return true
@@ -969,7 +969,7 @@ const loadEmails = async (page = 1) => {
       categoryId: emailFilter.value || undefined,
       hasAttachments: onlyWithAttachments.value || undefined
     }
-    
+
     const response = await emailsService.getEmails(params)
     if (response.success) {
       const payload: any = response.data || {}
@@ -991,6 +991,24 @@ const closeSyncModal = () => {
   // Réinitialiser les options si nécessaire
 }
 
+const waitForSyncCompletion = async (jobId: string, timeoutMs = 120000) => {
+  const startedAt = Date.now()
+  while (Date.now() - startedAt < timeoutMs) {
+    const job = await emailsService.getSyncJob(jobId)
+    if (!job.success || !job.data) {
+      throw new Error('Suivi de synchronisation indisponible')
+    }
+    if (job.data.status === 'COMPLETED') {
+      return job.data
+    }
+    if (job.data.status === 'FAILED') {
+      throw new Error(job.data.errorMessage || 'Échec de la synchronisation')
+    }
+    await new Promise(resolve => setTimeout(resolve, 2000))
+  }
+  throw new Error('Délai dépassé: synchronisation toujours en cours')
+}
+
 const startSyncWithOptions = async () => {
   syncing.value = true
   try {
@@ -1004,18 +1022,21 @@ const startSyncWithOptions = async () => {
     }
 
     const response = await emailsService.syncEmails(syncConfig)
-    if (response.success) {
-      // Mettre à jour la date de dernière synchronisation
-      const now = new Date().toISOString()
-      lastSyncDate.value = now
-      localStorage.setItem('emails_last_sync', now)
-      
-      // Recharger les données après la synchronisation
-      await Promise.all([loadEmails(), loadSenders()])
-      
-      // Fermer le modal
-      closeSyncModal()
+    if (!response.success || !response.data?.id) {
+      throw new Error('Impossible de démarrer la synchronisation')
     }
+    await waitForSyncCompletion(response.data.id)
+
+    // Mettre à jour la date de dernière synchronisation
+    const now = new Date().toISOString()
+    lastSyncDate.value = now
+    localStorage.setItem('emails_last_sync', now)
+
+    // Recharger les données après la synchronisation
+    await Promise.all([loadEmails(), loadSenders()])
+
+    // Fermer le modal
+    closeSyncModal()
   } catch (error) {
     console.error('Erreur lors de la synchronisation:', error)
   } finally {
@@ -1040,7 +1061,7 @@ const saveCategory = async () => {
     alert(errors.join('\n'))
     return
   }
-  
+
   saving.value = true
   try {
     if (editingCategory.value) {
@@ -1075,7 +1096,7 @@ const editCategory = (category: EmailCategory) => {
 
 const deleteCategory = async (id: string) => {
   if (!confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) return
-  
+
   try {
     await emailsService.deleteCategory(id)
     await loadCategories()
@@ -1137,7 +1158,7 @@ const analyzeAttachment = async (attachmentId: string) => {
       currentAttachmentId.value = attachmentId
       currentAnalysis.value = response.data.analysisResult
       showAnalysisModal.value = true
-      
+
       // Recharger les emails pour voir le statut mis à jour
       await loadEmails(emailPagination.value.page)
     }
@@ -1162,13 +1183,13 @@ const closeAnalysisModal = () => {
 
 const convertToInvoice = async () => {
   if (!currentAttachmentId.value || !currentAnalysis.value) return
-  
+
   try {
     const response = await emailsService.convertAttachment(currentAttachmentId.value, {
       convertTo: 'invoice',
       analysisData: currentAnalysis.value
     })
-    
+
     if (response.success && response.data) {
       closeAnalysisModal()
       // Rediriger vers la facture créée
@@ -1181,13 +1202,13 @@ const convertToInvoice = async () => {
 
 const convertToQuote = async () => {
   if (!currentAttachmentId.value || !currentAnalysis.value) return
-  
+
   try {
     const response = await emailsService.convertAttachment(currentAttachmentId.value, {
       convertTo: 'quote',
       analysisData: currentAnalysis.value
     })
-    
+
     if (response.success && response.data) {
       closeAnalysisModal()
       // Rediriger vers le devis créé
@@ -1208,16 +1229,16 @@ onMounted(async () => {
   // Initialiser les dates par défaut pour la synchronisation
   const today = new Date()
   const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
-  
+
   syncOptions.value.dateTo = today.toISOString().split('T')[0]
   syncOptions.value.dateFrom = lastWeek.toISOString().split('T')[0]
-  
+
   // Charger la date de dernière synchronisation depuis le localStorage
   const savedLastSync = localStorage.getItem('emails_last_sync')
   if (savedLastSync) {
     lastSyncDate.value = savedLastSync
   }
-  
+
   await Promise.all([
     loadCategories(),
     loadSenders(),

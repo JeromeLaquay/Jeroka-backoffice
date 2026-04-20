@@ -1,13 +1,20 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 
+const resolveLocalApiBaseUrl = (): string => {
+  if (typeof window === 'undefined') {
+    return 'http://localhost:3000/api/v1'
+  }
+  return `http://${window.location.hostname}:3000/api/v1`
+}
+
 // Configuration de base de l'API
 // En développement, utilisez localhost pour éviter les problèmes de certificat SSL
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 
-  ((import.meta as any).env?.DEV ? 'http://localhost:3002/api/v1' : 'https://apibackoffice.jerokaxperience.fr/api/v1')
+  ((import.meta as any).env?.DEV ? resolveLocalApiBaseUrl() : 'https://apibackoffice.jerokaxperience.fr/api/v1')
 
 // URLs disponibles pour basculer entre les environnements
 export const API_URLS = {
-  LOCAL: 'http://localhost:3002/api/v1',
+  LOCAL: resolveLocalApiBaseUrl(),
   PRODUCTION: 'https://apibackoffice.jerokaxperience.fr/api/v1'
 } as const
 

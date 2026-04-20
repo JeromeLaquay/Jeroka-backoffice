@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "jeroka.email.sync.requested.v1",
+  "title": "EmailSyncRequestedPayload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["correlationId", "userId", "requestedAt"],
+  "properties": {
+    "correlationId": { "type": "string", "format": "uuid" },
+    "userId": { "type": "string", "format": "uuid" },
+    "mode": { "type": ["string", "null"] },
+    "count": { "type": ["integer", "null"], "minimum": 1 },
+    "dateFrom": { "type": ["string", "null"] },
+    "dateTo": { "type": ["string", "null"] },
+    "includeAttachments": { "type": ["boolean", "null"] },
+    "autoAnalyze": { "type": ["boolean", "null"] },
+    "requestedAt": { "type": "string", "format": "date-time" }
+  }
+}
+

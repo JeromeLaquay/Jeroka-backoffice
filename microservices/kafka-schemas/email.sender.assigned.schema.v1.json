@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "jeroka.email.sender.assigned.v1",
+  "title": "EmailSenderAssignedPayload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["userId", "senderId", "categoryId", "occurredAt"],
+  "properties": {
+    "userId": { "type": "string", "format": "uuid" },
+    "senderId": { "type": "string", "minLength": 1 },
+    "categoryId": { "type": ["string", "null"] },
+    "occurredAt": { "type": "string", "format": "date-time" }
+  }
+}
+

@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: jeroka-email-events-worker
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: jeroka-email-events-worker
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+  port: 3015
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+logging:
+  level:
+    fr.jeroka: INFO
+
+jeroka:
+  api:
+    base-url: ${JEROKA_API_BASE_URL:http://email-service:3003}
+    internal-key: ${INTERNAL_API_KEY:}

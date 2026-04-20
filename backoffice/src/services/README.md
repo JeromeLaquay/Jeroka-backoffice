@@ -202,7 +202,7 @@ try {
 
 Les services utilisent les variables d'environnement suivantes :
 
-- `VITE_API_URL` - URL de base de l'API (défaut: `http://localhost:3002/api/v1`)
+- `VITE_API_URL` - URL de base de l'API (défaut dev: `http://localhost:3000/api/v1` via gateway)
 
 ### Authentification
 

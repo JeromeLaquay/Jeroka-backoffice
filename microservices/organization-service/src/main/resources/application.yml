@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: organization-service
+  datasource:
+    url: jdbc:postgresql://${ORG_DB_HOST:localhost}:${ORG_DB_PORT:5432}/${ORG_DB_NAME:jeroka_organization}
+    username: ${ORG_DB_USER:postgres}
+    password: ${ORG_DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JEROKA_AUTH_JWKS_URL:http://auth-service:3004/.well-known/jwks.json}
+
+server:
+  port: ${PORT:3005}
+
+jeroka:
+  internal:
+    api-key: ${INTERNAL_API_KEY:dev-internal-key}
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:3001}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
+logging:
+  level:
+    fr.jeroka: INFO

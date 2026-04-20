@@ -3,7 +3,7 @@
 ## Prérequis
 
 1. **Variables d’environnement** : copier [`.env.e2e.example`](../.env.e2e.example) vers `.env.e2e.local` à la racine du dossier `backoffice/` et renseigner **`PLAYWRIGHT_EMAIL` et `PLAYWRIGHT_PASSWORD` avec des valeurs non vides** (compte valide sur l’API). Les fichiers sont chargés par [`e2e/load-e2e-env.ts`](./load-e2e-env.ts) dans `playwright.config.ts` **et** dans `global-setup.ts` (processus séparé).
-2. **API** : l’application s’appuie sur le backend ; pour un scénario complet, démarrer aussi `api-java` (Docker) si nécessaire.
+2. **API** : l’application s’appuie sur le backend ; pour un scénario complet, démarrer la stack `microservices` (Docker) si nécessaire.
 3. Le **serveur Vite** est démarré automatiquement par Playwright (`npm run dev`) sauf s’il tourne déjà (`reuseExistingServer` hors CI).
 
 ## Commandes

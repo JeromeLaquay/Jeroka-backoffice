@@ -1,0 +1,2 @@
+-- PostgreSQL ne permet pas d’insérer depuis une autre base dans une seule requête SQL sans dblink.
+-- Utiliser le script shell : microservices/auth-service/scripts/copy-users-from-dashboard.sh

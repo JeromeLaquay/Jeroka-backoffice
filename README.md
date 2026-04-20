@@ -17,7 +17,7 @@ Back-office de gestion pour TPE/PME — Jeroka Xperience.
 ```
 back-office/
 ├── backoffice/        # Frontend Vue.js 3 (SPA)
-├── api-java/          # API Spring Boot 3 (Java 21)
+├── microservices/     # API microservices Spring Boot (Java 21)
 └── .github/workflows/ # CI/CD GitHub Actions
 ```
 
@@ -131,18 +131,19 @@ npm install
 npm run dev          # http://localhost:3001
 ```
 
-### API Java + PostgreSQL (Docker)
+### API microservices + PostgreSQL (Docker)
 
 ```bash
-cd api-java
-docker compose up -d --build
-# API : http://localhost:3002/api/v1
-# Health : http://localhost:3002/health
+docker compose -f microservices/docker-compose.yml up -d --build
+# API (gateway) : http://localhost:3000/api/v1
+# Health gateway : http://localhost:3000/actuator/health
 ```
+
+> Recommande pour une init propre des BDD : `down -v` puis `up -d --build` (bases recreees par `postgres-init`, schema cree par Flyway au demarrage des services).
 
 ### Variables d'environnement API
 
-Créer `api-java/.env` à partir des variables suivantes :
+Créer `.env` à la racine (utilisé par `microservices/docker-compose.yml`) à partir des variables suivantes :
 
 | Variable | Description |
 |----------|-------------|
@@ -176,4 +177,4 @@ Controller → MappingService → Service → Repository → PostgreSQL
 - **Service** : logique métier, `@Transactional`
 - **Repository** : accès données JPA
 
-Voir [`api-java/README.md`](api-java/README.md) pour le détail des endpoints et de l'architecture.
+Voir [`microservices/README.md`](microservices/README.md) pour le détail des services, endpoints et conventions.

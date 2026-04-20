@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0",
+  "eventType": "jeroka.email.sync.requested",
+  "correlationId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "causationId": null,
+  "emittedAt": "2026-04-19T12:00:00Z",
+  "data": {
+    "correlationId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "mode": null,
+    "count": 100,
+    "dateFrom": null,
+    "dateTo": null,
+    "includeAttachments": null,
+    "autoAnalyze": null,
+    "requestedAt": "2026-04-19T12:00:00Z"
+  }
+}

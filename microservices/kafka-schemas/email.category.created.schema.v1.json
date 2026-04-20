@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "jeroka.email.category.created.v1",
+  "title": "EmailCategoryCreatedPayload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["userId", "labelId", "labelName", "occurredAt"],
+  "properties": {
+    "userId": { "type": "string", "format": "uuid" },
+    "labelId": { "type": "string", "minLength": 1 },
+    "labelName": { "type": "string", "minLength": 1 },
+    "occurredAt": { "type": "string", "format": "date-time" }
+  }
+}
+
