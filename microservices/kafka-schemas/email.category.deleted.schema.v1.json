@@ -11,4 +11,3 @@
     "occurredAt": { "type": "string", "format": "date-time" }
   }
 }
-

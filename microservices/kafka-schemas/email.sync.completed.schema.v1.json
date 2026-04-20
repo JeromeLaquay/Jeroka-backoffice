@@ -4,7 +4,14 @@
   "title": "EmailSyncCompletedPayload v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["correlationId", "userId", "newEmails", "downloadedAttachments", "uniqueSenders", "occurredAt"],
+  "required": [
+    "correlationId",
+    "userId",
+    "newEmails",
+    "downloadedAttachments",
+    "uniqueSenders",
+    "occurredAt"
+  ],
   "properties": {
     "correlationId": { "type": "string", "format": "uuid" },
     "userId": { "type": "string", "format": "uuid" },
@@ -14,4 +21,3 @@
     "occurredAt": { "type": "string", "format": "date-time" }
   }
 }
-

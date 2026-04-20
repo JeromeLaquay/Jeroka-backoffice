@@ -16,7 +16,7 @@ Ce dépôt est un **monorepo** : back-office Vue (`backoffice/`), microservices 
 - Compose (`microservices/docker-compose.yml`) : Postgres **unique** multi-bases (`microservices/postgres-init/`), Kafka, gateway, microservices domaine, `email-service`, workers, **`auth-service`** (`:3004`, JWT RS256 + JWKS, comptes dans `jeroka_auth` ; copie utilisateurs : `microservices/auth-service/scripts/copy-users-from-dashboard.sh`), **`ia-docs-events-worker`** (`:3016`).
 
 ## Outils MCP (projet)
-Configuration : `.cursor/mcp.json` (playwright, fetch, postgres, git, filesystem).  
+Configuration : `.cursor/mcp.json` (playwright, fetch, postgres, git, filesystem).
 **Toujours** vérifier le schéma d’un outil MCP avant de l’appeler.
 
 ## Tests
