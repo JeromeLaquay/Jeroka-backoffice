@@ -3,6 +3,7 @@ package fr.jeroka.organization;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,6 +27,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/health", "/actuator/**").permitAll()
                         .requestMatchers("/api/v1/internal/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/settings/google/callback")
+                        .permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(o -> o.jwt(j -> j.jwtAuthenticationConverter(jerokaJwtRoles())));
         return http.build();

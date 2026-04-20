@@ -1,6 +1,8 @@
 package fr.jeroka.organization.web;
 
+import fr.jeroka.organization.exception.OrgApiException;
 import fr.jeroka.organization.security.OrgJwtClaims;
+import fr.jeroka.organization.service.OrgGoogleOAuthService;
 import fr.jeroka.organization.service.OrgSocialCredentialsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -9,25 +11,28 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/settings")
 public class OrgSettingsApiController {
 
-    private static final String CONNECT_UNAVAILABLE =
-            "Connexion OAuth Google non migrée dans organization-service (utiliser le core en attendant).";
-
     private final OrgSocialCredentialsService socialCredentialsService;
+    private final OrgGoogleOAuthService googleOAuthService;
     private final String frontendUrl;
 
     public OrgSettingsApiController(
             OrgSocialCredentialsService socialCredentialsService,
+            OrgGoogleOAuthService googleOAuthService,
             @Value("${app.frontend-url:http://localhost:3001}") String frontendUrl) {
         this.socialCredentialsService = socialCredentialsService;
+        this.googleOAuthService = googleOAuthService;
         this.frontendUrl = trimTrailingSlash(frontendUrl);
     }
 
@@ -42,13 +47,28 @@ public class OrgSettingsApiController {
     }
 
     @GetMapping("/google/connect")
-    public ResponseEntity<Map<String, Object>> googleConnect() {
-        return ResponseEntity.badRequest().body(Map.of("success", false, "message", CONNECT_UNAVAILABLE));
+    public ResponseEntity<Map<String, Object>> googleConnect(@AuthenticationPrincipal Jwt jwt) {
+        try {
+            return ResponseEntity.ok(googleOAuthService.startAuthorization(
+                    OrgJwtClaims.requireSubjectUserId(jwt), OrgJwtClaims.requireCompanyId(jwt)));
+        } catch (OrgApiException ex) {
+            return ResponseEntity.status(ex.getStatus())
+                    .body(Map.of("success", false, "message", ex.getMessage()));
+        }
     }
 
     @GetMapping("/google/callback")
-    public RedirectView googleCallback() {
-        return new RedirectView(frontendUrl + "/parametres?google=error&reason=oauth_not_migrated");
+    public RedirectView googleCallback(
+            @RequestParam(required = false) String code,
+            @RequestParam(required = false) String state,
+            @RequestParam(required = false) String error,
+            @RequestParam(value = "error_description", required = false) String errorDescription) {
+        try {
+            return new RedirectView(googleOAuthService.completeOAuthRedirect(code, state, error, errorDescription));
+        } catch (OrgApiException ex) {
+            String reason = URLEncoder.encode(ex.getMessage(), StandardCharsets.UTF_8);
+            return new RedirectView(frontendUrl + "/parametres?google=error&reason=" + reason);
+        }
     }
 
     @GetMapping("/google/status")

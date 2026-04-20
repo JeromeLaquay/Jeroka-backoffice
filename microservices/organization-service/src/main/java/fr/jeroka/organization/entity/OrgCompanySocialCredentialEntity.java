@@ -68,4 +68,44 @@ public class OrgCompanySocialCredentialEntity {
     public Map<String, Object> getEncryptedCredentials() {
         return encryptedCredentials;
     }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public void setCompanyId(UUID companyId) {
+        this.companyId = companyId;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
+    public void setEncryptedCredentials(Map<String, Object> encryptedCredentials) {
+        this.encryptedCredentials = encryptedCredentials;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public void setExpiresAt(Instant expiresAt) {
+        this.expiresAt = expiresAt;
+    }
+
+    public void setLastUsedAt(Instant lastUsedAt) {
+        this.lastUsedAt = lastUsedAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

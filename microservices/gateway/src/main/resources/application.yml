@@ -6,9 +6,13 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins:
-              - "http://localhost:3001"
-              - "http://127.0.0.1:3001"
+            # Patterns : même machine qu’api.ts (hostname:3001) depuis le réseau local.
+            allowedOriginPatterns:
+              - "http://localhost:*"
+              - "http://127.0.0.1:*"
+              - "http://192.168.*:*"
+              - "http://10.*:*"
+              - "http://172.*:*"
             allowedMethods:
               - GET
               - POST

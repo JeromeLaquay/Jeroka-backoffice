@@ -36,9 +36,9 @@ Voir **`GOVERNANCE.md`** (conventions, CI, ports, Kafka).
   - PowerShell : `.\microservices\scripts\start-back-and-db.ps1`
   - Bash : `bash microservices/scripts/start-back-and-db.sh`
   - Reset propre : ajouter `--fresh`
-- `postgres-init` crée les bases `jeroka_*`.
+- `postgres-init` crée les bases `jeroka_*` (uniquement au **premier** démarrage du volume Postgres vide).
 - Chaque microservice applique ensuite ses migrations Flyway (`classpath:db/migration`) au démarrage.
-- Ce mode suffit pour obtenir une base prête côté structure (tables/index).
+- Le service **`sql-seed`** attend que les tables existent puis exécute `sql/seed/10-seed-dev-data.sql` (données démo, idempotent). La **gateway** attend la fin du seed (`service_completed_successfully`) pour éviter un front sur une API sans lignes de démo.
 
 ### Mode optionnel : scripts SQL manuels
 

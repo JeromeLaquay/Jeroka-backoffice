@@ -3,13 +3,25 @@
 -- psql -U postgres -d postgres -f microservices/sql/seed/10-seed-dev-data.sql
 
 \connect jeroka_auth
-INSERT INTO auth_signing_keys (kid, public_pem, private_pem, status)
-VALUES ('dev-kid-1', 'dev-public-key', 'dev-private-key', 'ACTIVE')
-ON CONFLICT (kid) DO NOTHING;
+-- Pas d'INSERT dans auth_signing_keys : PEM PKCS#8 généré au démarrage par JwksKeyService.
 
 INSERT INTO users (id, company_id, email, password_hash, first_name, last_name, role, is_active)
 VALUES ('00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000001', 'admin@jeroka.local', '$2a$10$devhashplaceholder', 'Admin', 'Jeroka', 'admin', true)
 ON CONFLICT (id) DO NOTHING;
+
+-- Compte dev (BCrypt, même entreprise démo). Email : laquay.jerome@gmail.com
+INSERT INTO users (id, company_id, email, password_hash, first_name, last_name, role, is_active)
+VALUES (
+  '00000000-0000-4000-8000-000000000099',
+  '00000000-0000-0000-0000-000000000001',
+  'laquay.jerome@gmail.com',
+  '$2b$10$e3H2zbFoPh.U/e9W73KfHOyniqBWPo6iSckUlffDs8XdIR8CNLq8G',
+  'Jerome',
+  'Laquay',
+  'admin',
+  true
+)
+ON CONFLICT (company_id, email) DO NOTHING;
 
 \connect jeroka_organization
 INSERT INTO companies (id, name, legal_name, status, subscription_plan)
@@ -19,6 +31,20 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO users (id, company_id, email, password_hash, first_name, last_name, role, is_active, is_company_admin)
 VALUES ('00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000001', 'admin@jeroka.local', '$2a$10$devhashplaceholder', 'Admin', 'Jeroka', 'admin', true, true)
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO users (id, company_id, email, password_hash, first_name, last_name, role, is_active, is_company_admin)
+VALUES (
+  '00000000-0000-4000-8000-000000000099',
+  '00000000-0000-0000-0000-000000000001',
+  'laquay.jerome@gmail.com',
+  '$2b$10$e3H2zbFoPh.U/e9W73KfHOyniqBWPo6iSckUlffDs8XdIR8CNLq8G',
+  'Jerome',
+  'Laquay',
+  'admin',
+  true,
+  true
+)
+ON CONFLICT (company_id, email) DO NOTHING;
 
 INSERT INTO company_social_credentials (id, user_id, company_id, platform, encrypted_credentials, is_active)
 VALUES ('00000000-0000-0000-0000-000000000201', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000001', 'google', '{"oauthClientId":"demo-client","oauthClientSecret":"demo-secret","refreshToken":"demo-refresh-token","redirectUri":"http://localhost:3000/api/v1/settings/google/callback"}', true)

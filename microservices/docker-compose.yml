@@ -22,6 +22,25 @@ services:
       retries: 10
       start_period: 40s
 
+  # Après Flyway des services : injecte les données démo (idempotent). La gateway attend la fin.
+  sql-seed:
+    image: postgres:15-alpine
+    container_name: jeroka-sql-seed
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    volumes:
+      - ./sql/seed/10-seed-dev-data.sql:/seed/10-seed-dev-data.sql:ro
+      - ./scripts/wait-flyway-and-seed.sh:/wait-flyway-and-seed.sh:ro
+    entrypoint: ["/bin/sh", "/wait-flyway-and-seed.sh"]
+    networks:
+      - jeroka-dev-network
+
   kafka:
     image: docker.io/apache/kafka:3.9.2
     hostname: kafka
@@ -56,17 +75,30 @@ services:
     networks:
       - jeroka-dev-network
     depends_on:
-      - auth-service
-      - organization-service
-      - crm-service
-      - catalog-service
-      - billing-service
-      - scheduling-service
-      - content-service
-      - email-service
-      - docs-service
-      - dashboard-bff
-      - audit-service
+      sql-seed:
+        condition: service_completed_successfully
+      auth-service:
+        condition: service_started
+      organization-service:
+        condition: service_started
+      crm-service:
+        condition: service_started
+      catalog-service:
+        condition: service_started
+      billing-service:
+        condition: service_started
+      scheduling-service:
+        condition: service_started
+      content-service:
+        condition: service_started
+      email-service:
+        condition: service_started
+      docs-service:
+        condition: service_started
+      dashboard-bff:
+        condition: service_started
+      audit-service:
+        condition: service_started
 
   auth-service:
     build:
@@ -74,6 +106,8 @@ services:
       dockerfile: microservices/auth-service/Dockerfile
     container_name: jeroka-auth-service
     restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
       PORT: 3004
       AUTH_DB_HOST: postgres
@@ -82,6 +116,9 @@ services:
       AUTH_DB_USER: postgres
       AUTH_DB_PASSWORD: postgres
       JWT_ACCESS_TTL_MS: ${JWT_ACCESS_TTL_MS:-900000}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
     ports:
       - "3004:3004"
     networks:
@@ -96,6 +133,8 @@ services:
       dockerfile: microservices/organization-service/Dockerfile
     container_name: jeroka-organization-service
     restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
       PORT: 3005
       ORG_DB_HOST: postgres
@@ -105,6 +144,7 @@ services:
       ORG_DB_PASSWORD: postgres
       JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
       INTERNAL_API_KEY: ${INTERNAL_API_KEY:-dev-internal-key}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
     networks:
       - jeroka-dev-network
     depends_on:
@@ -119,6 +159,8 @@ services:
       dockerfile: microservices/crm-service/Dockerfile
     container_name: jeroka-crm-service
     restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
       PORT: 3006
       CRM_DB_HOST: postgres
@@ -127,6 +169,8 @@ services:
       CRM_DB_USER: postgres
       CRM_DB_PASSWORD: postgres
       JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
     networks:
       - jeroka-dev-network
     depends_on:
@@ -290,6 +334,8 @@ services:
       dockerfile: microservices/email-service/Dockerfile
     container_name: jeroka-email-service
     restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
       PORT: 3003
       EMAIL_DB_HOST: postgres
@@ -297,13 +343,17 @@ services:
       EMAIL_DB_NAME: jeroka_email
       EMAIL_DB_USER: postgres
       EMAIL_DB_PASSWORD: postgres
-      JWT_SECRET: ${JWT_SECRET:-jeroka-dev-secret-min-32-chars-change-me}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
       INTERNAL_API_KEY: ${INTERNAL_API_KEY:-dev-internal-key}
       JEROKA_ORGANIZATION_API_BASE_URL: http://organization-service:3005
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       CORS_ORIGINS: http://localhost:3001,http://127.0.0.1:3001
     ports:
       - "3003:3003"

@@ -1,6 +1,10 @@
 spring:
   application:
     name: jeroka-auth-service
+  autoconfigure:
+    exclude:
+      # Évite l’utilisateur in-memory par défaut (JWT + comptes en base uniquement).
+      - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   jpa:
     hibernate:
       ddl-auto: validate

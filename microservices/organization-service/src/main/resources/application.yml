@@ -25,6 +25,13 @@ server:
 jeroka:
   internal:
     api-key: ${INTERNAL_API_KEY:dev-internal-key}
+  google:
+    oauth:
+      # Mêmes variables que le compose microservices/.env (Google Cloud Console).
+      client-id: ${GOOGLE_CLIENT_ID:}
+      client-secret: ${GOOGLE_CLIENT_SECRET:}
+      # URI enregistrée côté Google : passer par la gateway (port 3000).
+      redirect-uri: ${GOOGLE_OAUTH_REDIRECT_URI:http://localhost:3000/api/v1/settings/google/callback}
 
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:3001}
