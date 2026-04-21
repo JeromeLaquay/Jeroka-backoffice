@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="accounting-page">
     <!-- En-tête -->
     <div class="flex justify-between items-center">
       <div>
@@ -147,6 +147,7 @@
         <div class="flex space-x-2">
           <router-link
             to="/comptabilite/transactions"
+            data-cy="accounting-transactions-link"
             class="text-sm text-primary-600 hover:text-primary-500"
           >
             Voir tout

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "jeroka.email.sync.completed.v1",
+  "title": "EmailSyncCompletedPayload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "correlationId",
+    "userId",
+    "newEmails",
+    "downloadedAttachments",
+    "uniqueSenders",
+    "occurredAt"
+  ],
+  "properties": {
+    "correlationId": { "type": "string", "format": "uuid" },
+    "userId": { "type": "string", "format": "uuid" },
+    "newEmails": { "type": "integer", "minimum": 0 },
+    "downloadedAttachments": { "type": "integer", "minimum": 0 },
+    "uniqueSenders": { "type": "integer", "minimum": 0 },
+    "occurredAt": { "type": "string", "format": "date-time" }
+  }
+}

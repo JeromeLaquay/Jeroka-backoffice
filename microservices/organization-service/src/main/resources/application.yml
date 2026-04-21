@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: organization-service
+  datasource:
+    url: jdbc:postgresql://${ORG_DB_HOST:localhost}:${ORG_DB_PORT:5432}/${ORG_DB_NAME:jeroka_organization}
+    username: ${ORG_DB_USER:postgres}
+    password: ${ORG_DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JEROKA_AUTH_JWKS_URL:http://auth-service:3004/.well-known/jwks.json}
+
+server:
+  port: ${PORT:3005}
+
+jeroka:
+  internal:
+    api-key: ${INTERNAL_API_KEY:dev-internal-key}
+  google:
+    oauth:
+      # Mêmes variables que le compose microservices/.env (Google Cloud Console).
+      client-id: ${GOOGLE_CLIENT_ID:}
+      client-secret: ${GOOGLE_CLIENT_SECRET:}
+      # URI enregistrée côté Google : passer par la gateway (port 3000).
+      redirect-uri: ${GOOGLE_OAUTH_REDIRECT_URI:http://localhost:3000/api/v1/settings/google/callback}
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:3001}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
+logging:
+  level:
+    fr.jeroka: INFO

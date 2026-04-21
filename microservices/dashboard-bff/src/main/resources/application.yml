@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: dashboard-bff
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JEROKA_AUTH_JWKS_URL:http://auth-service:3004/.well-known/jwks.json}
+
+server:
+  port: ${PORT:3013}
+
+jeroka:
+  downstream:
+    crm-base-url: ${JEROKA_CRM_BASE_URL:http://crm-service:3006}
+    billing-base-url: ${JEROKA_BILLING_BASE_URL:http://billing-service:3008}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
+logging:
+  level:
+    fr.jeroka: INFO

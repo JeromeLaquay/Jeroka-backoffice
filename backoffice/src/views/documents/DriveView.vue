@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 h-full flex flex-col">
+  <div class="p-4 h-full flex flex-col" data-cy="documents-page">
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-4">
       <div class="p-4 flex items-center justify-between">
         <div>
@@ -10,7 +10,12 @@
           <p v-if="loadError" class="mt-2 text-sm text-amber-600 dark:text-amber-400">{{ loadError }}</p>
         </div>
         <div class="flex items-center gap-2">
-          <button @click="loadRoot" :disabled="loadingTree" class="px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50">
+          <button
+            data-cy="documents-refresh-button"
+            @click="loadRoot"
+            :disabled="loadingTree"
+            class="px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+          >
             <span v-if="loadingTree" class="inline-block w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin mr-2"></span>
             Rafraîchir
           </button>

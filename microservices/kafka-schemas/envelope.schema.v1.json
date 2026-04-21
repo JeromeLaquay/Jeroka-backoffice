@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "jeroka.kafka.envelope.v1",
+  "title": "JerokaKafkaEventEnvelope v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "eventType", "emittedAt", "data"],
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0" },
+    "eventType": { "type": "string", "minLength": 1 },
+    "correlationId": { "type": ["string", "null"], "format": "uuid" },
+    "causationId": { "type": ["string", "null"] },
+    "emittedAt": { "type": "string", "format": "date-time" },
+    "data": { "type": "object" }
+  }
+}
+

@@ -20,6 +20,7 @@
         
         <router-link
           to="/fournisseurs/create"
+          data-cy="create-supplier-link"
           class="btn-primary inline-flex items-center"
         >
           <PlusIcon class="h-4 w-4 mr-2" />

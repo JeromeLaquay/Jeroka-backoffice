@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: crm-service
+  datasource:
+    url: jdbc:postgresql://${CRM_DB_HOST:localhost}:${CRM_DB_PORT:5432}/${CRM_DB_NAME:jeroka_crm}
+    username: ${CRM_DB_USER:postgres}
+    password: ${CRM_DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JEROKA_AUTH_JWKS_URL:http://auth-service:3004/.well-known/jwks.json}
+
+server:
+  port: ${PORT:3006}
+
+jeroka:
+  core-forward:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
+logging:
+  level:
+    fr.jeroka: INFO

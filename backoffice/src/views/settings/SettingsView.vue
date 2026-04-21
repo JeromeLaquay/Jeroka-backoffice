@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="settings-page">
     <!-- En-tête -->
     <div>
       <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Paramètres</h1>
@@ -14,6 +14,7 @@
         <button
           v-for="tab in tabs"
           :key="tab.id"
+          :data-cy="`settings-tab-${tab.id}`"
           @click="activeTab = tab.id"
           :class="[
             'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',

@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: billing-service
+  datasource:
+    url: jdbc:postgresql://${BILLING_DB_HOST:localhost}:${BILLING_DB_PORT:5432}/${BILLING_DB_NAME:jeroka_billing}
+    username: ${BILLING_DB_USER:postgres}
+    password: ${BILLING_DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JEROKA_AUTH_JWKS_URL:http://auth-service:3004/.well-known/jwks.json}
+
+server:
+  port: ${PORT:3008}
+
+jeroka:
+  core-forward:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
+logging:
+  level:
+    fr.jeroka: INFO

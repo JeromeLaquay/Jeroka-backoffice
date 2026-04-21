@@ -1,0 +1,440 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: jeroka-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: jeroka_dashboard
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - jeroka-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  # Après Flyway des services : injecte les données démo (idempotent). La gateway attend la fin.
+  sql-seed:
+    image: postgres:15-alpine
+    container_name: jeroka-sql-seed
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    volumes:
+      - ./sql/seed/10-seed-dev-data.sql:/seed/10-seed-dev-data.sql:ro
+      - ./scripts/wait-flyway-and-seed.sh:/wait-flyway-and-seed.sh:ro
+    entrypoint: ["/bin/sh", "/wait-flyway-and-seed.sh"]
+    networks:
+      - jeroka-dev-network
+
+  kafka:
+    image: docker.io/apache/kafka:3.9.2
+    hostname: kafka
+    container_name: jeroka-kafka-dev
+    restart: unless-stopped
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - jeroka-dev-network
+
+  gateway:
+    build:
+      context: ..
+      dockerfile: microservices/gateway/Dockerfile
+    container_name: jeroka-gateway
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      sql-seed:
+        condition: service_completed_successfully
+      auth-service:
+        condition: service_started
+      organization-service:
+        condition: service_started
+      crm-service:
+        condition: service_started
+      catalog-service:
+        condition: service_started
+      billing-service:
+        condition: service_started
+      scheduling-service:
+        condition: service_started
+      content-service:
+        condition: service_started
+      email-service:
+        condition: service_started
+      docs-service:
+        condition: service_started
+      dashboard-bff:
+        condition: service_started
+      audit-service:
+        condition: service_started
+
+  auth-service:
+    build:
+      context: ..
+      dockerfile: microservices/auth-service/Dockerfile
+    container_name: jeroka-auth-service
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      PORT: 3004
+      AUTH_DB_HOST: postgres
+      AUTH_DB_PORT: 5432
+      AUTH_DB_NAME: jeroka_auth
+      AUTH_DB_USER: postgres
+      AUTH_DB_PASSWORD: postgres
+      JWT_ACCESS_TTL_MS: ${JWT_ACCESS_TTL_MS:-900000}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+    ports:
+      - "3004:3004"
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  organization-service:
+    build:
+      context: ..
+      dockerfile: microservices/organization-service/Dockerfile
+    container_name: jeroka-organization-service
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      PORT: 3005
+      ORG_DB_HOST: postgres
+      ORG_DB_PORT: 5432
+      ORG_DB_NAME: jeroka_organization
+      ORG_DB_USER: postgres
+      ORG_DB_PASSWORD: postgres
+      JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY:-dev-internal-key}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  crm-service:
+    build:
+      context: ..
+      dockerfile: microservices/crm-service/Dockerfile
+    container_name: jeroka-crm-service
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      PORT: 3006
+      CRM_DB_HOST: postgres
+      CRM_DB_PORT: 5432
+      CRM_DB_NAME: jeroka_crm
+      CRM_DB_USER: postgres
+      CRM_DB_PASSWORD: postgres
+      JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  catalog-service:
+    build:
+      context: ..
+      dockerfile: microservices/catalog-service/Dockerfile
+    container_name: jeroka-catalog-service
+    restart: unless-stopped
+    environment:
+      PORT: 3007
+      CATALOG_DB_HOST: postgres
+      CATALOG_DB_PORT: 5432
+      CATALOG_DB_NAME: jeroka_catalog
+      CATALOG_DB_USER: postgres
+      CATALOG_DB_PASSWORD: postgres
+      JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  billing-service:
+    build:
+      context: ..
+      dockerfile: microservices/billing-service/Dockerfile
+    container_name: jeroka-billing-service
+    restart: unless-stopped
+    environment:
+      PORT: 3008
+      BILLING_DB_HOST: postgres
+      BILLING_DB_PORT: 5432
+      BILLING_DB_NAME: jeroka_billing
+      BILLING_DB_USER: postgres
+      BILLING_DB_PASSWORD: postgres
+      JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  scheduling-service:
+    build:
+      context: ..
+      dockerfile: microservices/scheduling-service/Dockerfile
+    container_name: jeroka-scheduling-service
+    restart: unless-stopped
+    environment:
+      PORT: 3009
+      SCHEDULING_DB_HOST: postgres
+      SCHEDULING_DB_PORT: 5432
+      SCHEDULING_DB_NAME: jeroka_scheduling
+      SCHEDULING_DB_USER: postgres
+      SCHEDULING_DB_PASSWORD: postgres
+      JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  content-service:
+    build:
+      context: ..
+      dockerfile: microservices/content-service/Dockerfile
+    container_name: jeroka-content-service
+    restart: unless-stopped
+    environment:
+      PORT: 3010
+      CONTENT_DB_HOST: postgres
+      CONTENT_DB_PORT: 5432
+      CONTENT_DB_NAME: jeroka_content
+      CONTENT_DB_USER: postgres
+      CONTENT_DB_PASSWORD: postgres
+      JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  docs-service:
+    build:
+      context: ..
+      dockerfile: microservices/docs-service/Dockerfile
+    container_name: jeroka-docs-service
+    restart: unless-stopped
+    environment:
+      PORT: 3011
+      JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      auth-service:
+        condition: service_started
+
+  dashboard-bff:
+    build:
+      context: ..
+      dockerfile: microservices/dashboard-bff/Dockerfile
+    container_name: jeroka-dashboard-bff
+    restart: unless-stopped
+    environment:
+      PORT: 3013
+      JEROKA_CRM_BASE_URL: http://crm-service:3006
+      JEROKA_BILLING_BASE_URL: http://billing-service:3008
+      JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      auth-service:
+        condition: service_started
+      crm-service:
+        condition: service_started
+      billing-service:
+        condition: service_started
+
+  audit-service:
+    build:
+      context: ..
+      dockerfile: microservices/audit-service/Dockerfile
+    container_name: jeroka-audit-service
+    restart: unless-stopped
+    environment:
+      PORT: 3012
+      AUDIT_DB_HOST: postgres
+      AUDIT_DB_PORT: 5432
+      AUDIT_DB_NAME: jeroka_audit
+      AUDIT_DB_USER: postgres
+      AUDIT_DB_PASSWORD: postgres
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      auth-service:
+        condition: service_started
+
+  email-service:
+    build:
+      context: ..
+      dockerfile: microservices/email-service/Dockerfile
+    container_name: jeroka-email-service
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      PORT: 3003
+      EMAIL_DB_HOST: postgres
+      EMAIL_DB_PORT: 5432
+      EMAIL_DB_NAME: jeroka_email
+      EMAIL_DB_USER: postgres
+      EMAIL_DB_PASSWORD: postgres
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JEROKA_AUTH_JWKS_URL: http://auth-service:3004/.well-known/jwks.json
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY:-dev-internal-key}
+      JEROKA_ORGANIZATION_API_BASE_URL: http://organization-service:3005
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      CORS_ORIGINS: http://localhost:3001,http://127.0.0.1:3001
+    ports:
+      - "3003:3003"
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      organization-service:
+        condition: service_started
+
+  email-events-worker:
+    build:
+      context: ..
+      dockerfile: microservices/email-events-worker/Dockerfile
+    container_name: jeroka-email-events-worker
+    restart: unless-stopped
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JEROKA_API_BASE_URL: http://email-service:3003
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY:-dev-internal-key}
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      kafka:
+        condition: service_started
+      email-service:
+        condition: service_started
+
+  ia-docs-events-worker:
+    build:
+      context: ..
+      dockerfile: microservices/ia-docs-events-worker/Dockerfile
+    container_name: jeroka-ia-docs-events-worker
+    restart: unless-stopped
+    environment:
+      PORT: 3016
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "3016:3016"
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      kafka:
+        condition: service_started
+
+  adminer-dev:
+    image: adminer:4.8.1
+    container_name: jeroka-adminer-dev
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      - postgres
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: dracula
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8080",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  jeroka-dev-network:
+    external: true
+    name: jeroka-dev-network
+
+volumes:
+  postgres_data:
+    name: jeroka-postgres-data

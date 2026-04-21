@@ -1,0 +1,125 @@
+spring:
+  application:
+    name: jeroka-gateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            # Patterns : même machine qu’api.ts (hostname:3001) depuis le réseau local.
+            allowedOriginPatterns:
+              - "http://localhost:*"
+              - "http://127.0.0.1:*"
+              - "http://192.168.*:*"
+              - "http://10.*:*"
+              - "http://172.*:*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      routes:
+        - id: auth
+          uri: http://auth-service:3004
+          predicates:
+            - Path=/api/v1/auth/**
+        - id: organization-companies
+          uri: http://organization-service:3005
+          predicates:
+            - Path=/api/v1/companies/**
+        - id: organization-settings
+          uri: http://organization-service:3005
+          predicates:
+            - Path=/api/v1/settings/**
+        - id: organization-company
+          uri: http://organization-service:3005
+          predicates:
+            - Path=/api/v1/company/**
+        - id: organization-users
+          uri: http://organization-service:3005
+          predicates:
+            - Path=/api/v1/users/**
+        - id: crm-persons
+          uri: http://crm-service:3006
+          predicates:
+            - Path=/api/v1/persons/**
+        - id: crm-messages
+          uri: http://crm-service:3006
+          predicates:
+            - Path=/api/v1/messages/**
+        - id: catalog
+          uri: http://catalog-service:3007
+          predicates:
+            - Path=/api/v1/products/**
+        - id: billing-quotes
+          uri: http://billing-service:3008
+          predicates:
+            - Path=/api/v1/quotes/**
+        - id: billing-invoices
+          uri: http://billing-service:3008
+          predicates:
+            - Path=/api/v1/invoices/**
+        - id: billing-accounting
+          uri: http://billing-service:3008
+          predicates:
+            - Path=/api/v1/accounting/**
+        - id: scheduling
+          uri: http://scheduling-service:3009
+          predicates:
+            - Path=/api/v1/appointments/**
+        - id: content-publications
+          uri: http://content-service:3010
+          predicates:
+            - Path=/api/v1/publications/**
+        - id: content-announcements
+          uri: http://content-service:3010
+          predicates:
+            - Path=/api/v1/announcements/**
+        - id: content-orders
+          uri: http://content-service:3010
+          predicates:
+            - Path=/api/v1/orders/**
+        - id: email
+          uri: http://email-service:3003
+          predicates:
+            - Path=/api/v1/emails/**
+        - id: docs-drive
+          uri: http://docs-service:3011
+          predicates:
+            - Path=/api/v1/drive/**
+        - id: docs-documents
+          uri: http://docs-service:3011
+          predicates:
+            - Path=/api/v1/documents/**
+        - id: dashboard
+          uri: http://dashboard-bff:3013
+          predicates:
+            - Path=/api/v1/dashboard/**
+        - id: audit-logs
+          uri: http://audit-service:3012
+          predicates:
+            - Path=/api/v1/admin/audit/**
+        - id: organization-admin
+          uri: http://organization-service:3005
+          predicates:
+            - Path=/api/v1/admin/**
+
+server:
+  port: ${PORT:3000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO

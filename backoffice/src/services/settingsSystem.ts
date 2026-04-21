@@ -42,7 +42,7 @@ class SettingsSystem {
       const msg = err.response?.data?.message ?? err.message ?? 'Connexion Google échouée'
       const isNetworkError = !err.response && (err.message === 'Network Error' || err.code === 'ERR_NETWORK')
       const message = isNetworkError
-        ? 'Erreur réseau : l\'API ne répond pas. Vérifiez que l\'API est démarrée (port 3002) et l\'URL dans les paramètres.'
+        ? 'Erreur réseau : l\'API ne répond pas. Vérifiez que la gateway est démarrée (port 3000) et l\'URL dans les paramètres.'
         : msg
       throw new Error(message)
     }

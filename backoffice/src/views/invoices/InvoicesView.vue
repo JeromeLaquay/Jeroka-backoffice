@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="invoices-page">
     <!-- En-tête -->
     <div class="flex justify-between items-center">
       <div>
@@ -21,6 +21,7 @@
         
         <router-link
           to="/factures/create"
+          data-cy="create-invoice-link"
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
           <PlusIcon class="h-4 w-4 mr-2" />

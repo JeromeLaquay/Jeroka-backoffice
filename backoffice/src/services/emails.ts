@@ -116,6 +116,18 @@ export interface AttachmentsQueryParams {
   analyzed?: boolean
 }
 
+export interface EmailSyncJob {
+  id: string
+  status: 'REQUESTED' | 'RUNNING' | 'COMPLETED' | 'FAILED'
+  requestedAt: string
+  startedAt?: string
+  completedAt?: string
+  errorMessage?: string
+  newEmails?: number
+  downloadedAttachments?: number
+  uniqueSenders?: number
+}
+
 export interface PaginatedResponse<T> {
   data: T[]
   pagination: {
@@ -169,8 +181,13 @@ class EmailsService {
     return response.data
   }
 
-  async syncEmails(config?: { mode?: string; count?: number; dateFrom?: string; dateTo?: string; includeAttachments?: boolean; autoAnalyze?: boolean }): Promise<ApiResponse<{ newEmails: number; downloadedAttachments: number }>> {
-    const response = await apiService.axiosInstance.post<ApiResponse<{ newEmails: number; downloadedAttachments: number }>>('/emails/sync', config)
+  async syncEmails(config?: { mode?: string; count?: number; dateFrom?: string; dateTo?: string; includeAttachments?: boolean; autoAnalyze?: boolean }): Promise<ApiResponse<EmailSyncJob>> {
+    const response = await apiService.axiosInstance.post<ApiResponse<EmailSyncJob>>('/emails/sync', config)
+    return response.data
+  }
+
+  async getSyncJob(jobId: string): Promise<ApiResponse<EmailSyncJob>> {
+    const response = await apiService.axiosInstance.get<ApiResponse<EmailSyncJob>>(`/emails/sync/${jobId}`)
     return response.data
   }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="announcements-page">
     <!-- Header -->
     <div class="sm:flex sm:items-center sm:justify-between">
       <div>
@@ -11,6 +11,7 @@
       <div class="mt-4 sm:mt-0 flex space-x-3">
         <button
           @click="openCreateModal"
+          data-cy="create-announcement-button"
           class="btn-primary inline-flex items-center"
         >
           <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
