@@ -1,180 +1,134 @@
 # Jeroka Back-Office
 
-Back-office de gestion pour TPE/PME — Jeroka Xperience.
+Back-office de gestion pour TPE/PME (frontend Vue + backend microservices Spring Boot).
+
+## Vue d'ensemble
+
+Le projet est un monorepo compose de :
+
+- `backoffice/` : SPA Vue 3 (Vite, TypeScript, Pinia, Tailwind).
+- `microservices/` : architecture microservices Java 21 (Spring Boot 3, Spring Security, Flyway, Kafka).
+- `microservices/docker-compose.yml` : stack locale complete (Postgres, Kafka, gateway, services metier, workers, Adminer).
+
+Le frontend appelle exclusivement la gateway (`http://localhost:3000/api/v1`).
+
+### Apercu de l'interface
+
+![Capture du dashboard Jeroka](./readme-capture.PNG)
 
 ## Stack technique
 
-| Composant | Technologies |
-|-----------|-------------|
-| **Frontend** | Vue.js 3, TypeScript, Vite, Tailwind CSS, Pinia |
-| **API** | Spring Boot 3.4, Java 21, JWT, Spring Security, AOP |
-| **Base de données** | PostgreSQL (migrations Flyway) |
-| **Déploiement** | Docker, Docker Compose, GitHub Actions (CI/CD SSH) |
-| **Tests** | Cypress (E2E), Playwright (MCP) |
+- Frontend : Vue 3, TypeScript, Vite, Pinia, Tailwind CSS.
+- Backend : Java 21, Spring Boot 3.4, Spring Cloud Gateway, Spring Security (JWT RS256 via JWKS).
+- Data : PostgreSQL + Flyway (une base par domaine `jeroka_*`).
+- Messaging : Kafka (events domaines, worker email, audit).
+- Tooling : Docker Compose, Maven, Playwright MCP (tests E2E via Cursor).
 
-## Structure du projet
+## Structure du depot
 
-```
+```text
 back-office/
-├── backoffice/        # Frontend Vue.js 3 (SPA)
-├── microservices/     # API microservices Spring Boot (Java 21)
-└── .github/workflows/ # CI/CD GitHub Actions
+├── backoffice/                 # Frontend
+├── microservices/              # Gateway + services + workers + modules partages
+│   ├── docker-compose.yml
+│   ├── README.md
+│   └── GOVERNANCE.md
+└── .github/workflows/          # CI
 ```
 
----
+## Services principaux (local)
 
-## Fonctionnalités
+- `gateway` (`3000`) : point d'entree API du front.
+- `auth-service` (`3004`) : login/register/profile, JWT RS256, JWKS.
+- `organization-service` (`3005`) : company, users, admin, settings (incluant OAuth Google cote org).
+- `crm-service` (`3006`) : persons + messages.
+- `catalog-service` (`3007`) : produits.
+- `billing-service` (`3008`) : devis, factures, comptabilite.
+- `scheduling-service` (`3009`) : rendez-vous.
+- `content-service` (`3010`) : publications (+ stubs annonces/commandes).
+- `docs-service` (`3011`) : endpoints documents/drive (stubs).
+- `audit-service` (`3012`) : projection des events Kafka pour audit.
+- `dashboard-bff` (`3013`) : aggregation des stats dashboard.
+- `email-service` (`3003`) + `email-events-worker` : sync/categorisation emails et traitements asynchrones.
 
-### Dashboard
-- Statistiques globales : clients, messages, factures, devis
-- Activité récente : messages non lus, dernières factures, nouveaux clients
-- Indicateurs mensuels/hebdomadaires
+Ports detailes et conventions : `microservices/README.md`.
 
-### Gestion des clients
-- Liste filtrée et paginée (search, statut, type)
-- Fiche client détaillée (coordonnées, historique)
-- Création, modification, suppression
-- Export et import
-- Gestion des fournisseurs (même module)
+## Demarrage en local
 
-### Messages de contact
-- Réception et gestion des messages entrants (formulaire web)
-- Filtres : type (devis, information, partenariat), statut (lu/non lu), date
-- Marquage lu / non lu, réponse par email
-- Génération de brouillon de réponse via IA (OpenAI / Claude)
-- Conversion d'un message en devis
-
-### Publications (réseaux sociaux)
-- Création et planification de publications
-- Diffusion multi-plateformes : Facebook, LinkedIn, Twitter
-- Statut de publication (brouillon, programmé, publié)
-
-### Factures
-- Création de factures avec lignes de produits, TVA, remises
-- Numérotation automatique (format FAC-YYYY-NNNN)
-- Statuts : brouillon → envoyée → payée / en retard
-- Marquage comme payée
-- Détail complet et historique
-
-### Devis
-- Création de devis liés à des clients et des produits
-- Numérotation automatique (format DV-YYYY-NNNN)
-- Statuts : brouillon → envoyé → accepté / refusé / expiré
-- Conversion d'un devis en facture
-
-### Produits & Catalogue
-- Gestion du catalogue produits/services
-- Catégories, prix HT, taux TVA, unité, stock
-- Statistiques produits
-
-### Commandes
-- Gestion des commandes (création, suivi, détail)
-
-### Fournisseurs
-- Annuaire fournisseurs (coordonnées, SIRET, TVA)
-- Historique des échanges
-
-### Comptabilité
-- Tableau de bord financier : chiffre d'affaires, dépenses, bénéfice net, TVA due
-- Liste des transactions récentes dérivées des factures
-- Actions rapides : rapports TVA, compte de résultat, flux de trésorerie
-- Import / export de données comptables
-
-### Calendrier & Rendez-vous
-- Gestion des créneaux de disponibilité
-- Liste et filtrage des rendez-vous (statut, date, période)
-- Intégration Google Calendar (vue embarquée)
-- Génération de créneaux via IA
-
-### Emails (Google Workspace)
-- Synchronisation Gmail via OAuth2 Google
-- Lecture et catégorisation des emails
-- Gestion des expéditeurs et catégories
-
-### Documents (Google Drive)
-- Accès à Google Drive depuis le back-office
-- Liste, téléchargement et upload de fichiers
-- Analyse de documents par IA (factures, devis, etc.)
-
-### Annonces
-- Gestion des annonces internes ou publiables
-
-### Paramètres
-- **Profil** : modification prénom, nom, téléphone, avatar
-- **Entreprise** : raison sociale, SIRET, TVA, adresse, logo
-- **Système** : intégrations Meta (Facebook/Instagram), LinkedIn, Twitter, Google
-- **Sécurité** : changement de mot de passe
-- **Sauvegardes** : création et restauration
-- **Intégrations** : configuration des APIs tierces
-- **Développement** : basculer entre API locale et production
-
-### Administration (rôle admin)
-- Dashboard super-admin (stats globales multi-sociétés)
-- Gestion des entreprises (CRUD)
-- Gestion des utilisateurs (CRUD, activation/désactivation, rôles)
-
----
-
-## Lancement en développement
-
-### Prérequis
+### Prerequis
 
 - Node.js 20+
-- JDK 21+, Maven 3.9+
+- JDK 21+
+- Maven 3.9+
 - Docker Desktop
 
-### Frontend
+### 1) Configurer les variables d'environnement
+
+- Fichier backend : `microservices/.env` (non versionne).
+- Fichier frontend local : `backoffice/.env.development` avec :
+
+```env
+VITE_API_URL=http://localhost:3000/api/v1
+```
+
+Variables backend habituelles (selon tes integrations locales) :
+
+- `DB_PASSWORD`
+- `JWT_SECRET`, `JWT_REFRESH_SECRET`
+- `INTERNAL_API_KEY`
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_URI`
+- `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`
+
+### 2) Demarrer les microservices
+
+Depuis la racine du repo :
+
+```bash
+docker compose -f microservices/docker-compose.yml down -v
+docker compose -f microservices/docker-compose.yml up -d --build
+```
+
+Ce que fait la stack :
+
+- `postgres-init` cree les bases `jeroka_*` au premier demarrage d'un volume vide.
+- Chaque service applique ses migrations Flyway.
+- Le service `sql-seed` attend les tables puis execute `microservices/sql/seed/10-seed-dev-data.sql` (idempotent).
+- La gateway attend la fin du seed pour eviter un front sur des donnees non initialisees.
+
+### 3) Demarrer le frontend
 
 ```bash
 cd backoffice
 npm install
-npm run dev          # http://localhost:3001
+npm run dev
 ```
 
-### API microservices + PostgreSQL (Docker)
+- Front : `http://localhost:3001`
+- API gateway : `http://localhost:3000/api/v1`
+- Health gateway : `http://localhost:3000/actuator/health`
 
-```bash
-docker compose -f microservices/docker-compose.yml up -d --build
-# API (gateway) : http://localhost:3000/api/v1
-# Health gateway : http://localhost:3000/actuator/health
-```
+## Authentification de dev
 
-> Recommande pour une init propre des BDD : `down -v` puis `up -d --build` (bases recreees par `postgres-init`, schema cree par Flyway au demarrage des services).
+Le seed de dev cree des comptes de test. Exemple utilise dans les tests locaux recents :
 
-### Variables d'environnement API
+## Fonctionnalites couvertes
 
-Créer `.env` à la racine (utilisé par `microservices/docker-compose.yml`) à partir des variables suivantes :
+- Dashboard (stats agregees CRM + Billing).
+- CRM : clients/personnes, messages, brouillons IA.
+- Billing : devis, factures, comptabilite.
+- Catalog : produits/categories/stats.
+- Scheduling : rendez-vous.
+- Content : publications.
+- Email : synchronisation Gmail, categories, assignation d'expediteurs, pipeline async Kafka.
+- Admin : entreprises/utilisateurs/statistiques (via `organization-service`) + audit Kafka.
 
-| Variable | Description |
-|----------|-------------|
-| `DB_PASSWORD` | Mot de passe PostgreSQL |
-| `JWT_SECRET` | Secret JWT (min. 32 caractères) |
-| `GOOGLE_CLIENT_ID` | OAuth2 Google Client ID |
-| `GOOGLE_CLIENT_SECRET` | OAuth2 Google Client Secret |
-| `OPENAI_API_KEY` | Clé OpenAI (IA) |
-| `ANTHROPIC_API_KEY` | Clé Anthropic/Claude (IA) |
-| `CORS_ORIGINS` | Origines autorisées (ex. `http://localhost:3001`) |
+## CI
 
-## CI/CD
+Le monorepo utilise des workflows GitHub Actions (build/verification Maven par module).
+Voir `.github/workflows/` et `microservices/GOVERNANCE.md`.
 
-Déploiement automatique sur push `main` via `.github/workflows/deploy.yml` :
-1. Connexion SSH au serveur cible
-2. `git pull` + `docker compose -f docker-compose.prod.yml up -d --build`
-3. Exécution des tests Cypress contre les URLs de production
+## Documentation complementaire
 
-Secrets GitHub requis : `SERVER_SSH_KEY`, `SERVER_HOST`, `SERVER_USER`, `SERVER_PROJECT_PATH`, `TOKEN_GITHUB`.
-
----
-
-## Architecture API
-
-```
-Controller → MappingService → Service → Repository → PostgreSQL
-```
-
-- **Controller** : validation des entrées, délègue au MappingService
-- **MappingService** : conversion DTO ↔ entités, orchestration
-- **Service** : logique métier, `@Transactional`
-- **Repository** : accès données JPA
-
-Voir [`microservices/README.md`](microservices/README.md) pour le détail des services, endpoints et conventions.
+- `microservices/README.md` : cartographie des services, ports, Docker, seed.
+- `microservices/GOVERNANCE.md` : conventions, securite, migration, gouvernance.
+- `microservices/sql/README.md` : scripts SQL manuels (init/migration/seed) si besoin.
