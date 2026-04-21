@@ -2,6 +2,12 @@ package fr.jeroka.contracts.kafka;
 
 /**
  * Noms des topics Kafka par domaine (alignés sur le découpage microservices).
+ *
+ * <p>Exemple de chaîne d'interaction email:
+ * {@code email-service} publie {@code EMAIL_SYNC_REQUESTED} →
+ * {@code email-events-worker} déclenche le run du job →
+ * {@code email-service} publie {@code EMAIL_SYNC_COMPLETED} →
+ * {@code audit-service} historise ces deux événements.
  */
 public final class JerokaKafkaTopics {
 

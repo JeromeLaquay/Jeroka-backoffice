@@ -17,7 +17,14 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Publie les événements du domaine « emails » vers Kafka pour les microservices.
+ * Publie les événements du domaine « emails » vers Kafka.
+ *
+ * <p>Interaction globale:
+ * 1) {@code email-service} émet un événement métier (sync demandée, catégorie créée, etc.).
+ * 2) {@code email-events-worker} consomme ces événements pour déclencher des traitements asynchrones.
+ * 3) {@code audit-service} consomme les mêmes topics pour historiser les actions dans {@code history_logs}.
+ *
+ * <p>L'enveloppe {@code JerokaKafkaEventEnvelope} uniformise le format (eventId, correlationId, data).
  */
 @Component
 @ConditionalOnBean(KafkaTemplate.class)
@@ -64,11 +71,13 @@ public class EmailKafkaEventPublisher {
 
     private void send(String topic, String partitionKey, Object dataPayload) {
         try {
+            // correlationId = identifiant transversal (job/sync) exploité par les consommateurs.
             JerokaKafkaEventEnvelope envelope = JerokaKafkaEnvelopeBuilder.forTopicPayload(
                     topic,
                     extractCorrelationId(dataPayload),
                     dataPayload);
             String json = objectMapper.writeValueAsString(envelope);
+            // partitionKey = userId pour regrouper les événements d'un même utilisateur.
             kafkaTemplate.send(topic, partitionKey, json);
             log.debug("Kafka topic={} clé={}", topic, partitionKey);
         } catch (JsonProcessingException e) {

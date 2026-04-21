@@ -136,6 +136,9 @@ public class EmailsModuleService {
 
     /**
      * Synchronise avec Gmail : libellÃ©s utilisateur â†” catÃ©gories applicatives, expÃ©diteurs uniques depuis les messages.
+     *
+     * <p>Version synchrone: l'API attend la fin de l'exécution puis renvoie le résultat.
+     * On publie quand même les événements Kafka start/end pour l'observabilité transverse (audit, workers).
      */
     public SyncResultDto sync(JwtService.UserPrincipal principal, SyncRequest req) {
         var userId = requireUserId(principal);
@@ -144,6 +147,7 @@ public class EmailsModuleService {
             return new SyncResultDto(0, 0, 0);
         }
         var correlationId = UUID.randomUUID();
+        // correlationId = fil conducteur partagé entre l'événement "requested" et "completed".
         emitEmailKafka(pub -> pub.publishSyncRequested(correlationId, userId,
                 req != null ? req.mode() : null,
                 req != null ? req.count() : null,
@@ -157,6 +161,12 @@ public class EmailsModuleService {
         return result;
     }
 
+    /**
+     * Version asynchrone: crée un job en base puis publie {@code EMAIL_SYNC_REQUESTED}.
+     *
+     * <p>Le worker Kafka ({@code email-events-worker}) consomme l'événement et appelle ensuite
+     * {@code /api/v1/emails/sync/{jobId}/run} pour exécuter réellement la synchro.
+     */
     public SyncJobDto requestSync(JwtService.UserPrincipal principal, SyncRequest req) {
         var userId = requireUserId(principal);
         Optional<GoogleOAuthCredentials> creds = coreApiGoogleOAuthClient.getCredentialsForUser(userId);
@@ -176,6 +186,7 @@ public class EmailsModuleService {
         job.setAutoAnalyze(req != null ? req.autoAnalyze() : null);
         emailSyncJobRepository.save(job);
 
+        // Ici le correlationId transporté dans l'événement est le jobId.
         emitEmailKafka(pub -> pub.publishSyncRequested(jobId, userId,
                 req != null ? req.mode() : null,
                 req != null ? req.count() : null,
@@ -187,6 +198,12 @@ public class EmailsModuleService {
         return toSyncJobDto(job);
     }
 
+    /**
+     * Exécute un job asynchrone demandé précédemment.
+     *
+     * <p>Entrée appelée en interne par le worker événementiel, puis publication de
+     * {@code EMAIL_SYNC_COMPLETED} en succès.
+     */
     public SyncResultDto runSyncJob(UUID jobId) {
         if (jobId == null) throw new IllegalArgumentException("jobId requis");
         var job = emailSyncJobRepository.findById(jobId)
@@ -258,6 +275,10 @@ public class EmailsModuleService {
     }
 
     private void emitEmailKafka(Consumer<EmailKafkaEventPublisher> action) {
+        if (emailKafkaEventPublisher.getIfAvailable() == null) {
+            log.warn("Publication événement email ignorée: publisher Kafka indisponible");
+            return;
+        }
         emailKafkaEventPublisher.ifAvailable(pub -> {
             try {
                 action.accept(pub);

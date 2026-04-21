@@ -14,7 +14,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 /**
- * Consommation des topics email (un groupe, plusieurs topics — évite les conflits de rebalance).
+ * Consomme les événements Kafka du domaine email.
+ *
+ * <p>Rôle principal du worker:
+ * - Réagir à {@code jeroka.email.sync.requested}
+ * - Déclencher ensuite l'exécution réelle du job via HTTP interne sur {@code email-service}
+ *
+ * <p>Ce découplage permet de répondre vite côté API, puis de traiter la synchro en asynchrone.
  */
 @Component
 public class EmailDomainEventListeners {
@@ -49,6 +55,7 @@ public class EmailDomainEventListeners {
     public void onEmailDomainEvent(String payload, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         log.info("email-events-worker topic={} payload={}", topic, payload);
         if (JerokaKafkaTopics.EMAIL_SYNC_REQUESTED.equals(topic)) {
+            // Le correlationId de l'événement correspond ici au jobId côté email-service.
             triggerJobRun(payload);
         }
     }
@@ -64,6 +71,7 @@ public class EmailDomainEventListeners {
             return;
         }
         try {
+            // Appel interne sécurisé par clé API: pas exposé au front/gateway.
             http.post()
                     .uri(apiBaseUrl + "/api/v1/emails/sync/" + jobId + "/run")
                     .header("X-Internal-Api-Key", internalKey)

@@ -17,7 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 /**
- * Consomme les topics principaux pour alimenter {@code history_logs}.
+ * Projette les événements Kafka dans {@code history_logs}.
+ *
+ * <p>Ce listener ne pilote pas le métier: il sert à la traçabilité transverse.
+ * Chaque message reçu est stocké avec:
+ * - le topic,
+ * - l'eventId (enveloppe),
+ * - le correlationId (chaînage de flux),
+ * - le payload brut (JSON).
  */
 @Component
 public class AuditKafkaListeners {
@@ -52,6 +59,7 @@ public class AuditKafkaListeners {
             JsonNode root = objectMapper.readTree(payload);
             UUID eventId = JerokaKafkaConsumerSupport.readEventId(root);
             String correlationId = JerokaKafkaConsumerSupport.readCorrelationIdFromEnvelopeOrFlat(root);
+            // Le stockage brut simplifie l'analyse des incidents et le debugging inter-services.
             repository.save(new HistoryLog(
                     UUID.randomUUID(),
                     topic,
