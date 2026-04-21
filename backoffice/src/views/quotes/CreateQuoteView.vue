@@ -419,18 +419,32 @@ const handleSubmit = async () => {
   }
 }
 // Méthodes
+const extractPersons = (response: any): any[] => {
+  if (Array.isArray(response?.items)) return response.items
+  if (Array.isArray(response?.data)) return response.data
+  if (response?.success && Array.isArray(response?.data?.items)) return response.data.items
+  return []
+}
+
+const toClientOption = (client: any) => {
+  const fullName = `${client?.firstName || ''} ${client?.lastName || ''}`.trim()
+  const name = (client?.name && String(client.name).trim()) || fullName || client?.email || 'Client'
+  return {
+    ...client,
+    name,
+    avatar_url:
+      client?.avatar_url ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=a855f7&color=fff`
+  }
+}
+
 const loadClients = async () => {
   try {
-    const response = await personsService.getPersons({ type: 'client' })
-    if (response.success && response.data && Array.isArray(response.data)) {
-      // Mapper les clients pour correspondre à l'interface attendue par ClientSelector
-      clients.value = response.data.map((client: any) => ({
-        ...client,
-        avatar_url: client.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(client.name)}&background=a855f7&color=fff`
-      }))
-    }
+    const response = await personsService.getPersons({ type: 'client', page: 1, limit: 100 })
+    clients.value = extractPersons(response).map(toClientOption)
   } catch (error) {
     console.error('Erreur lors du chargement des clients:', error)
+    clients.value = []
   }
 }
 
@@ -438,13 +452,13 @@ const loadClients = async () => {
 watch([() => form.issueDate, () => form.validityDays], updateValidUntil)
 
 // Lifecycle
-onMounted(() => {
+onMounted(async () => {
+  await loadClients()
   if (isEdit.value) {
-    loadQuote()
-  } else {
-    generateQuoteNumber()
-    updateValidUntil()
-    loadClients()
+    await loadQuote()
+    return
   }
+  generateQuoteNumber()
+  updateValidUntil()
 })
 </script>

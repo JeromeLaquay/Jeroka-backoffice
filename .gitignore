@@ -146,6 +146,7 @@ cypress/downloads/
 # Playwright
 playwright-report/
 test-results/
+.playwright-mcp/
 
 # ===========================================
 # ENVIRONNEMENT ET CONFIGURATION
