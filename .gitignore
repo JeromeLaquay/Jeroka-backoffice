@@ -77,6 +77,7 @@ desktop.ini
 # Secrets / variables locales (ne pas versionner)
 microservices/.env
 backoffice/.env
+backoffice/.env.e2e.local
 
 # ===========================================
 # NODE.JS / JAVASCRIPT / TYPESCRIPT
