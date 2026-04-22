@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.HashMap;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -74,11 +75,11 @@ public class OrgSettingsApiController {
     @GetMapping("/google/status")
     public Map<String, Object> googleStatus(@AuthenticationPrincipal Jwt jwt) {
         boolean connected = socialCredentialsService.hasActiveGoogleCredentials(OrgJwtClaims.requireSubjectUserId(jwt));
-        return Map.of(
-                "success",
-                true,
-                "data",
-                Map.of("isConnected", connected, "calendarId", null, "hasServiceAccount", false));
+        Map<String, Object> data = new HashMap<>();
+        data.put("isConnected", connected);
+        data.put("calendarId", null);
+        data.put("hasServiceAccount", false);
+        return Map.of("success", true, "data", data);
     }
 
     @PostMapping("/google/test/calendar")

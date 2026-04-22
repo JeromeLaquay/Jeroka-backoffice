@@ -13,6 +13,10 @@ server:
 jeroka:
   core-forward:
     enabled: false
+  organization-api:
+    base-url: ${JEROKA_ORGANIZATION_API_BASE_URL:http://organization-service:3005}
+  internal:
+    api-key: ${INTERNAL_API_KEY:}
 
 management:
   endpoints:

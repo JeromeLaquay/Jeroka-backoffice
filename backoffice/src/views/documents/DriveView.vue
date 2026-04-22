@@ -133,7 +133,7 @@
           </div>
           <div v-else class="text-gray-500">Aucune prévisualisation disponible.</div>
         </div>
-        <div v-else class="text-gray-500">Sélectionnez un élément à droite.</div>
+        <div v-else class="text-gray-500">Sélectionnez un élément à gauche.</div>
       </div>
     </div>
   </div>
@@ -154,20 +154,12 @@ const loadingFolders = ref<Set<string>>(new Set())
 const showAnalyzeDropdown = ref(false)
 const showCreateDropdown = ref(false)
 
-function expandAll(nodes: any[]): any[] {
-  return (nodes || []).map((n: any) => ({
-    ...n,
-    expanded: true,
-    children: n?.children ? expandAll(n.children) : n.children
-  }))
-}
-
 async function loadRoot(): Promise<void> {
   loadError.value = null
   loadingTree.value = true
   try {
     const data = await googleDriveService.listChildren()
-    tree.value = expandAll(data)
+    tree.value = (data || []).map((item: TreeNode) => ({ ...item, expanded: false }))
     selected.value = null
   } catch (e: any) {
     loadError.value = e?.message || 'Erreur lors du chargement des documents.'
@@ -241,27 +233,30 @@ const DriveNode = defineComponent({
       }
     }
 
-    const selectOrToggle = (e: Event): void => {
-      if (isFolder(props.node)) {
-        toggleNode(e)
-      } else {
-        emit('select', props.node)
-      }
+    const selectNode = (): void => {
+      emit('select', props.node)
     }
 
     return (): any => h('li', [
       h(
         'div',
-        { class: 'flex items-center gap-2 py-1 cursor-pointer hover:bg-gray-50 px-1', onClick: selectOrToggle },
+        { class: 'flex items-center gap-2 py-1 cursor-pointer hover:bg-gray-50 px-1', onClick: selectNode },
         [
           isFolder(props.node)
-            ? h(
-                'span',
-                { class: 'w-6 text-center inline-flex items-center justify-center' },
+            ? h('div', { class: 'w-10 inline-flex items-center justify-center gap-1' }, [
+                h(
+                  'button',
+                  {
+                    class: 'w-3 text-xs text-gray-500',
+                    onClick: toggleNode,
+                    title: props.node.expanded ? 'Réduire' : 'Déplier'
+                  },
+                  props.node.expanded ? '▼' : '▶'
+                ),
                 loadingFolders.value.has(props.node.id)
                   ? h('span', { class: 'w-4 h-4 border-2 border-gray-300 border-t-primary-600 rounded-full animate-spin inline-block' })
-                  : (props.node.expanded ? '📂' : '📁')
-              )
+                  : h('span', {}, props.node.expanded ? '📂' : '📁')
+              ])
             : h('span', { class: 'w-6 text-center' }, '📄'),
           h('span', { class: isFolder(props.node) ? 'font-medium' : '' }, props.node.name)
         ]
