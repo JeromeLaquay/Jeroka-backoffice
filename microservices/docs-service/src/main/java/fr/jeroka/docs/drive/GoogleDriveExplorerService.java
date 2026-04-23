@@ -28,11 +28,12 @@ public class GoogleDriveExplorerService {
 
     public List<Map<String, Object>> listChildren(UUID userId, String parentId) {
         String token = accessTokenFor(userId);
+        String effectiveParent = resolveParentForRequest(userId, parentId);
         List<Map<String, Object>> allItems = new ArrayList<>();
         String nextPageToken = null;
         int guard = 0;
         do {
-            String uri = buildListUri(parentId, nextPageToken);
+            String uri = buildListUri(effectiveParent, nextPageToken);
             String body = http.get()
                     .uri(uri)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -70,6 +71,14 @@ public class GoogleDriveExplorerService {
             throw new IllegalStateException("Impossible de récupérer un access_token Google");
         }
         return token;
+    }
+
+    private String resolveParentForRequest(UUID userId, String parentId) {
+        String normalizedParent = normalizeParent(parentId);
+        if (normalizedParent != null && !"root".equalsIgnoreCase(normalizedParent)) {
+            return normalizedParent;
+        }
+        return oAuthClient.getDriveRootFolderId(userId).orElse(normalizedParent);
     }
 
     private String buildListUri(String parentId, String pageToken) {

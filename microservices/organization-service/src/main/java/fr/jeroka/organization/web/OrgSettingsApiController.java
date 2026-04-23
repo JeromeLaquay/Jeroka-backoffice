@@ -2,14 +2,18 @@ package fr.jeroka.organization.web;
 
 import fr.jeroka.organization.exception.OrgApiException;
 import fr.jeroka.organization.security.OrgJwtClaims;
+import fr.jeroka.organization.service.OrgDriveRootSettingsService;
 import fr.jeroka.organization.service.OrgGoogleOAuthService;
 import fr.jeroka.organization.service.OrgSocialCredentialsService;
+import fr.jeroka.organization.web.dto.GoogleDriveRootSettingsRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,14 +30,17 @@ public class OrgSettingsApiController {
 
     private final OrgSocialCredentialsService socialCredentialsService;
     private final OrgGoogleOAuthService googleOAuthService;
+    private final OrgDriveRootSettingsService driveRootSettingsService;
     private final String frontendUrl;
 
     public OrgSettingsApiController(
             OrgSocialCredentialsService socialCredentialsService,
             OrgGoogleOAuthService googleOAuthService,
+            OrgDriveRootSettingsService driveRootSettingsService,
             @Value("${app.frontend-url:http://localhost:3001}") String frontendUrl) {
         this.socialCredentialsService = socialCredentialsService;
         this.googleOAuthService = googleOAuthService;
+        this.driveRootSettingsService = driveRootSettingsService;
         this.frontendUrl = trimTrailingSlash(frontendUrl);
     }
 
@@ -95,6 +102,30 @@ public class OrgSettingsApiController {
     @PostMapping("/google/test/drive")
     public ResponseEntity<Map<String, Object>> testDrive(@AuthenticationPrincipal Jwt jwt) {
         return testGoogleConnection(jwt);
+    }
+
+    @GetMapping("/google/drive-root")
+    public Map<String, Object> getGoogleDriveRoot(@AuthenticationPrincipal Jwt jwt) {
+        return Map.of(
+                "success",
+                true,
+                "data",
+                driveRootSettingsService.get(
+                        OrgJwtClaims.requireSubjectUserId(jwt), OrgJwtClaims.requireCompanyId(jwt)));
+    }
+
+    @PutMapping("/google/drive-root")
+    public Map<String, Object> setGoogleDriveRoot(
+            @AuthenticationPrincipal Jwt jwt, @RequestBody GoogleDriveRootSettingsRequest body) {
+        return Map.of(
+                "success",
+                true,
+                "data",
+                driveRootSettingsService.save(
+                        OrgJwtClaims.requireSubjectUserId(jwt),
+                        OrgJwtClaims.requireCompanyId(jwt),
+                        body.scope(),
+                        body.folderUrl()));
     }
 
     private ResponseEntity<Map<String, Object>> testGoogleConnection(Jwt jwt) {

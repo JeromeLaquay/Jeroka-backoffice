@@ -7,6 +7,9 @@
           <p class="text-sm text-gray-600 dark:text-gray-400">
             Gérez vos dossiers et fichiers, et prévisualisez les documents extraits.
           </p>
+          <p v-if="rootFolderLabel" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Racine active: {{ rootFolderLabel }}
+          </p>
           <p v-if="loadError" class="mt-2 text-sm text-amber-600 dark:text-amber-400">{{ loadError }}</p>
         </div>
         <div class="flex items-center gap-2">
@@ -142,6 +145,7 @@
 <script setup lang="ts">
 import { ref, computed, defineComponent, h, type PropType } from 'vue'
 import googleDriveService, { type DriveItem } from '../../services/drive'
+import settingsSystem from '../../services/settingsSystem'
 
 
 type TreeNode = DriveItem & { children?: TreeNode[]; expanded?: boolean }
@@ -153,12 +157,18 @@ const loadError = ref<string | null>(null)
 const loadingFolders = ref<Set<string>>(new Set())
 const showAnalyzeDropdown = ref(false)
 const showCreateDropdown = ref(false)
+const rootFolderId = ref<string | null>(null)
+const rootFolderLabel = ref<string | null>(null)
 
 async function loadRoot(): Promise<void> {
   loadError.value = null
   loadingTree.value = true
   try {
-    const data = await googleDriveService.listChildren()
+    const rootRes = await settingsSystem.getGoogleDriveRoot().catch(() => ({ success: false } as any))
+    const savedFolderId = rootRes?.success ? rootRes?.data?.folderId ?? null : null
+    rootFolderId.value = savedFolderId
+    rootFolderLabel.value = savedFolderId ? `Dossier configuré (${savedFolderId})` : 'Google Drive (racine par défaut)'
+    const data = await googleDriveService.listChildren(rootFolderId.value ?? undefined)
     tree.value = (data || []).map((item: TreeNode) => ({ ...item, expanded: false }))
     selected.value = null
   } catch (e: any) {

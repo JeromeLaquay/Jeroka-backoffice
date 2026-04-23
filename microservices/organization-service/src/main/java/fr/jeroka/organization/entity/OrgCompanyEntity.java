@@ -74,6 +74,9 @@ public class OrgCompanyEntity {
     @Column(name = "subscription_plan", length = 50)
     private String subscriptionPlan;
 
+    @Column(name = "google_drive_folder_id", length = 255)
+    private String googleDriveFolderId;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -228,6 +231,14 @@ public class OrgCompanyEntity {
 
     public void setSubscriptionPlan(String subscriptionPlan) {
         this.subscriptionPlan = subscriptionPlan;
+    }
+
+    public String getGoogleDriveFolderId() {
+        return googleDriveFolderId;
+    }
+
+    public void setGoogleDriveFolderId(String googleDriveFolderId) {
+        this.googleDriveFolderId = googleDriveFolderId;
     }
 
     public String getSize() {

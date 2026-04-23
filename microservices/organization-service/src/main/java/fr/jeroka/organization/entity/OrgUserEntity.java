@@ -163,6 +163,14 @@ public class OrgUserEntity {
         this.phone = phone;
     }
 
+    public String getGoogleDriveFolderId() {
+        return googleDriveFolderId;
+    }
+
+    public void setGoogleDriveFolderId(String googleDriveFolderId) {
+        this.googleDriveFolderId = googleDriveFolderId;
+    }
+
     public String getRole() {
         return role;
     }

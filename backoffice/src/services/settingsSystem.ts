@@ -6,6 +6,14 @@ export type GoogleOAuthStatus = {
   hasServiceAccount: boolean
 }
 
+export type GoogleDriveRootSettings = {
+  scope: 'user' | 'company'
+  folderId: string | null
+  folderUrl: string | null
+  userFolderId: string | null
+  companyFolderId: string | null
+}
+
 class SettingsSystem {
   async testCalendar(): Promise<{ success: boolean }> {
     const res = await apiService.post('/settings/google/test/calendar')
@@ -52,6 +60,18 @@ class SettingsSystem {
     const res = await apiService.get<GoogleOAuthStatus>('/settings/google/status')
     console.log('getGoogleStatus', res);
     return { success: res.success, data: res.data }
+  }
+
+  async getGoogleDriveRoot(): Promise<{ success: boolean; data?: GoogleDriveRootSettings }> {
+    const res = await apiService.get<GoogleDriveRootSettings>('/settings/google/drive-root')
+    return { success: res.success, data: res.data }
+  }
+
+  async saveGoogleDriveRoot(
+    payload: { scope: 'user' | 'company'; folderUrl: string }
+  ): Promise<{ success: boolean; data?: GoogleDriveRootSettings; message?: string }> {
+    const res = await apiService.put<GoogleDriveRootSettings>('/settings/google/drive-root', payload)
+    return { success: res.success, data: res.data, message: res.message }
   }
 }
 export default new SettingsSystem()

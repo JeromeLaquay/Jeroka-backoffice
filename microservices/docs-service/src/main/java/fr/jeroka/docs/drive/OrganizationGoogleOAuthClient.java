@@ -38,6 +38,22 @@ public class OrganizationGoogleOAuthClient {
         }
     }
 
+    public Optional<String> getDriveRootFolderId(UUID userId) {
+        if (userId == null || internalApiKey.isBlank()) {
+            return Optional.empty();
+        }
+        try {
+            Map<String, Object> body = fetchBody(userId);
+            String folderId = stringValue(body.get("driveRootFolderId")).trim();
+            if (folderId.isBlank()) {
+                return Optional.empty();
+            }
+            return Optional.of(folderId);
+        } catch (Exception ignored) {
+            return Optional.empty();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private Map<String, Object> fetchBody(UUID userId) {
         return http.get()

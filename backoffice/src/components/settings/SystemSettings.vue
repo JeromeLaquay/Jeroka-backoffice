@@ -141,6 +141,46 @@
             </button>
           </div>
         </div>
+
+        <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-900/30 rounded-md">
+          <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Dossier racine Documents</h4>
+          <p class="text-xs text-gray-600 dark:text-gray-300 mb-3">
+            Définissez un dossier Google Drive racine à afficher dans Documents (URL dossier ou ID).
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">Portée</label>
+              <select v-model="driveRoot.scope" class="w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm">
+                <option value="user">Utilisateur</option>
+                <option value="company">Entreprise</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">URL dossier racine</label>
+              <input
+                v-model="driveRoot.folderUrl"
+                type="text"
+                placeholder="https://drive.google.com/drive/u/0/folders/..."
+                class="w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm"
+              />
+            </div>
+          </div>
+          <div class="mt-3 flex items-center justify-between">
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              Racine active: {{ driveRoot.activeScopeLabel }} <span v-if="driveRoot.activeFolderId">({{ driveRoot.activeFolderId }})</span>
+            </p>
+            <button
+              type="button"
+              @click="saveDriveRoot"
+              :disabled="savingDriveRoot"
+              class="px-3 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50"
+            >
+              {{ savingDriveRoot ? 'Enregistrement...' : 'Enregistrer' }}
+            </button>
+          </div>
+          <p v-if="driveRootMessage" class="mt-2 text-xs text-green-600 dark:text-green-400">{{ driveRootMessage }}</p>
+          <p v-if="driveRootError" class="mt-2 text-xs text-red-600 dark:text-red-400">{{ driveRootError }}</p>
+        </div>
         <!-- voyant vert ou rouge selon le statut de la connexion -->
         <div class="flex flex-col items-center justify-center gap-1">
           <div class="flex items-center gap-2">
@@ -223,6 +263,15 @@ const linkedin = ref({ clientId: '', clientSecret: '', accessToken: '', organiza
 const twitter = ref({ apiKey: '', apiSecret: '', accessToken: '', accessTokenSecret: '' })
 const configured = ref<Record<SupportedPlatform, boolean>>({ meta: false, linkedin: false, twitter: false, 'site web': false, google: false })
 const googleOAuthStatus = ref<{ isConnected: boolean; calendarId: string | null | undefined; hasServiceAccount: boolean }>({ isConnected: false, calendarId: null, hasServiceAccount: false })
+const driveRoot = ref({
+  scope: 'user' as 'user' | 'company',
+  folderUrl: '',
+  activeFolderId: '',
+  activeScopeLabel: 'Entreprise'
+})
+const driveRootMessage = ref<string | null>(null)
+const driveRootError = ref<string | null>(null)
+const savingDriveRoot = ref(false)
 
 const isConfigured = (platform: SupportedPlatform) => configured.value[platform]
 
@@ -240,6 +289,7 @@ const loadConfigured = async () => {
     
     // Charger le statut OAuth Google
     await refreshGoogleStatus()
+    await loadDriveRoot()
   } catch (e) {
     // noop UI
   }
@@ -287,6 +337,40 @@ const refreshGoogleStatus = async () => {
     }
   } catch (e) {
     console.error('Erreur lors du chargement du statut Google:', e)
+  }
+}
+
+const loadDriveRoot = async () => {
+  driveRootError.value = null
+  try {
+    const res = await settingsSystem.getGoogleDriveRoot()
+    if (!res.success || !res.data) return
+    const data = res.data
+    driveRoot.value.scope = data.scope ?? 'user'
+    driveRoot.value.folderUrl = data.folderUrl ?? ''
+    driveRoot.value.activeFolderId = data.folderId ?? ''
+    driveRoot.value.activeScopeLabel = data.userFolderId ? 'Utilisateur' : 'Entreprise'
+  } catch (e: any) {
+    driveRootError.value = e?.message ?? 'Erreur lors du chargement du dossier racine'
+  }
+}
+
+const saveDriveRoot = async () => {
+  driveRootMessage.value = null
+  driveRootError.value = null
+  savingDriveRoot.value = true
+  try {
+    const res = await settingsSystem.saveGoogleDriveRoot({
+      scope: driveRoot.value.scope,
+      folderUrl: driveRoot.value.folderUrl
+    })
+    if (!res.success) throw new Error(res.message ?? 'Erreur lors de la sauvegarde')
+    driveRootMessage.value = 'Dossier racine enregistré.'
+    await loadDriveRoot()
+  } catch (e: any) {
+    driveRootError.value = e?.message ?? 'Erreur lors de la sauvegarde'
+  } finally {
+    savingDriveRoot.value = false
   }
 }
 
