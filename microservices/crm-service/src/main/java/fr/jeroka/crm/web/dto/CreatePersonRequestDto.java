@@ -23,5 +23,5 @@ public record CreatePersonRequestDto(
         @Size(max = 50) String vatNumber,
         @Pattern(regexp = "active|inactive|prospect", message = "status invalide") String status,
         @Size(max = 50) String source,
-        String notes
-) {}
+        String notes,
+        @Pattern(regexp = "client|supplier", message = "type personne invalide") String type) {}

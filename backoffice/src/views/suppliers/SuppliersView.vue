@@ -172,13 +172,13 @@
                   <div class="flex-shrink-0 h-10 w-10">
                     <div class="h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
                       <span class="text-sm font-medium text-primary-600 dark:text-primary-400">
-                        {{ (supplier.first_name?.[0] || '') + (supplier.last_name?.[0] || '') }}
+                        {{ (supplier.firstName?.[0] || '') + (supplier.lastName?.[0] || '') }}
                       </span>
                     </div>
                   </div>
                   <div class="ml-4">
                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {{ supplier.company_name || `${supplier.first_name} ${supplier.last_name}` }}
+                      {{ supplier.companyName || `${supplier.firstName} ${supplier.lastName}` }}
                     </div>
                     <div class="text-sm text-gray-500 dark:text-gray-400">
                       {{ supplier.email }}
@@ -188,12 +188,12 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      :class="supplier.type_label === 'Entreprise' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'">
-                  {{ supplier.type_label }}
+                      :class="supplier.typeClient === 'company' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'">
+                  {{ supplier.typeClient === 'company' ? 'Entreprise' : 'Particulier' }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                {{ supplier.first_name }} {{ supplier.last_name }}
+                {{ supplier.firstName }} {{ supplier.lastName }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
@@ -202,7 +202,7 @@
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {{ formatDate(supplier.created_at) }}
+                {{ formatDate(supplier.createdAt) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex justify-end space-x-2">
@@ -243,7 +243,8 @@
           </button>
           <button
             @click="next"
-            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            :disabled="page >= totalPages || totalPages === 0"
+            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Suivant
           </button>
@@ -251,7 +252,7 @@
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div>
             <p class="text-sm text-gray-700 dark:text-gray-300">
-              Affichage de {{ (page - 1) * limit + 1 }} à {{ Math.min(page * limit, suppliers.length) }} sur {{ suppliers.length }} résultats
+              Affichage de {{ rangeFrom }} à {{ rangeTo }} sur {{ totalCount }} résultats
             </p>
           </div>
           <div>
@@ -265,7 +266,8 @@
               </button>
               <button
                 @click="next"
-                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                :disabled="page >= totalPages || totalPages === 0"
+                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Suivant
               </button>
@@ -278,7 +280,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { personsService, type Person, type PersonStats } from '../../services/persons'
 import { 
   ArrowPathIcon, 
@@ -296,22 +298,49 @@ const status = ref('')
 const type = ref('')
 const page = ref(1)
 const limit = ref(10)
+const totalCount = ref(0)
+const totalPages = ref(0)
+
+const rangeFrom = computed(() => {
+  if (totalCount.value === 0) return 0
+  return (page.value - 1) * limit.value + 1
+})
+
+const rangeTo = computed(() => {
+  if (totalCount.value === 0) return 0
+  return Math.min(page.value * limit.value, totalCount.value)
+})
 
 async function load() {
-  const response = await personsService.getPersons({ 
-    page: page.value, 
-    limit: limit.value, 
-    type: 'supplier', 
-    search: search.value || undefined, 
-    status: (status.value as any) || undefined 
+  const typeClientParam =
+    type.value === 'Entreprise'
+      ? 'company'
+      : type.value === 'Particulier'
+        ? 'individual'
+        : undefined
+  const response = await personsService.getPersons({
+    page: page.value,
+    limit: limit.value,
+    personType: 'supplier',
+    typeClient: typeClientParam,
+    search: search.value || undefined,
+    status: status.value || undefined,
   })
-  console.log('list', response)
-  suppliers.value = response?.data || []
-  const s = await personsService.getPersonStats().catch(() => ({ total: 0, active: 0, companies: 0 }))
+  suppliers.value = response?.items ?? []
+  totalCount.value = Number(response?.total ?? 0)
+  totalPages.value = Number(response?.totalPages ?? 0)
+  const s = await personsService
+    .getPersonStats({ personType: 'supplier' })
+    .catch(() => ({ total: 0, active: 0, companies: 0 }))
   stats.value = s
 }
 
-function next() { page.value += 1; load() }
+function next() {
+  if (page.value < totalPages.value) {
+    page.value += 1
+    load()
+  }
+}
 function prev() { if (page.value > 1) { page.value -= 1; load() } }
 
 async function remove(id: string) {

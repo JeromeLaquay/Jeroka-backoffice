@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="create-client-page">
     <div class="sm:flex sm:items-center sm:justify-between">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Nouveau client</h1>
@@ -43,6 +43,7 @@
               class="form-input"
               required
               placeholder="Prénom"
+              data-cy="client-firstname-input"
             />
           </div>
 
@@ -54,6 +55,7 @@
               class="form-input"
               required
               placeholder="Nom de famille"
+              data-cy="client-lastname-input"
             />
           </div>
           
@@ -65,6 +67,7 @@
               class="form-input"
               required
               placeholder="email@exemple.fr"
+              data-cy="client-email-input"
             />
           </div>
           
@@ -212,6 +215,7 @@
           type="submit"
           :disabled="loading"
           class="btn-primary"
+          data-cy="submit-create-client"
         >
           {{ loading ? 'Création...' : 'Créer le client' }}
         </button>

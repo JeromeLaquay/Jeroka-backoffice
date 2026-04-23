@@ -20,6 +20,8 @@ export interface Person {
 }
 
 export interface CreatePersonRequest {
+  /** CRM : client (défaut) ou supplier */
+  type?: 'client' | 'supplier'
   typeClient?: 'individual' | 'company'
   firstName: string
   lastName: string
@@ -47,7 +49,10 @@ export interface PersonsListParams {
   limit?: number
   search?: string
   status?: string
+  /** @deprecated Préférer personType (client|supplier) et typeClient (individual|company). */
   type?: string
+  personType?: 'client' | 'supplier'
+  typeClient?: 'individual' | 'company'
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
 }
@@ -56,6 +61,12 @@ export interface PersonStats {
   total: number
   active: number
   companies: number
+  inactive?: number
+  prospect?: number
+}
+
+export interface PersonStatsParams {
+  personType?: 'client' | 'supplier'
 }
 
 class PersonsService {
@@ -103,10 +114,10 @@ class PersonsService {
   }
 
   /**
-   * Récupérer les statistiques des Persons
+   * Récupérer les statistiques des Persons (optionnellement filtrées par rôle CRM).
    */
-  async getPersonStats() {
-    const response = await apiService.axiosInstance.get('/persons/stats')
+  async getPersonStats(params: PersonStatsParams = {}) {
+    const response = await apiService.axiosInstance.get('/persons/stats', { params })
     return response.data
   }
 

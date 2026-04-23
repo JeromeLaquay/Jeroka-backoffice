@@ -41,25 +41,25 @@
               <label class="form-label">Type</label>
               <div class="mt-1">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      :class="supplier.type_label === 'Entreprise' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'">
-                  {{ supplier.type_label }}
+                      :class="supplier.typeClient === 'company' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'">
+                  {{ supplier.typeClient === 'company' ? 'Entreprise' : 'Particulier' }}
                 </span>
               </div>
             </div>
 
-            <div v-if="supplier.company_name">
+            <div v-if="supplier.companyName">
               <label class="form-label">Nom de l'entreprise</label>
-              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.company_name }}</div>
+              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.companyName }}</div>
             </div>
             
             <div>
               <label class="form-label">Prénom</label>
-              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.first_name }}</div>
+              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.firstName }}</div>
             </div>
 
             <div>
               <label class="form-label">Nom</label>
-              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.last_name }}</div>
+              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.lastName }}</div>
             </div>
             
             <div>
@@ -90,25 +90,15 @@
         </div>
 
         <!-- Adresse -->
-        <div v-if="supplier.address_line1 || supplier.city" class="card">
+        <div v-if="supplier.city || supplier.postalCode || supplier.country" class="card">
           <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">
             Adresse
           </h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div v-if="supplier.address_line1" class="md:col-span-2">
-              <label class="form-label">Adresse</label>
-              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.address_line1 }}</div>
-            </div>
-
-            <div v-if="supplier.address_line2" class="md:col-span-2">
-              <label class="form-label">Adresse ligne 2</label>
-              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.address_line2 }}</div>
-            </div>
-            
-            <div v-if="supplier.postal_code">
+            <div v-if="supplier.postalCode">
               <label class="form-label">Code postal</label>
-              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.postal_code }}</div>
+              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.postalCode }}</div>
             </div>
             
             <div v-if="supplier.city">
@@ -124,31 +114,6 @@
         </div>
 
         <!-- Informations entreprise -->
-        <div v-if="supplier.type_label === 'Entreprise' && (supplier.siret || supplier.vat_number)" class="card">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">
-            Informations entreprise
-          </h3>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div v-if="supplier.siret">
-              <label class="form-label">SIRET</label>
-              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.siret }}</div>
-            </div>
-            
-            <div v-if="supplier.vat_number">
-              <label class="form-label">TVA Intracommunautaire</label>
-              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.vat_number }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Notes -->
-        <div v-if="supplier.notes" class="card">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">
-            Notes
-          </h3>
-          <div class="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">{{ supplier.notes }}</div>
-        </div>
       </div>
 
       <!-- Sidebar -->
@@ -173,19 +138,14 @@
           </h3>
           
           <div class="space-y-4">
-            <div v-if="supplier.source">
-              <label class="form-label">Source</label>
-              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ supplier.source }}</div>
-            </div>
-
             <div>
               <label class="form-label">Créé le</label>
-              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ formatDate(supplier.created_at) }}</div>
+              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ formatDate(supplier.createdAt) }}</div>
             </div>
 
             <div>
               <label class="form-label">Modifié le</label>
-              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ formatDate(supplier.updated_at) }}</div>
+              <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ formatDate(supplier.updatedAt) }}</div>
             </div>
           </div>
         </div>
@@ -205,8 +165,8 @@ const id = String(route.params.id)
 const supplier = ref<Person | null>(null)
 
 async function load() {
-  const response = await personsService.getPerson(id)
-  supplier.value = response?.data || response
+  const data = await personsService.getPerson(id)
+  supplier.value = data && typeof data === 'object' && 'id' in data ? (data as Person) : null
 }
 
 function getStatusClass(status: string) {

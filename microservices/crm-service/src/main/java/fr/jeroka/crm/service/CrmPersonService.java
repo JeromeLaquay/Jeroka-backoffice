@@ -5,11 +5,14 @@ import fr.jeroka.crm.exception.CrmApiException;
 import fr.jeroka.crm.repository.CrmPersonRepository;
 import fr.jeroka.crm.web.dto.CreatePersonRequestDto;
 import fr.jeroka.crm.web.dto.PageDto;
+import fr.jeroka.crm.web.dto.PersonListQuery;
 import fr.jeroka.crm.web.dto.PersonResponseDto;
 import fr.jeroka.crm.web.dto.PersonStatsResponseDto;
 import fr.jeroka.crm.web.dto.UpdatePersonRequestDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,23 +32,51 @@ public class CrmPersonService {
     }
 
     @Transactional(readOnly = true)
-    public PageDto<PersonResponseDto> list(UUID companyId, int page, int limit) {
-        Pageable p = PageRequest.of(Math.max(0, page - 1), Math.min(100, Math.max(1, limit)));
-        var result = persons.findByCompanyId(companyId, p);
+    public PageDto<PersonResponseDto> list(PersonListQuery query) {
+        Pageable pageable =
+                PageRequest.of(
+                        Math.max(0, query.page() - 1),
+                        Math.min(100, Math.max(1, query.limit())),
+                        Sort.by(Sort.Direction.DESC, "createdAt"));
+        String search = normalizeSearch(query.search());
+        Page<CrmPersonEntity> result =
+                persons.searchFiltered(
+                        query.companyId(),
+                        query.personType(),
+                        query.typeClient(),
+                        query.status(),
+                        search,
+                        pageable);
         var items = result.getContent().stream().map(CrmPersonMapper::toResponse).toList();
-        return PageDto.of(items, page, limit, result.getTotalElements());
+        return PageDto.of(items, query.page(), query.limit(), result.getTotalElements());
     }
 
     @Transactional(readOnly = true)
-    public PersonStatsResponseDto stats(UUID companyId) {
-        long total = persons.countByCompanyId(companyId);
-        long active = persons.countByCompanyIdAndStatus(companyId, "active");
-        long inactive = persons.countByCompanyIdAndStatus(companyId, "inactive");
-        long prospect = persons.countByCompanyIdAndStatus(companyId, "prospect");
+    public PersonStatsResponseDto stats(UUID companyId, String personType) {
+        String pt = normalizePersonType(personType);
+        long total = persons.countFilteredTotal(companyId, pt);
+        long active = persons.countFilteredStatus(companyId, pt, "active");
+        long inactive = persons.countFilteredStatus(companyId, pt, "inactive");
+        long prospect = persons.countFilteredStatus(companyId, pt, "prospect");
         Instant startOfMonth =
                 YearMonth.now(ZoneOffset.UTC).atDay(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-        long createdThisMonth = persons.countByCompanyIdAndCreatedAtAfter(companyId, startOfMonth);
-        return new PersonStatsResponseDto(total, active, inactive, prospect, createdThisMonth);
+        long createdThisMonth = persons.countFilteredCreatedAfter(companyId, pt, startOfMonth);
+        long companies = persons.countFilteredCompanies(companyId, pt);
+        return new PersonStatsResponseDto(total, active, inactive, prospect, createdThisMonth, companies);
+    }
+
+    private static String normalizeSearch(String s) {
+        if (s == null || s.isBlank()) {
+            return null;
+        }
+        return s.trim();
+    }
+
+    private static String normalizePersonType(String personType) {
+        if (personType == null || personType.isBlank()) {
+            return null;
+        }
+        return personType.trim().toLowerCase();
     }
 
     @Transactional(readOnly = true)

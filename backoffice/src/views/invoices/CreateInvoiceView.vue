@@ -30,6 +30,7 @@
         <button
           type="submit"
           form="invoice-form"
+          data-cy="submit-create-invoice"
           :disabled="loading || !isFormValid"
           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -41,7 +42,7 @@
       </div>
     </div>
 
-    <form id="invoice-form" @submit.prevent="handleSubmit" class="space-y-6">
+    <form id="invoice-form" data-cy="invoice-form" @submit.prevent="handleSubmit" class="space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Colonne principale -->
         <div class="lg:col-span-2 space-y-6">
@@ -148,6 +149,7 @@
               </h3>
               <button
                 type="button"
+                data-cy="invoice-add-line-button"
                 @click="addInvoiceItem"
                 class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 dark:bg-primary-900 dark:text-primary-200 dark:hover:bg-primary-800"
               >
@@ -309,12 +311,11 @@ const isFormValid = computed(() => {
 // Méthodes
 const loadClients = async () => {
   try {
-    const response = await personsService.getPersons({ page: 1, limit: 200 })
+    const response = await personsService.getPersons({ page: 1, limit: 200, personType: 'client' })
     // API Java retourne PageDto avec items, pas { success, data }
     const list = response.items ?? []
-    const onlyClients = list.filter((p: any) => p.type === 'client')
     const name = (c: any) => [c.firstName, c.lastName].filter(Boolean).join(' ').trim() || c.email
-    clients.value = onlyClients.map((client: any) => ({
+    clients.value = list.map((client: any) => ({
       id: client.id,
       name: name(client),
       email: client.email ?? '',

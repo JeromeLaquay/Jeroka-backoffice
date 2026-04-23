@@ -413,17 +413,14 @@ const visiblePages = computed(() => {
 // Méthodes
 const loadClients = async () => {
   try {
-    const cleanFilters = Object.fromEntries(
-      Object.entries(filters.value).filter(([_, value]) => 
-        value !== '' && value !== null && value !== undefined && 
-        (Array.isArray(value) ? value.length > 0 : true)
-      )
-    )
-    
+    const f = filters.value
     const response = await personsService.getPersons({
       page: pagination.value.page,
       limit: pagination.value.limit,
-      ...cleanFilters
+      personType: 'client',
+      search: f.search || undefined,
+      status: f.status || undefined,
+      typeClient: f.type || undefined,
     })
 
     clients.value = response.items ?? []
@@ -440,14 +437,16 @@ const loadClients = async () => {
 
 const loadStats = async () => {
   try {
-    const response = await personsService.getPersonStats()
+    const response = await personsService.getPersonStats({ personType: 'client' })
+    const total = response.total ?? 0
+    const companies = response.companies ?? 0
     stats.value = {
-      total: response.total ?? 0,
+      total,
       active: response.active ?? 0,
       prospects: response.prospect ?? 0,
       inactive: response.inactive ?? 0,
-      companies: 0,
-      individuals: 0
+      companies,
+      individuals: Math.max(0, total - companies),
     }
   } catch (error) {
     console.error('Erreur lors du chargement des statistiques:', error)

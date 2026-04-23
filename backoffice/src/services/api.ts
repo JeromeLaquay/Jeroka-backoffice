@@ -617,10 +617,18 @@ class ApiService {
   // ===== HEALTH CHECK =====
 
   async healthCheck(): Promise<any> {
-    const response = await axios.get(
-      `${API_BASE_URL.replace("/api/v1", "")}/health`,
-    );
-    return response.data;
+    const base = API_BASE_URL.replace(/\/api\/v1\/?$/, "");
+    const paths = ["/actuator/health", "/health"];
+    let lastErr: unknown;
+    for (const p of paths) {
+      try {
+        const response = await axios.get(`${base}${p}`, { timeout: 5000 });
+        return response.data;
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    throw lastErr instanceof Error ? lastErr : new Error("Health check indisponible");
   }
 
   // ===== CONFIGURATION =====

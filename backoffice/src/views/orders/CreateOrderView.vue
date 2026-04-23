@@ -320,7 +320,7 @@ watch(() => form.shippingAddress, (value) => {
 // Méthodes
 const loadClients = async () => {
   try {
-    const response = await personsService.getPersons({ page: 1, limit: 200 })
+    const response = await personsService.getPersons({ page: 1, limit: 200, personType: 'client' })
     const list = response?.items ?? response?.data ?? []
     const name = (c: any) => [c.firstName, c.lastName].filter(Boolean).join(' ').trim() || c.email || ''
     clients.value = list.map((client: any) => ({

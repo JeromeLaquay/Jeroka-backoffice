@@ -440,7 +440,7 @@ const toClientOption = (client: any) => {
 
 const loadClients = async () => {
   try {
-    const response = await personsService.getPersons({ type: 'client', page: 1, limit: 100 })
+    const response = await personsService.getPersons({ personType: 'client', page: 1, limit: 100 })
     clients.value = extractPersons(response).map(toClientOption)
   } catch (error) {
     console.error('Erreur lors du chargement des clients:', error)

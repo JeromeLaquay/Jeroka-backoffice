@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" data-cy="create-supplier-page">
     <div class="sm:flex sm:items-center sm:justify-between">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Nouveau fournisseur</h1>
@@ -30,6 +30,7 @@
               v-model="form.company_name"
               type="text"
               class="form-input"
+              data-cy="supplier-company-name-input"
               :required="form.type_label === 'Entreprise'"
               placeholder="Nom de l'entreprise"
             />
@@ -43,6 +44,7 @@
               class="form-input"
               required
               placeholder="Prénom"
+              data-cy="supplier-firstname-input"
             />
           </div>
 
@@ -54,6 +56,7 @@
               class="form-input"
               required
               placeholder="Nom de famille"
+              data-cy="supplier-lastname-input"
             />
           </div>
           
@@ -65,6 +68,7 @@
               class="form-input"
               required
               placeholder="email@exemple.fr"
+              data-cy="supplier-email-input"
             />
           </div>
           
@@ -230,6 +234,7 @@
         </router-link>
         <button
           type="submit"
+          data-cy="submit-create-supplier"
           :disabled="loading"
           class="btn-primary"
         >
@@ -245,11 +250,31 @@ import { reactive, ref } from 'vue'
 import { personsService, type CreatePersonRequest } from '../../services/persons'
 import { useRouter } from 'vue-router'
 
+interface SupplierFormState {
+  type_label: 'Particulier' | 'Entreprise'
+  first_name: string
+  last_name: string
+  company_name: string
+  email: string
+  phone: string
+  mobile: string
+  website: string
+  address_line1: string
+  address_line2: string
+  city: string
+  postal_code: string
+  country: string
+  siret: string
+  vat_number: string
+  status: 'active' | 'inactive' | 'prospect'
+  source: string
+  notes: string
+}
+
 const router = useRouter()
 const loading = ref(false)
 
-const form = reactive<CreatePersonRequest>({
-  type: 'supplier',
+const form = reactive<SupplierFormState>({
   type_label: 'Entreprise',
   first_name: '',
   last_name: '',
@@ -267,21 +292,58 @@ const form = reactive<CreatePersonRequest>({
   vat_number: '',
   status: 'active',
   source: '',
-  notes: ''
+  notes: '',
 })
+
+function buildCreatePayload(): CreatePersonRequest {
+  const typeClient = form.type_label === 'Entreprise' ? 'company' : 'individual'
+  return {
+    type: 'supplier',
+    typeClient,
+    firstName: form.first_name.trim(),
+    lastName: form.last_name.trim(),
+    companyName: typeClient === 'company' ? form.company_name.trim() || undefined : undefined,
+    email: form.email.trim(),
+    phone: form.phone.trim() || undefined,
+    mobile: form.mobile.trim() || undefined,
+    website: form.website.trim() || undefined,
+    addressLine1: form.address_line1.trim() || undefined,
+    addressLine2: form.address_line2.trim() || undefined,
+    city: form.city.trim() || undefined,
+    postalCode: form.postal_code.trim() || undefined,
+    country: form.country || 'France',
+    siret: form.siret.trim() || undefined,
+    vatNumber: form.vat_number.trim() || undefined,
+    status: form.status,
+    source: form.source.trim() || undefined,
+    notes: form.notes.trim() || undefined,
+  }
+}
+
+function extractCreatedPersonId(body: unknown): string | undefined {
+  if (!body || typeof body !== 'object') return undefined
+  const o = body as Record<string, unknown>
+  if (typeof o.id === 'string' && o.id.length > 0) return o.id
+  const data = o.data
+  if (data && typeof data === 'object') {
+    const inner = (data as Record<string, unknown>).id
+    if (typeof inner === 'string' && inner.length > 0) return inner
+  }
+  return undefined
+}
 
 const handleSubmit = async () => {
   if (loading.value) return
-  
+
   loading.value = true
-  
+
   try {
-    const response = await personsService.createPerson(form)
-    
-    if (response.success) {
-      router.push('/fournisseurs')
+    const response = await personsService.createPerson(buildCreatePayload())
+    const id = extractCreatedPersonId(response)
+    if (id) {
+      await router.push('/fournisseurs')
     } else {
-      console.error('Erreur lors de la création:', response.error)
+      console.error('Erreur lors de la création: réponse invalide', response)
     }
   } catch (error) {
     console.error('Erreur lors de la création:', error)

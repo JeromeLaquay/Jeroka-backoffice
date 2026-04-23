@@ -235,30 +235,20 @@ export const useAuthStore = defineStore('auth', () => {
 
   const initializeAuth = async () => {
     loading.value = true
-    
+
     try {
       const storedToken = localStorage.getItem('auth_token')
       const storedUser = localStorage.getItem('user')
-      
+
       if (storedToken && storedUser) {
         token.value = storedToken
         user.value = JSON.parse(storedUser)
-        
-        // Vérifier que l'API est accessible avec un timeout
-        const isApiAvailable = await Promise.race([
-          checkApiConnection(),
-          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 3000))
-        ])
-        
-        if (isApiAvailable) {
-          await refreshUserProfile()
-        } else {
-          console.warn('API non accessible, utilisation du token stocké localement')
-        }
+        // Toujours valider le JWT via l’API (évite session affichée « connectée » avec token expiré).
+        // Le ping « health » seul est trompeur : le gateway Spring expose /actuator/health, pas /health.
+        await refreshUserProfile()
       }
     } catch (err) {
       console.error('Erreur lors de l\'initialisation:', err)
-      // En cas d'erreur, nettoyer et continuer sans bloquer l'app
       await logout()
     } finally {
       loading.value = false

@@ -4,6 +4,7 @@ import fr.jeroka.crm.security.CrmJwtCompanyId;
 import fr.jeroka.crm.service.CrmPersonService;
 import fr.jeroka.crm.web.dto.CreatePersonRequestDto;
 import fr.jeroka.crm.web.dto.PageDto;
+import fr.jeroka.crm.web.dto.PersonListQuery;
 import fr.jeroka.crm.web.dto.PersonResponseDto;
 import fr.jeroka.crm.web.dto.PersonStatsResponseDto;
 import fr.jeroka.crm.web.dto.UpdatePersonRequestDto;
@@ -38,13 +39,29 @@ public class PersonsApiController {
     public PageDto<PersonResponseDto> list(
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int limit) {
-        return crmPersonService.list(CrmJwtCompanyId.require(jwt), page, limit);
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String personType,
+            @RequestParam(required = false) String typeClient,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String search) {
+        PersonListQuery query =
+                PersonListQuery.from(
+                        CrmJwtCompanyId.require(jwt),
+                        page,
+                        limit,
+                        type,
+                        personType,
+                        typeClient,
+                        status,
+                        search);
+        return crmPersonService.list(query);
     }
 
     @GetMapping("/stats")
-    public PersonStatsResponseDto stats(@AuthenticationPrincipal Jwt jwt) {
-        return crmPersonService.stats(CrmJwtCompanyId.require(jwt));
+    public PersonStatsResponseDto stats(
+            @AuthenticationPrincipal Jwt jwt, @RequestParam(required = false) String personType) {
+        return crmPersonService.stats(CrmJwtCompanyId.require(jwt), personType);
     }
 
     @GetMapping("/{id}")

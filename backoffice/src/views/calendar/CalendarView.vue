@@ -26,6 +26,8 @@
               Générer avec IA
             </button>
             <button
+              type="button"
+              data-cy="calendar-open-slots-modal"
               @click="showGenerateModal = true"
               class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
             >
@@ -363,7 +365,7 @@
 
     <!-- Modal de génération de créneaux -->
     <div v-if="showGenerateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4" data-cy="calendar-slots-modal">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Générer des créneaux</h3>
           <button @click="closeGenerateModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -374,6 +376,9 @@
         </div>
 
         <form @submit.prevent="submitGenerateSlots" class="space-y-4">
+          <p v-if="generateSlotsError" data-cy="calendar-slots-error" class="text-sm text-red-600 dark:text-red-400">
+            {{ generateSlotsError }}
+          </p>
           <!-- Date -->
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date</label>
@@ -381,6 +386,7 @@
               v-model="form.date"
               type="date"
               required
+              data-cy="calendar-slot-date"
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
@@ -392,6 +398,7 @@
               v-model="form.startTime"
               type="time"
               required
+              data-cy="calendar-slot-start"
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
@@ -403,6 +410,7 @@
               v-model="form.endTime"
               type="time"
               required
+              data-cy="calendar-slot-end"
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
@@ -413,6 +421,7 @@
             <select
               v-model="form.slotDurationMinutes"
               required
+              data-cy="calendar-slot-duration"
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
               <option value="15">15 minutes</option>
@@ -433,6 +442,7 @@
             </button>
             <button
               type="submit"
+              data-cy="calendar-slots-submit"
               :disabled="submitting"
               class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
@@ -464,11 +474,12 @@ const periodFilter = ref('')
 // Modal état
 const showGenerateModal = ref(false)
 const submitting = ref(false)
+const generateSlotsError = ref('')
 const form = ref({
   date: '',
   startTime: '09:00',
   endTime: '18:00',
-  slotDurationMinutes: 30
+  slotDurationMinutes: 30 as number | string,
 })
 
 const iframe = ref<HTMLIFrameElement | null>(null)
@@ -487,25 +498,46 @@ const reloadCalendarIframe = () => {
 // Fonctions pour le modal de génération de créneaux
 const closeGenerateModal = () => {
   showGenerateModal.value = false
+  generateSlotsError.value = ''
 }
 
 const submitGenerateSlots = async () => {
+  generateSlotsError.value = ''
   try {
     submitting.value = true
-    // Appel backend
-    await calendarApi.availability.create({
+    const nbCreees = await calendarApi.availability.create({
       day: form.value.date,
       startTime: form.value.startTime,
       endTime: form.value.endTime,
-      appointmentTime: form.value.slotDurationMinutes
+      appointmentTime: Number(form.value.slotDurationMinutes) || 30,
     })
-    // Mettre à jour l'iframe Google Calendar
+    if (nbCreees === 0) {
+      generateSlotsError.value =
+        'Aucun créneau créé : vérifiez la date et que l’heure de fin est après l’heure de début.'
+      return
+    }
     reloadCalendarIframe()
-    // Rafraîchir les rendez-vous
     await refreshAppointments()
     showGenerateModal.value = false
-  } catch (e) {
+  } catch (e: unknown) {
     console.error('Erreur génération créneaux', e)
+    const status =
+      typeof e === 'object' &&
+      e !== null &&
+      'response' in e &&
+      typeof (e as { response?: { status?: number } }).response === 'object'
+        ? (e as { response?: { status?: number } }).response?.status
+        : undefined
+    if (status === 401) {
+      generateSlotsError.value =
+        'Session expirée ou accès refusé. Déconnectez-vous puis reconnectez-vous, puis réessayez.'
+    } else {
+      const msg =
+        typeof e === 'object' && e !== null && 'message' in e
+          ? String((e as { message: string }).message)
+          : 'Erreur lors de la génération des créneaux.'
+      generateSlotsError.value = msg
+    }
   } finally {
     submitting.value = false
   }

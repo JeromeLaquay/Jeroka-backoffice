@@ -37,7 +37,7 @@ final class CrmPersonMapper {
         var p = new CrmPersonEntity();
         p.setId(UUID.randomUUID());
         p.setCompanyId(companyId);
-        p.setType("client");
+        p.setType(resolvePersonType(req.type()));
         p.setTypeClient(req.typeClient() != null ? req.typeClient() : "individual");
         p.setFirstName(trim(req.firstName()));
         p.setLastName(trim(req.lastName()));
@@ -118,5 +118,12 @@ final class CrmPersonMapper {
 
     private static String trim(String s) {
         return s != null ? s.trim() : null;
+    }
+
+    private static String resolvePersonType(String type) {
+        if (type == null || type.isBlank()) {
+            return "client";
+        }
+        return "supplier".equalsIgnoreCase(type.trim()) ? "supplier" : "client";
     }
 }
