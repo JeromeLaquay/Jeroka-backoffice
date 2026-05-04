@@ -37,7 +37,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/health").permitAll()
+                        .requestMatchers("/health", "/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/emails/sync/*/run").permitAll()
                         .requestMatchers("/api/v1/emails/**").authenticated()
                         .anyRequest().authenticated())

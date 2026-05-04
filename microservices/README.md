@@ -48,4 +48,6 @@ Voir **`GOVERNANCE.md`** (conventions, CI, ports, Kafka).
   - un seed de démo.
 - Voir `microservices/sql/README.md`.
 
-**Ports** : gateway **3000**, email **3003**, auth **3004**, organization **3005**, crm **3006**, catalog **3007**, billing **3008**, scheduling **3009**, content **3010**, docs **3011**, audit **3012**, dashboard-bff **3013**, worker IA/docs **3016**, Adminer **8080**.
+**Ports** : gateway **3000**, email **3003**, auth **3004**, organization **3005**, crm **3006**, catalog **3007**, billing **3008**, scheduling **3009**, content **3010**, docs **3011**, audit **3012**, dashboard-bff **3013**, worker IA/docs **3016**, Adminer **8080**. Observabilité : **Prometheus** `9090`, **Grafana** `3030` (admin / admin en dev), **kafka-exporter** `9308`.
+
+Voir `observability/prometheus.yml` et `observability/grafana/` (datasource + dashboard « Jeroka — Overview » provisionnés au démarrage).

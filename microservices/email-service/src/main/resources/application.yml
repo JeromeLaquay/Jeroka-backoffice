@@ -52,6 +52,12 @@ app:
     mail:
       stub: ${APP_GOOGLE_MAIL_STUB:false}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
 logging:
   level:
     root: INFO

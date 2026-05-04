@@ -406,6 +406,56 @@ services:
       kafka:
         condition: service_started
 
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: jeroka-prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - jeroka-dev-network
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:v1.8.0
+    container_name: jeroka-kafka-exporter
+    restart: unless-stopped
+    command:
+      - --kafka.server=kafka:9092
+    ports:
+      - "9308:9308"
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      kafka:
+        condition: service_started
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: jeroka-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: http://localhost:3030
+    volumes:
+      - jeroka-grafana-data:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/etc/grafana/dashboards:ro
+    ports:
+      - "3030:3000"
+    networks:
+      - jeroka-dev-network
+    depends_on:
+      prometheus:
+        condition: service_started
+
   adminer-dev:
     image: adminer:4.8.1
     container_name: jeroka-adminer-dev
@@ -442,3 +492,5 @@ networks:
 volumes:
   postgres_data:
     name: jeroka-postgres-data
+  jeroka-grafana-data:
+    name: jeroka-grafana-data

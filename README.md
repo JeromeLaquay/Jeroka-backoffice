@@ -106,6 +106,8 @@ npm run dev
 - Front : `http://localhost:3001`
 - API gateway : `http://localhost:3000/api/v1`
 - Health gateway : `http://localhost:3000/actuator/health`
+- Prometheus : `http://localhost:9090` (scrape des `/actuator/prometheus` des services + kafka-exporter)
+- Grafana : `http://localhost:3030` (compte dev `admin` / `admin`, datasource Prometheus provisionné)
 
 ## Authentification de dev
 
